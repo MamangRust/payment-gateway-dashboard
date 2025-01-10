@@ -1,4 +1,12 @@
-import { CreateMerchant, UpdateMerchant } from "../../domain/request";
+import {
+  CreateMerchant,
+  FindAllMerchant,
+  findByApiKeyMerchant,
+  FindByIdMerchant,
+  FindMerchantUser,
+  FindTrashedMerchant,
+  UpdateMerchant,
+} from "../../domain/request";
 import { Merchant } from "../../model/merchant";
 
 export interface MerchantStore {
@@ -35,8 +43,6 @@ export interface MerchantStore {
   errorCreateMerchant: string | null;
   errorUpdateMerchant: string | null;
   errorTrashedMerchant: string | null;
-  errorRestoreMerchant: string | null;
-  errorDeletePermanentMerchant: string | null;
 
   setLoadingGetMerchants: (value: boolean) => void;
   setLoadingGetMerchant: (value: boolean) => void;
@@ -47,8 +53,6 @@ export interface MerchantStore {
   setLoadingCreateMerchant: (value: boolean) => void;
   setLoadingUpdateMerchant: (value: boolean) => void;
   setLoadingTrashedMerchant: (value: boolean) => void;
-  setLoadingRestoreMerchant: (value: boolean) => void;
-  setLoadingDeletePermanentMerchant: (value: boolean) => void;
 
   setErrorGetMerchants: (value: string | null) => void;
   setErrorGetMerchant: (value: string | null) => void;
@@ -59,31 +63,13 @@ export interface MerchantStore {
   setErrorCreateMerchant: (value: string | null) => void;
   setErrorUpdateMerchant: (value: string | null) => void;
   setErrorTrashedMerchant: (value: string | null) => void;
-  setErrorRestoreMerchant: (value: string | null) => void;
-  setErrorDeletePermanentMerchant: (value: string | null) => void;
 
-  findAllMerchants: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findById: (id: number) => Promise<void>;
-  findByApiKey: (api_key: string) => Promise<void>;
-  findByMerchantUser: (user_id: number) => Promise<void>;
-  findByActive: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByTrashed: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findAllMerchants: (req: FindAllMerchant) => Promise<void>;
+  findById: (req: FindByIdMerchant) => Promise<void>;
+  findByApiKey: (req: findByApiKeyMerchant) => Promise<void>;
+  findByMerchantUser: (req: FindMerchantUser) => Promise<void>;
 
   createMerchant: (req: CreateMerchant) => Promise<boolean>;
-  updateMerchant: (id: number, req: UpdateMerchant) => Promise<boolean>;
-  restoreMerchant: (id: number) => Promise<boolean>;
-  trashedMerchant: (id: number) => Promise<boolean>;
-  deleteMerchantPermanent: (id: number) => Promise<boolean>;
+  updateMerchant: (req: UpdateMerchant) => Promise<boolean>;
+  trashedMerchant: (req: FindTrashedMerchant) => Promise<boolean>;
 }

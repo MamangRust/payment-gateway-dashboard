@@ -21,7 +21,7 @@ export default function useRegister() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const response = await register(validatedValues);
+      const response = await register(validatedValues, toast);
 
       if (response) {
         toast({

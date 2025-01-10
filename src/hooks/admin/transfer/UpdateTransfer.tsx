@@ -1,38 +1,50 @@
-import useUserStore from "@/store/user/user";
+import useTransferStore from "@/store/transfer/transfer";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateUserFormValues, updateUserSchema } from "@/schemas";
+import {
+  UpdateTransferFormValues,
+  updateTransferRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransfer from "@/store/transfer/modal";
+import { UpdateTransfer } from "@/types/domain/request";
 
-export default function useUpdateUser() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
-    useModalUser();
+export default function useUpdateTransfer() {
+  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editTransferId } =
+    useModalTransfer();
 
   const {
-    updateUser,
-    setLoadingUpdateUser,
-    loadingUpdateUser,
-    setErrorUpdateUser,
-  } = useUserStore();
+    updateTransfer,
+    setLoadingUpdateTransfer,
+    loadingUpdateTransfer,
+    setErrorUpdateTransfer,
+  } = useTransferStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: UpdateUserFormValues) => {
-    setLoadingUpdateUser(true);
+  const handleSubmit = async (data: UpdateTransferFormValues) => {
+    setLoadingUpdateTransfer(true);
 
     try {
-      const validatedValues = updateUserSchema.parse(data);
+      const validatedValues = updateTransferRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const req: UpdateTransfer = {
+        id: editTransferId as number,
+        transfer_from: validatedValues.transfer_from,
+        transfer_to: validatedValues.transfer_to,
+        transfer_amount: validatedValues.transfer_amount,
+        toast: toast,
+      };
+
+      const result = await updateTransfer(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "Transfer berhasil diupdate",
           variant: "default",
         });
 
@@ -40,38 +52,39 @@ export default function useUpdateUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal mengedit Transfer. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorUpdateUser(errorMessage);
+        setErrorUpdateTransfer(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorUpdateUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorUpdateTransfer(
+          error?.message || "Terjadi kesalahan saat mengedit Transfer",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat mengedit Transfer",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingUpdateUser(false);
+      setLoadingUpdateTransfer(false);
       hideModalEdit();
     }
   };
 
   return {
     handleSubmit,
-    loadingUpdateUser,
+    loadingUpdateTransfer,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,

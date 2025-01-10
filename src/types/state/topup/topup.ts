@@ -1,4 +1,12 @@
+import {
+  CreateTopup,
+  FindAllTopup,
+  FindByIdTopup,
+  UpdateTopup,
+} from "@/types/domain/request/topup";
 import { Topup } from "../../model/topup";
+import { FindByCardNumberTopup } from "@/types/domain/request/topup/findByCardNumber";
+import { TrashedTopup } from "@/types/domain/request/topup/trashed";
 
 export interface TopupStore {
   topups: Topup[] | null;
@@ -20,8 +28,6 @@ export interface TopupStore {
   loadingCreateTopup: boolean;
   loadingUpdateTopup: boolean;
   loadingTrashedTopup: boolean;
-  loadingRestoreTopup: boolean;
-  loadingPermanentTopup: boolean;
 
   errorGetTopups: string | null;
   errorGetTopup: string | null;
@@ -32,8 +38,6 @@ export interface TopupStore {
   errorCreateTopup: string | null;
   errorUpdateTopup: string | null;
   errorTrashedTopup: string | null;
-  errorRestoreTopup: string | null;
-  errorPermanentTopup: string | null;
 
   setLoadingGetTopups: (value: boolean) => void;
   setLoadingGetTopup: (value: boolean) => void;
@@ -44,8 +48,6 @@ export interface TopupStore {
   setLoadingCreateTopup: (value: boolean) => void;
   setLoadingUpdateTopup: (value: boolean) => void;
   setLoadingTrashedTopup: (value: boolean) => void;
-  setLoadingRestoreTopup: (value: boolean) => void;
-  setLoadingPermanentTopup: (value: boolean) => void;
 
   setErrorGetTopups: (value: string | null) => void;
   setErrorGetTopup: (value: string | null) => void;
@@ -56,30 +58,16 @@ export interface TopupStore {
   setErrorCreateTopup: (value: string | null) => void;
   setErrorUpdateTopup: (value: string | null) => void;
   setErrorTrashedTopup: (value: string | null) => void;
-  setErrorRestoreTopup: (value: string | null) => void;
-  setErrorPermanentTopup: (value: string | null) => void;
 
-  findAllTopups: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByIdTopup: (id: number) => Promise<void>;
+  findAllTopups: (req: FindAllTopup) => Promise<void>;
+  findByIdTopup: (req: FindByIdTopup) => Promise<void>;
   findByActiveTopup: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
-  findByTrashedTopup: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByCardNumberTopup: (cardNumber: string) => Promise<void>;
-
-  createTopup: (req: any) => Promise<boolean>;
-  updateTopup: (id: number, req: any) => Promise<boolean>;
-  restoreTopup: (id: number) => Promise<boolean>;
-  trashedTopup: (id: number) => Promise<boolean>;
-  deleteTopupPermanent: (id: number) => Promise<boolean>;
+  findByCardNumberTopup: (req: FindByCardNumberTopup) => Promise<void>;
+  createTopup: (req: CreateTopup) => Promise<boolean>;
+  updateTopup: (req: UpdateTopup) => Promise<boolean>;
+  trashedTopup: (req: TrashedTopup) => Promise<boolean>;
 }

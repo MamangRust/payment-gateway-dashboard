@@ -1,37 +1,40 @@
-import useUserStore from "@/store/user/user";
+import useTransactionStore from "@/store/transaction/transaction";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { CreateUserFormValues, createUserSchema } from "@/schemas";
+import {
+  CreateTransactionFormValues,
+  createTransactionRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransaction from "@/store/transaction/modal";
 
-export default function useCreateUser() {
-  const { isModalVisible, showModal, hideModal } = useModalUser();
+export default function useCreateTransaction() {
+  const { isModalVisible, showModal, hideModal } = useModalTransaction();
 
   const {
-    createUser,
-    setLoadingCreateUser,
-    loadingCreateUser,
-    setErrorCreateUser,
-  } = useUserStore();
+    createTransaction,
+    setLoadingCreateTransaction,
+    loadingCreateTransaction,
+    setErrorCreateTransaction,
+  } = useTransactionStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: CreateUserFormValues) => {
-    setLoadingCreateUser(true);
+  const handleSubmit = async (data: CreateTransactionFormValues) => {
+    setLoadingCreateTransaction(true);
 
     try {
-      const validatedValues = createUserSchema.parse(data);
+      const validatedValues = createTransactionRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createUser(validatedValues);
+      const result = await createTransaction(validatedValues);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil dibuat",
+          description: "Transaction berhasil dibuat",
           variant: "default",
         });
 
@@ -46,31 +49,32 @@ export default function useCreateUser() {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorCreateUser(errorMessage);
+        setErrorCreateTransaction(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorCreateUser(
-          error?.message || "Terjadi kesalahan saat membuat user",
+        setErrorCreateTransaction(
+          error?.message || "Terjadi kesalahan saat membuat transaction",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat membuat user",
+          description:
+            error?.message || "Terjadi kesalahan saat membuat transaction",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingCreateUser(false);
+      setLoadingCreateTransaction(false);
       hideModal();
     }
   };
 
   return {
     handleSubmit,
-    loadingCreateUser,
+    loadingCreateTransaction,
     isModalVisible,
     showModal,
     hideModal,

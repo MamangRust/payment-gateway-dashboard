@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UpdateSaldoFormValues, updateSaldoRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalSaldo from "@/store/saldo/modal";
+import { UpdateSaldo } from "@/types/domain/request";
 
 export default function useUpdateSaldo() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editSaldoId } =
@@ -27,7 +28,14 @@ export default function useUpdateSaldo() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateSaldo(editSaldoId as number, validatedValues);
+      const req: UpdateSaldo = {
+        id: editSaldoId as number,
+        card_number: validatedValues.card_number,
+        total_balance: validatedValues.total_balance,
+        toast: toast,
+      };
+
+      const result = await updateSaldo(req);
 
       if (result) {
         toast({

@@ -6,4 +6,5 @@ export * from "./transaction";
 export * from "./transfer";
 export * from "./withdraw";
 export * from "./auth";
+export * from "./user";
 export * from "./notification";

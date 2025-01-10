@@ -2,8 +2,15 @@ import { create } from "zustand";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { CardStore } from "@/types/state/card/card";
-import { CreateCard, UpdateCard } from "@/types/domain/request";
+import {
+  CreateCard,
+  FindAllCard,
+  FindByCardNumber,
+  FindByIdCard,
+  UpdateCard,
+} from "@/types/domain/request";
 import { getAccessToken } from "../auth";
+import { FindByUser } from "@/types/domain/request/card/user";
 
 const useCardStore = create<CardStore>((set, get) => ({
   cards: null,
@@ -25,20 +32,15 @@ const useCardStore = create<CardStore>((set, get) => ({
   loadingCreateCard: false,
   loadingUpdateCard: false,
   loadingTrashedCard: false,
-  loadingRestoreCard: false,
-  loadingDeleteCard: false,
 
   errorGetCards: null,
   errorGetCard: null,
   errorGetCardByUser: null,
   errorGetActiveCards: null,
-  errorGetTrashedCards: null,
   errorGetCardByCardNumber: null,
   errorCreateCard: null,
   errorUpdateCard: null,
   errorTrashedCard: null,
-  errorRestoreCard: null,
-  errorDeleteCard: null,
 
   setErrorGetCards: (value: string | null) => set({ errorGetCards: value }),
   setErrorGetCard: (value: string | null) => set({ errorGetCard: value }),
@@ -46,17 +48,13 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ errorGetCardByUser: value }),
   setErrorGetActiveCards: (value: string | null) =>
     set({ errorGetActiveCards: value }),
-  setErrorGetTrashedCards: (value: string | null) =>
-    set({ errorGetTrashedCards: value }),
+
   setErrorGetCardByCardNumber: (value: string | null) =>
     set({ errorGetCardByCardNumber: value }),
   setErrorCreateCard: (value: string | null) => set({ errorCreateCard: value }),
   setErrorUpdateCard: (value: string | null) => set({ errorUpdateCard: value }),
   setErrorTrashedCard: (value: string | null) =>
     set({ errorTrashedCard: value }),
-  setErrorRestoreCard: (value: string | null) =>
-    set({ errorRestoreCard: value }),
-  setErrorDeleteCard: (value: string | null) => set({ errorDeleteCard: value }),
 
   setLoadingGetCards: (value: boolean) => set({ loadingGetCards: value }),
   setLoadingGetCard: (value: boolean) => set({ loadingGetCard: value }),
@@ -64,22 +62,19 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingGetCardByUser: value }),
   setLoadingGetActiveCards: (value: boolean) =>
     set({ loadingGetActiveCards: value }),
-  setLoadingGetTrashedCards: (value: boolean) =>
-    set({ loadingGetTrashedCards: value }),
+
   setLoadingGetCardByCardNumber: (value: boolean) =>
     set({ loadingGetCardByCardNumber: value }),
   setLoadingCreateCard: (value: boolean) => set({ loadingCreateCard: value }),
   setLoadingUpdateCard: (value: boolean) => set({ loadingUpdateCard: value }),
   setLoadingTrashedCard: (value: boolean) => set({ loadingTrashedCard: value }),
-  setLoadingRestoreCard: (value: boolean) => set({ loadingRestoreCard: value }),
-  setLoadingDeleteCard: (value: boolean) => set({ loadingDeleteCard: value }),
 
-  findAllCards: async (search: string, page: number, pageSize: number) => {
+  findAllCards: async (req: FindAllCard) => {
     set({ loadingGetCards: true, errorGetCards: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/card", {
-        params: { page, pageSize, search },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -99,15 +94,16 @@ const useCardStore = create<CardStore>((set, get) => ({
         error,
         () => set({ loadingGetCards: false }),
         (message: any) => set({ errorGetCards: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdCard: async (id: number) => {
+  findByIdCard: async (req: FindByIdCard) => {
     set({ loadingGetCard: true, errorGetCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/cards/${id}`, {
+      const response = await myApi.get(`/cards/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ card: response.data, loadingGetCard: false, errorGetCard: null });
@@ -118,15 +114,16 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingGetCard: false }),
         (message: any) => set({ errorGetCard: message }),
+        req.toast,
       );
     }
   },
 
-  findByUser: async (id: number) => {
+  findByUser: async (req: FindByUser) => {
     set({ loadingGetCardByUser: true, errorGetCardByUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/cards/user/${id}`, {
+      const response = await myApi.get(`/cards/user/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -141,15 +138,16 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingGetCardByUser: false }),
         (message: any) => set({ errorGetCardByUser: message }),
+        req.toast,
       );
     }
   },
 
-  findByCardNumber: async (cardNumber: string) => {
+  findByCardNumber: async (req: FindByCardNumber) => {
     set({ loadingGetCardByCardNumber: true, errorGetCardByCardNumber: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/cards/number/${cardNumber}`, {
+      const response = await myApi.get(`/cards/number/${req.cardNumber}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -162,6 +160,7 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingGetCardByCardNumber: false }),
         (message: any) => set({ errorGetCardByCardNumber: message }),
+        req.toast,
       );
     }
   },
@@ -190,34 +189,7 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveCards: false }),
         (message: any) => set({ errorGetActiveCards: message }),
-      );
-    }
-  },
-
-  findByTrashedCard: async (search: string, page: number, pageSize: number) => {
-    set({ loadingGetTrashedCards: true, errorGetTrashedCards: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/cards/trashed", {
-        params: { page, pageSize, search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        cards: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedCards: false,
-        errorGetTrashedCards: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedCards: false }),
-        (message: any) => set({ errorGetTrashedCards: message }),
+        1,
       );
     }
   },
@@ -240,15 +212,16 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingCreateCard: false }),
         (message: any) => set({ errorCreateCard: message }),
+        req.toast,
       );
     }
   },
 
-  updateCard: async (id: number, req: UpdateCard) => {
+  updateCard: async (req: UpdateCard) => {
     set({ loadingUpdateCard: true, errorUpdateCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/cards/${id}`, req, {
+      const response = await myApi.put(`/cards/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -262,33 +235,16 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingUpdateCard: false }),
         (message: any) => set({ errorUpdateCard: message }),
+        req.toast,
       );
     }
   },
 
-  restoreCard: async (id: number) => {
-    set({ loadingRestoreCard: true, errorRestoreCard: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/cards/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreCard: false, errorRestoreCard: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreCard: false }),
-        (message: any) => set({ errorRestoreCard: message }),
-      );
-    }
-  },
-
-  trashedCard: async (id: number) => {
+  trashedCard: async (req: FindByIdCard) => {
     set({ loadingTrashedCard: true, errorTrashedCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/cards/trashed/${id}`, null, {
+      const response = await myApi.patch(`/cards/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedCard: false, errorTrashedCard: null });
@@ -298,24 +254,7 @@ const useCardStore = create<CardStore>((set, get) => ({
         err,
         () => set({ loadingTrashedCard: false }),
         (message: any) => set({ errorTrashedCard: message }),
-      );
-    }
-  },
-
-  deletePermanentCard: async (id: number) => {
-    set({ loadingDeleteCard: true, errorDeleteCard: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/cards/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingDeleteCard: false, errorDeleteCard: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingDeleteCard: false }),
-        (message: any) => set({ errorDeleteCard: message }),
+        req.toast,
       );
     }
   },

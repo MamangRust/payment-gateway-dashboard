@@ -1,33 +1,43 @@
-import useUserStore from "@/store/user/user";
+import useTransactionStore from "@/store/transaction/transaction";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateUserFormValues, updateUserSchema } from "@/schemas";
+import {
+  UpdateTransactionFormValues,
+  updateTransactionRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransaction from "@/store/transaction/modal";
 
-export default function useUpdateUser() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
-    useModalUser();
+export default function useUpdateTransaction() {
+  const {
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+    editTransactionId,
+  } = useModalTransaction();
 
   const {
-    updateUser,
-    setLoadingUpdateUser,
-    loadingUpdateUser,
-    setErrorUpdateUser,
-  } = useUserStore();
+    updateTransaction,
+    setLoadingUpdateTransaction,
+    loadingUpdateTransaction,
+    setErrorUpdateTransaction,
+  } = useTransactionStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: UpdateUserFormValues) => {
-    setLoadingUpdateUser(true);
+  const handleSubmit = async (data: UpdateTransactionFormValues) => {
+    setLoadingUpdateTransaction(true);
 
     try {
-      const validatedValues = updateUserSchema.parse(data);
+      const validatedValues = updateTransactionRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const result = await updateTransaction(
+        editTransactionId as number,
+        validatedValues,
+      );
 
       if (result) {
         toast({
@@ -47,14 +57,14 @@ export default function useUpdateUser() {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorUpdateUser(errorMessage);
+        setErrorUpdateTransaction(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorUpdateUser(
+        setErrorUpdateTransaction(
           error?.message || "Terjadi kesalahan saat mengedit user",
         );
         toast({
@@ -64,14 +74,14 @@ export default function useUpdateUser() {
         });
       }
     } finally {
-      setLoadingUpdateUser(false);
+      setLoadingUpdateTransaction(false);
       hideModalEdit();
     }
   };
 
   return {
     handleSubmit,
-    loadingUpdateUser,
+    loadingUpdateTransaction,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,

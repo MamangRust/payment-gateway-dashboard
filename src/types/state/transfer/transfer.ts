@@ -1,3 +1,12 @@
+import {
+  FindAllTransfer,
+  FindByIdTransfer,
+  TransferFrom,
+  TransferTo,
+  CreateTransfer,
+  UpdateTransfer,
+  TrashedTransfer,
+} from "@/types/domain/request";
 import { Transfer } from "../../model/transfer";
 
 export interface TransferStore {
@@ -21,8 +30,6 @@ export interface TransferStore {
   loadingCreateTransfer: boolean;
   loadingUpdateTransfer: boolean;
   loadingTrashedTransfer: boolean;
-  loadingRestoreTransfer: boolean;
-  loadingPermanentTransfer: boolean;
 
   errorGetTransfers: string | null;
   errorGetTransfer: string | null;
@@ -34,8 +41,6 @@ export interface TransferStore {
   errorCreateTransfer: string | null;
   errorUpdateTransfer: string | null;
   errorTrashedTransfer: string | null;
-  errorRestoreTransfer: string | null;
-  errorPermanentTransfer: string | null;
 
   setLoadingGetTransfers: (value: boolean) => void;
   setLoadingGetTransfer: (value: boolean) => void;
@@ -47,8 +52,6 @@ export interface TransferStore {
   setLoadingCreateTransfer: (value: boolean) => void;
   setLoadingUpdateTransfer: (value: boolean) => void;
   setLoadingTrashedTransfer: (value: boolean) => void;
-  setLoadingRestoreTransfer: (value: boolean) => void;
-  setLoadingPermanentTransfer: (value: boolean) => void;
 
   setErrorGetTransfers: (value: string | null) => void;
   setErrorGetTransfer: (value: string | null) => void;
@@ -60,31 +63,17 @@ export interface TransferStore {
   setErrorCreateTransfer: (value: string | null) => void;
   setErrorUpdateTransfer: (value: string | null) => void;
   setErrorTrashedTransfer: (value: string | null) => void;
-  setErrorRestoreTransfer: (value: string | null) => void;
-  setErrorPermanentTransfer: (value: string | null) => void;
 
-  findAllTransfers: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByIdTransfer: (id: number) => Promise<void>;
-  findByTransferFrom: (fromAccountId: number) => Promise<void>;
-  findByTransferTo: (toAccountId: number) => Promise<void>;
+  findAllTransfers: (req: FindAllTransfer) => Promise<void>;
+  findByIdTransfer: (req: FindByIdTransfer) => Promise<void>;
+  findByTransferFrom: (req: TransferFrom) => Promise<void>;
+  findByTransferTo: (req: TransferTo) => Promise<void>;
   findByActiveTransfer: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
-  findByTrashedTransfer: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-
-  createTransfer: (req: any) => Promise<boolean>;
-  updateTransfer: (id: number, req: any) => Promise<boolean>;
-  restoreTransfer: (id: number) => Promise<boolean>;
-  trashedTransfer: (id: number) => Promise<boolean>;
-  deleteTransferPermanent: (id: number) => Promise<boolean>;
+  createTransfer: (req: CreateTransfer) => Promise<boolean>;
+  updateTransfer: (req: UpdateTransfer) => Promise<boolean>;
+  trashedTransfer: (req: TrashedTransfer) => Promise<boolean>;
 }

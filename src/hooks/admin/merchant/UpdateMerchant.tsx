@@ -7,6 +7,7 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalMerchant from "@/store/merchant/modal";
+import { UpdateMerchant } from "@/types/domain/request";
 
 export default function useUpdateMerchant() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editMerchantId } =
@@ -30,10 +31,15 @@ export default function useUpdateMerchant() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateMerchant(
-        editMerchantId as number,
-        validatedValues,
-      );
+      const req: UpdateMerchant = {
+        id: editMerchantId as number,
+        user_id: validatedValues.user_id,
+        name: validatedValues.name,
+        status: validatedValues.status,
+        toast: toast,
+      };
+
+      const result = await updateMerchant(req);
 
       if (result) {
         toast({

@@ -21,7 +21,7 @@ const PaginationDropdown = ({ pagination, setPagination, table }: any) => {
               key={size}
               className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
               onClick={() => {
-                setPagination({ ...pagination, pageSize: size });
+                setPagination(size);
                 table.setPageSize(size);
               }}
             >

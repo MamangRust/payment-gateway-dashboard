@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CreateTopupFormValues, createTopupRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalTopup from "@/store/topup/modal";
+import { CreateTopup } from "@/types/domain/request/topup";
 
 export default function useCreateTopup() {
   const { isModalVisible, showModal, hideModal } = useModalTopup();
@@ -26,7 +27,14 @@ export default function useCreateTopup() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createTopup(validatedValues);
+      const req: CreateTopup = {
+        card_number: validatedValues.card_number,
+        topup_amount: validatedValues.topup_amount,
+        topup_method: validatedValues.topup_method,
+        toast: toast,
+      };
+
+      const result = await createTopup(req);
 
       if (result) {
         toast({

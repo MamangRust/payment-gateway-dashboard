@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import useModalUser from "@/store/user/modal";
+import { TrashedUser } from "@/types/domain/request";
 
 export default function useDeleteUser() {
   const {
@@ -28,7 +29,12 @@ export default function useDeleteUser() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedUser(deleteUserId as number);
+      const req: TrashedUser = {
+        id: deleteUserId as number,
+        toast: toast,
+      };
+
+      const result = await trashedUser(req);
 
       if (result) {
         toast({

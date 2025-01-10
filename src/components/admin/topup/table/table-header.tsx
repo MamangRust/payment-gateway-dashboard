@@ -1,7 +1,8 @@
-import { flexRender } from '@tanstack/react-table';
-import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
+import { flexRender } from "@tanstack/react-table";
+import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
+import { TableHeaderSaldoProps } from "@/types/table";
 
-const TableHeaderSaldo = ({ table }: any) => (
+const TableHeaderSaldo = ({ table }: TableHeaderSaldoProps) => (
   <TableHeader>
     {table.getHeaderGroups().map((headerGroup: any) => (
       <TableRow key={headerGroup.id}>

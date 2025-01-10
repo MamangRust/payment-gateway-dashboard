@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CreateSaldoFormValues, createSaldoRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalSaldo from "@/store/saldo/modal";
+import { CreateSaldo } from "@/types/domain/request";
 
 export default function useCreateSaldo() {
   const { isModalVisible, showModal, hideModal } = useModalSaldo();
@@ -26,7 +27,13 @@ export default function useCreateSaldo() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createSaldo(validatedValues);
+      const req: CreateSaldo = {
+        card_number: validatedValues.card_number,
+        total_balance: validatedValues.total_balance,
+        toast: toast,
+      };
+
+      const result = await createSaldo(req);
 
       if (result) {
         toast({

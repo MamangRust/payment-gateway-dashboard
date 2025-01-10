@@ -1,39 +1,39 @@
-import useUserStore from "@/store/user/user";
+import useTransferStore from "@/store/transfer/transfer";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransfer from "@/store/transfer/modal";
 
-export default function useDeleteUser() {
+export default function useDeleteTransfer() {
   const {
-    deleteUserId,
+    deleteTransferId,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalUser();
+  } = useModalTransfer();
 
   const {
-    trashedUser,
-    setLoadingTrashedUser,
-    loadingTrashedUser,
-    setErrorTrashedUser,
-  } = useUserStore();
+    trashedTransfer,
+    setLoadingTrashedTransfer,
+    loadingTrashedTransfer,
+    setErrorTrashedTransfer,
+  } = useTransferStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    setLoadingTrashedUser(true);
+    setLoadingTrashedTransfer(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedUser(deleteUserId as number);
+      const result = await trashedTransfer(deleteTransferId as number);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "Transfer berhasil didelete",
           variant: "default",
         });
 
@@ -41,38 +41,39 @@ export default function useDeleteUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal menghapus Transfer. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorTrashedUser(errorMessage);
+        setErrorTrashedTransfer(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorTrashedUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorTrashedTransfer(
+          error?.message || "Terjadi kesalahan saat menghapus Transfer",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat menghapus Transfer",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingTrashedUser(false);
+      setLoadingTrashedTransfer(false);
       hideModalDelete();
     }
   };
 
   return {
     handleSubmit,
-    loadingTrashedUser,
+    loadingTrashedTransfer,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,

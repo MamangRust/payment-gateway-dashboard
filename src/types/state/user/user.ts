@@ -1,4 +1,10 @@
-import { CreateUser, UpdateUser } from "@/types/domain/request";
+import {
+  CreateUser,
+  FindAllUser,
+  FindByIdUser,
+  TrashedUser,
+  UpdateUser,
+} from "@/types/domain/request";
 import { User } from "@/types/model/user";
 
 export interface UserStore {
@@ -19,8 +25,6 @@ export interface UserStore {
   loadingCreateUser: boolean;
   loadingUpdateUser: boolean;
   loadingTrashedUser: boolean;
-  loadingRestoreUser: boolean;
-  loadingDeleteUser: boolean;
 
   errorGetUsers: string | null;
   errorGetUser: string | null;
@@ -29,8 +33,6 @@ export interface UserStore {
   errorCreateUser: string | null;
   errorUpdateUser: string | null;
   errorTrashedUser: string | null;
-  errorRestoreUser: string | null;
-  errorDeleteUser: string | null;
 
   setErrorGetUsers: (value: string | null) => void;
   setErrorGetUser: (value: string | null) => void;
@@ -40,8 +42,6 @@ export interface UserStore {
   setErrorCreateUser: (value: string | null) => void;
   setErrorUpdateUser: (value: string | null) => void;
   setErrorTrashedUser: (value: string | null) => void;
-  setErrorRestoreUser: (value: string | null) => void;
-  setErrorDeleteUser: (value: string | null) => void;
 
   setLoadingGetUsers: (value: boolean) => void;
   setLoadingGetUser: (value: boolean) => void;
@@ -51,29 +51,16 @@ export interface UserStore {
   setLoadingCreateUser: (value: boolean) => void;
   setLoadingUpdateUser: (value: boolean) => void;
   setLoadingTrashedUser: (value: boolean) => void;
-  setLoadingRestoreUser: (value: boolean) => void;
-  setLoadingDeleteUser: (value: boolean) => void;
 
-  findAllUsers: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findById: (id: number) => Promise<void>;
+  findAllUsers: (req: FindAllUser) => Promise<void>;
+  findById: (req: FindByIdUser) => Promise<void>;
   findByActive: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByTrashed: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
 
   createUser: (req: CreateUser) => Promise<boolean>;
-  updateUser: (id: number, req: UpdateUser) => Promise<boolean>;
-  restoreUser: (id: number) => Promise<boolean>;
-  trashedUser: (id: number) => Promise<boolean>;
-  deleteUserPermanent: (id: number) => Promise<boolean>;
+  updateUser: (req: UpdateUser) => Promise<boolean>;
+  trashedUser: (req: TrashedUser) => Promise<boolean>;
 }

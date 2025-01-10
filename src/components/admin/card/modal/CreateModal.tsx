@@ -1,13 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
 import CreateCardForm from "../form/CreateForm";
 import useModalCard from "@/store/card/modal";
 import { useRef } from "react";
@@ -31,12 +29,6 @@ export function AddCard() {
       open={isModalVisible}
       onOpenChange={(open) => (open ? showModal() : hideModal())}
     >
-      <DialogTrigger asChild>
-        <Button variant="default" size="sm" onClick={showModal}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Card
-        </Button>
-      </DialogTrigger>
       <DialogContent className="max-w-2xl w-full">
         <DialogHeader>
           <DialogTitle>Add New Card</DialogTitle>

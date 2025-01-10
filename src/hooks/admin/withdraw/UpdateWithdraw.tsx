@@ -1,38 +1,50 @@
-import useUserStore from "@/store/user/user";
+import useWithdrawStore from "@/store/withdraw/withdraw";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateUserFormValues, updateUserSchema } from "@/schemas";
+import {
+  UpdateWithdrawFormValues,
+  updateWithdrawRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalWithdraw from "@/store/withdraw/modal";
+import { UpdateWithdraw } from "@/types/domain/request";
 
 export default function useUpdateUser() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
-    useModalUser();
+  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editWithdrawId } =
+    useModalWithdraw();
 
   const {
-    updateUser,
-    setLoadingUpdateUser,
-    loadingUpdateUser,
-    setErrorUpdateUser,
-  } = useUserStore();
+    updateWithdraw,
+    setLoadingUpdateWithdraw,
+    loadingUpdateWithdraw,
+    setErrorUpdateWithdraw,
+  } = useWithdrawStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: UpdateUserFormValues) => {
-    setLoadingUpdateUser(true);
+  const handleSubmit = async (data: UpdateWithdrawFormValues) => {
+    setLoadingUpdateWithdraw(true);
 
     try {
-      const validatedValues = updateUserSchema.parse(data);
+      const validatedValues = updateWithdrawRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const req: UpdateWithdraw = {
+        id: editWithdrawId as number,
+        card_number: validatedValues.card_number,
+        withdraw_amount: validatedValues.withdraw_amount,
+        withdraw_time: validatedValues.withdraw_time,
+        toast: toast,
+      };
+
+      const result = await updateWithdraw(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "withdraw berhasil diupdate",
           variant: "default",
         });
 
@@ -40,38 +52,39 @@ export default function useUpdateUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal membuat withdraw. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorUpdateUser(errorMessage);
+        setErrorUpdateWithdraw(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorUpdateUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorUpdateWithdraw(
+          error?.message || "Terjadi kesalahan saat mengedit withdraw",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat mengedit withdraw",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingUpdateUser(false);
+      setLoadingUpdateWithdraw(false);
       hideModalEdit();
     }
   };
 
   return {
     handleSubmit,
-    loadingUpdateUser,
+    loadingUpdateWithdraw,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,

@@ -3,6 +3,15 @@ import { create } from "zustand";
 import { getAccessToken } from "../auth";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import {
+  CreateTransfer,
+  FindAllTransfer,
+  FindByIdTransfer,
+  TransferFrom,
+  TransferTo,
+  TrashedTransfer,
+  UpdateTransfer,
+} from "@/types/domain/request";
 
 const useTransferStore = create<TransferStore>((set, get) => ({
   transfers: null,
@@ -53,9 +62,6 @@ const useTransferStore = create<TransferStore>((set, get) => ({
   setLoadingCreateTransfer: (value) => set({ loadingCreateTransfer: value }),
   setLoadingUpdateTransfer: (value) => set({ loadingUpdateTransfer: value }),
   setLoadingTrashedTransfer: (value) => set({ loadingTrashedTransfer: value }),
-  setLoadingRestoreTransfer: (value) => set({ loadingRestoreTransfer: value }),
-  setLoadingPermanentTransfer: (value) =>
-    set({ loadingPermanentTransfer: value }),
 
   setErrorGetTransfers: (value) => set({ errorGetTransfers: value }),
   setErrorGetTransfer: (value) => set({ errorGetTransfer: value }),
@@ -68,24 +74,22 @@ const useTransferStore = create<TransferStore>((set, get) => ({
   setErrorCreateTransfer: (value) => set({ errorCreateTransfer: value }),
   setErrorUpdateTransfer: (value) => set({ errorUpdateTransfer: value }),
   setErrorTrashedTransfer: (value) => set({ errorTrashedTransfer: value }),
-  setErrorRestoreTransfer: (value) => set({ errorRestoreTransfer: value }),
-  setErrorPermanentTransfer: (value) => set({ errorPermanentTransfer: value }),
 
-  findAllTransfers: async (search: string, page: number, pageSize: number) => {
+  findAllTransfers: async (req: FindAllTransfer) => {
     set({ loadingGetTransfers: true, errorGetTransfers: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/transfers", {
-        params: { search, page, pageSize },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         transfers: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetTransfers: false,
         errorGetTransfers: null,
@@ -95,15 +99,16 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingGetTransfers: false }),
         (message: any) => set({ errorGetTransfers: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdTransfer: async (id: number) => {
+  findByIdTransfer: async (req: FindByIdTransfer) => {
     set({ loadingGetTransfer: true, errorGetTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/${id}`, {
+      const response = await myApi.get(`/transfers/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -116,15 +121,16 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingGetTransfer: false }),
         (message: any) => set({ errorGetTransfer: message }),
+        req.toast,
       );
     }
   },
 
-  findByTransferFrom: async (fromAccountId: number) => {
+  findByTransferFrom: async (req: TransferFrom) => {
     set({ loadingGetTransferFrom: true, errorGetTransferFrom: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/from/${fromAccountId}`, {
+      const response = await myApi.get(`/transfers/from/${req.cardNumber}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -137,15 +143,16 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingGetTransferFrom: false }),
         (message: any) => set({ errorGetTransferFrom: message }),
+        req.toast,
       );
     }
   },
 
-  findByTransferTo: async (toAccountId: number) => {
+  findByTransferTo: async (req: TransferTo) => {
     set({ loadingGetTransferTo: true, errorGetTransferTo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/to/${toAccountId}`, {
+      const response = await myApi.get(`/transfers/to/${req.cardNumber}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -158,6 +165,7 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingGetTransferTo: false }),
         (message: any) => set({ errorGetTransferTo: message }),
+        req.toast,
       );
     }
   },
@@ -190,43 +198,12 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveTransfer: false }),
         (message: any) => set({ errorGetActiveTransfer: message }),
+        null,
       );
     }
   },
 
-  findByTrashedTransfer: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
-    set({ loadingGetTrashedTransfer: true, errorGetTrashedTransfer: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/transfers/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedTransfer: false,
-        errorGetTrashedTransfer: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedTransfer: false }),
-        (message: any) => set({ errorGetTrashedTransfer: message }),
-      );
-    }
-  },
-
-  createTransfer: async (req: any) => {
+  createTransfer: async (req: CreateTransfer) => {
     set({ loadingCreateTransfer: true, errorCreateTransfer: null });
     try {
       const token = getAccessToken();
@@ -240,15 +217,16 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingCreateTransfer: false }),
         (message: any) => set({ errorCreateTransfer: message }),
+        req.toast,
       );
     }
   },
 
-  updateTransfer: async (id: number, req: any) => {
+  updateTransfer: async (req: UpdateTransfer) => {
     set({ loadingUpdateTransfer: true, errorUpdateTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/transfers/${id}`, req, {
+      const response = await myApi.put(`/transfers/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateTransfer: false, errorUpdateTransfer: null });
@@ -258,33 +236,16 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingUpdateTransfer: false }),
         (message: any) => set({ errorUpdateTransfer: message }),
+        req.toast,
       );
     }
   },
 
-  restoreTransfer: async (id: number) => {
-    set({ loadingRestoreTransfer: true, errorRestoreTransfer: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/transfers/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreTransfer: false, errorRestoreTransfer: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreTransfer: false }),
-        (message: any) => set({ errorRestoreTransfer: message }),
-      );
-    }
-  },
-
-  trashedTransfer: async (id: number) => {
+  trashedTransfer: async (req: TrashedTransfer) => {
     set({ loadingTrashedTransfer: true, errorTrashedTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/transfers/trashed/${id}`, null, {
+      const response = await myApi.patch(`/transfers/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedTransfer: false, errorTrashedTransfer: null });
@@ -294,24 +255,7 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         err,
         () => set({ loadingTrashedTransfer: false }),
         (message: any) => set({ errorTrashedTransfer: message }),
-      );
-    }
-  },
-
-  deleteTransferPermanent: async (id: number) => {
-    set({ loadingPermanentTransfer: true, errorPermanentTransfer: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/transfers/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingPermanentTransfer: false, errorPermanentTransfer: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingPermanentTransfer: false }),
-        (message: any) => set({ errorPermanentTransfer: message }),
+        req.toast,
       );
     }
   },

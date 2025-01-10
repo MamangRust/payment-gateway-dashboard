@@ -1,5 +1,11 @@
 import { Saldo } from "@/types/model/saldo";
-import { CreateSaldo, UpdateSaldo } from "@/types/domain/request";
+import {
+  CreateSaldo,
+  FindAllSaldo,
+  FindByIdSaldo,
+  UpdateSaldo,
+} from "@/types/domain/request";
+import { FindByCardNumber, TrashedSaldo } from "@/types/domain/request/saldo";
 
 export interface SaldoStore {
   saldos: Saldo[] | null;
@@ -21,8 +27,6 @@ export interface SaldoStore {
   loadingCreateSaldo: boolean;
   loadingUpdateSaldo: boolean;
   loadingTrashedSaldo: boolean;
-  loadingRestoreSaldo: boolean;
-  loadingDeletePermanent: boolean;
 
   errorGetSaldos: string | null;
   errorGetSaldo: string | null;
@@ -33,8 +37,6 @@ export interface SaldoStore {
   errorCreateSaldo: string | null;
   errorUpdateSaldo: string | null;
   errorTrashedSaldo: string | null;
-  errorRestoreSaldo: string | null;
-  errorDeletePermanent: string | null;
 
   setLoadingGetSaldos: (value: boolean) => void;
   setLoadingGetSaldo: (value: boolean) => void;
@@ -45,8 +47,6 @@ export interface SaldoStore {
   setLoadingCreateSaldo: (value: boolean) => void;
   setLoadingUpdateSaldo: (value: boolean) => void;
   setLoadingTrashedSaldo: (value: boolean) => void;
-  setLoadingRestoreSaldo: (value: boolean) => void;
-  setLoadingDeletePermanent: (value: boolean) => void;
 
   setErrorGetSaldos: (value: string | null) => void;
   setErrorGetSaldo: (value: string | null) => void;
@@ -57,30 +57,16 @@ export interface SaldoStore {
   setErrorCreateSaldo: (value: string | null) => void;
   setErrorUpdateSaldo: (value: string | null) => void;
   setErrorTrashedSaldo: (value: string | null) => void;
-  setErrorRestoreSaldo: (value: string | null) => void;
-  setErrorDeletePermanent: (value: string | null) => void;
 
-  findAllSaldos: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByIdSaldo: (id: number) => Promise<void>;
+  findAllSaldos: (req: FindAllSaldo) => Promise<void>;
+  findByIdSaldo: (req: FindByIdSaldo) => Promise<void>;
   findByActiveSaldo: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
-  findByTrashedSaldo: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByCardNumberSaldo: (cardNumber: string) => Promise<void>;
-
+  findByCardNumberSaldo: (req: FindByCardNumber) => Promise<void>;
   createSaldo: (req: CreateSaldo) => Promise<boolean>;
-  updateSaldo: (id: number, req: UpdateSaldo) => Promise<boolean>;
-  restoreSaldo: (id: number) => Promise<boolean>;
-  trashedSaldo: (id: number) => Promise<boolean>;
-  deleteSaldoPermanent: (id: number) => Promise<boolean>;
+  updateSaldo: (req: UpdateSaldo) => Promise<boolean>;
+  trashedSaldo: (req: TrashedSaldo) => Promise<boolean>;
 }

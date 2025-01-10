@@ -1,38 +1,47 @@
-import useUserStore from "@/store/user/user";
+import useTopupStore from "@/store/topup/topup";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateUserFormValues, updateUserSchema } from "@/schemas";
+import { UpdateTopupFormValues, updateTopupRequestSchema } from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTopup from "@/store/topup/modal";
+import { UpdateTopup } from "@/types/domain/request/topup";
 
-export default function useUpdateUser() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
-    useModalUser();
+export default function useUpdateTopup() {
+  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editTopupId } =
+    useModalTopup();
 
   const {
-    updateUser,
-    setLoadingUpdateUser,
-    loadingUpdateUser,
-    setErrorUpdateUser,
-  } = useUserStore();
+    updateTopup,
+    setLoadingUpdateTopup,
+    loadingUpdateTopup,
+    setErrorUpdateTopup,
+  } = useTopupStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: UpdateUserFormValues) => {
-    setLoadingUpdateUser(true);
+  const handleSubmit = async (data: UpdateTopupFormValues) => {
+    setLoadingUpdateTopup(true);
 
     try {
-      const validatedValues = updateUserSchema.parse(data);
+      const validatedValues = updateTopupRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const req: UpdateTopup = {
+        id: editTopupId as number,
+        card_number: validatedValues.card_number,
+        topup_amount: validatedValues.topup_amount,
+        topup_method: validatedValues.topup_method,
+        toast: toast,
+      };
+
+      const result = await updateTopup(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "topup berhasil diupdate",
           variant: "default",
         });
 
@@ -40,38 +49,39 @@ export default function useUpdateUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal membuat topup. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorUpdateUser(errorMessage);
+        setErrorUpdateTopup(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorUpdateUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorUpdateTopup(
+          error?.message || "Terjadi kesalahan saat mengedit topup",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat mengedit topup",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingUpdateUser(false);
+      setLoadingUpdateTopup(false);
       hideModalEdit();
     }
   };
 
   return {
     handleSubmit,
-    loadingUpdateUser,
+    loadingUpdateTopup,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,

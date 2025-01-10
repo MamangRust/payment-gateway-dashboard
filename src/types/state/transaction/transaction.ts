@@ -1,4 +1,12 @@
-import { CreateTransaction, UpdateTransaction } from "../../domain/request";
+import {
+  CreateTransaction,
+  FindAllTransaction,
+  FindyByCardNumberTransaction,
+  FindyByIdTransaction,
+  FindyByMerchantTransaction,
+  TrashedTransaction,
+  UpdateTransaction,
+} from "../../domain/request";
 import { Transaction } from "../../model/transaction";
 
 export interface TransactionStore {
@@ -21,9 +29,7 @@ export interface TransactionStore {
 
   loadingCreateTransaction: boolean;
   loadingUpdateTransaction: boolean;
-  loadingRestoreTransaction: boolean;
   loadingTrashedTransaction: boolean;
-  loadingDeletePermanentTransaction: boolean;
 
   errorGetTransactions: string | null;
   errorGetTransaction: string | null;
@@ -34,9 +40,7 @@ export interface TransactionStore {
 
   errorCreateTransaction: string | null;
   errorUpdateTransaction: string | null;
-  errorRestoreTransaction: string | null;
   errorTrashedTransaction: string | null;
-  errorDeletePermanentTransaction: string | null;
 
   setLoadingGetTransactions: (value: boolean) => void;
   setLoadingGetTransaction: (value: boolean) => void;
@@ -47,9 +51,7 @@ export interface TransactionStore {
 
   setLoadingCreateTransaction: (value: boolean) => void;
   setLoadingUpdateTransaction: (value: boolean) => void;
-  setLoadingRestoreTransaction: (value: boolean) => void;
   setLoadingTrashedTransaction: (value: boolean) => void;
-  setLoadingDeletePermanentTransaction: (value: boolean) => void;
 
   setErrorGetTransactions: (value: string | null) => void;
   setErrorGetTransaction: (value: string | null) => void;
@@ -60,32 +62,20 @@ export interface TransactionStore {
 
   setErrorCreateTransaction: (value: string | null) => void;
   setErrorUpdateTransaction: (value: string | null) => void;
-  setErrorRestoreTransaction: (value: string | null) => void;
   setErrorTrashedTransaction: (value: string | null) => void;
-  setErrorDeletePermanentTransaction: (value: string | null) => void;
 
-  findAllTransactions: (
-    search: string,
-    page: number,
-    pageSize: number,
+  findAllTransactions: (req: FindAllTransaction) => Promise<void>;
+  findByIdTransaction: (req: FindyByIdTransaction) => Promise<void>;
+  findByCardNumberTransaction: (
+    req: FindyByCardNumberTransaction,
   ) => Promise<void>;
-  findByIdTransaction: (id: number) => Promise<void>;
-  findByCardNumberTransaction: (cardNumber: string) => Promise<void>;
-  findByMerchantTransaction: (merchantId: number) => Promise<void>;
+  findByMerchantTransaction: (req: FindyByMerchantTransaction) => Promise<void>;
   findByActiveTransaction: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
-  findByTrashedTransaction: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-
   createTransaction: (req: CreateTransaction) => Promise<boolean>;
-  updateTransaction: (id: number, req: UpdateTransaction) => Promise<boolean>;
-  restoreTransaction: (id: number) => Promise<boolean>;
-  trashedTransaction: (id: number) => Promise<boolean>;
-  deleteTransactionPermanent: (id: number) => Promise<boolean>;
+  updateTransaction: (req: UpdateTransaction) => Promise<boolean>;
+  trashedTransaction: (req: TrashedTransaction) => Promise<boolean>;
 }

@@ -32,9 +32,9 @@ export interface AuthStore {
   setLoadingGetMe: (value: boolean) => void;
   setLoadingRefreshAccessToken: (value: boolean) => void;
 
-  login: (req: LoginRequest) => Promise<boolean>;
-  register: (req: RegisterRequest) => Promise<boolean>;
-  getMe: () => Promise<void>;
-  refreshAccessToken: () => Promise<void>;
-  logout: () => Promise<boolean>;
+  login: (req: LoginRequest, toast: any) => Promise<boolean>;
+  register: (req: RegisterRequest, toast: any) => Promise<boolean>;
+  getMe: (toast: any) => Promise<void>;
+  refreshAccessToken: (toast: any) => Promise<void>;
+  logout: (toast: any) => Promise<boolean>;
 }

@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createUserSchema, UpdateUserFormValues } from "@/schemas";
+import { updateCardRequestSchema, UpdateUserFormValues } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { forwardRef } from "react";
@@ -13,7 +13,7 @@ const UpdateUserForm = forwardRef<HTMLFormElement, UserUpdateFormProps>(
       handleSubmit,
       formState: { errors },
     } = useForm<UpdateUserFormValues>({
-      resolver: zodResolver(createUserSchema),
+      resolver: zodResolver(updateCardRequestSchema),
     });
 
     return (

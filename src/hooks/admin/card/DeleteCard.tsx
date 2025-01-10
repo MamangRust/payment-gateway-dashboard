@@ -1,7 +1,6 @@
 import useCardStore from "@/store/card/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
 import useModalCard from "@/store/card/modal";
 
 export default function useDeleteCard() {
@@ -33,7 +32,7 @@ export default function useDeleteCard() {
       if (result) {
         toast({
           title: "Success",
-          description: "Card berhasil diupdate",
+          description: "Card berhasil dihapus",
           variant: "default",
         });
 
@@ -41,30 +40,19 @@ export default function useDeleteCard() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat card. Silakan coba lagi.",
+          description: "Gagal menghapus card. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorTrashedCard(errorMessage);
-        toast({
-          title: "Validation Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      } else {
-        setErrorTrashedCard(
-          error?.message || "Terjadi kesalahan saat menghapus card",
-        );
-        toast({
-          title: "Error",
-          description:
-            error?.message || "Terjadi kesalahan saat menghapus card",
-          variant: "destructive",
-        });
-      }
+      const errorMessage =
+        error?.message || "Terjadi kesalahan saat menghapus card";
+      setErrorTrashedCard(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoadingTrashedCard(false);
       hideModalDelete();

@@ -5,7 +5,13 @@ import { persist, PersistOptions } from "zustand/middleware";
 const useNotificationStore = create(
   persist<NotificationState>(
     (set) => ({
-      notifications: [],
+      notifications: [
+        { id: 1, message: "Dummy notification 1" },
+        { id: 2, message: "Dummy notification 2" },
+        { id: 3, message: "Dummy notification 3" },
+        { id: 4, message: "Dummy notification 4" },
+        { id: 5, message: "Dummy notification 5" },
+      ],
       addNotification: (message) => {
         set((state) => ({
           notifications: [...state.notifications, { id: Date.now(), message }],

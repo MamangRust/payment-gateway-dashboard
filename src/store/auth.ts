@@ -41,7 +41,7 @@ const useAuthStore = create<AuthStore>()(
       setErrorRefreshAccessToken: (value: string | null) =>
         set({ errorRefreshAccessToken: value }),
 
-      login: async (req: LoginRequest) => {
+      login: async (req: LoginRequest, toast: any) => {
         set({
           loadingLogin: true,
           errorLogin: null,
@@ -61,7 +61,7 @@ const useAuthStore = create<AuthStore>()(
             });
 
             const timer = setInterval(
-              () => get().refreshAccessToken?.(),
+              () => get().refreshAccessToken?.(toast),
               15 * 60 * 1000,
             );
 
@@ -84,11 +84,12 @@ const useAuthStore = create<AuthStore>()(
               set({
                 errorLogin: message,
               }),
+            toast,
           );
           return false;
         }
       },
-      logout: async () => {
+      logout: async (toast: any) => {
         set({
           loadingLogout: true,
           errorLogout: null,
@@ -102,18 +103,23 @@ const useAuthStore = create<AuthStore>()(
           });
           return true;
         } catch (error: any) {
-          set({
-            errorLogout: error?.message || "Failed to log out",
-          });
+          handleApiError(
+            error,
+            () =>
+              set({
+                loadingLogout: false,
+              }),
+            (message: any) =>
+              set({
+                errorLogout: message,
+              }),
+            toast,
+          );
           return false;
-        } finally {
-          set({
-            loadingLogout: false,
-          });
         }
       },
 
-      register: async (req: RegisterRequest) => {
+      register: async (req: RegisterRequest, toast: any) => {
         set({
           loadingRegister: true,
           errorRegister: null,
@@ -141,12 +147,13 @@ const useAuthStore = create<AuthStore>()(
               set({
                 errorRegister: message,
               }),
+            toast,
           );
           return false;
         }
       },
 
-      getMe: async () => {
+      getMe: async (toast: any) => {
         set({
           loadingGetMe: true,
           errorGetMe: null,
@@ -177,11 +184,12 @@ const useAuthStore = create<AuthStore>()(
               set({
                 errorGetMe: messsage,
               }),
+            toast,
           );
         }
       },
 
-      refreshAccessToken: async () => {
+      refreshAccessToken: async (toast: any) => {
         set({
           loadingRefreshAccessToken: true,
           errorRefreshAccessToken: null,
@@ -198,7 +206,6 @@ const useAuthStore = create<AuthStore>()(
               },
             },
           );
-          console.log("refresh token :", response.data);
 
           if (response.status == 200) {
             set({
@@ -221,6 +228,7 @@ const useAuthStore = create<AuthStore>()(
               set({
                 errorRefreshAccessToken: messsage,
               }),
+            toast,
           );
         }
       },
@@ -239,6 +247,18 @@ export const getAccessToken = () => {
   }
 
   return accessToken;
+};
+
+export const handleUnauthorized = (error: any, toast: any) => {
+  if (error) {
+    const { logout } = useAuthStore.getState();
+
+    const authStorage = localStorage.getItem("auth-storage");
+
+    if (authStorage) {
+      logout(toast);
+    }
+  }
 };
 
 export default useAuthStore;

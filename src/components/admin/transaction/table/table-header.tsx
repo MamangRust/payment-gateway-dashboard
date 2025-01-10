@@ -1,7 +1,8 @@
-import { flexRender } from '@tanstack/react-table';
-import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
+import { flexRender } from "@tanstack/react-table";
+import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
+import { TableHeaderTransactionProps } from "@/types/table";
 
-const TableHeaderTransaction = ({ table }: any) => (
+const TableHeaderTransaction = ({ table }: TableHeaderTransactionProps) => (
   <TableHeader>
     {table.getHeaderGroups().map((headerGroup: any) => (
       <TableRow key={headerGroup.id}>

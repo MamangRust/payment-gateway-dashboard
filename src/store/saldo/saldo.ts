@@ -3,7 +3,13 @@ import { create } from "zustand";
 import { getAccessToken } from "../auth";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
-import { CreateSaldo, UpdateSaldo } from "@/types/domain/request";
+import {
+  CreateSaldo,
+  UpdateSaldo,
+  FindByIdSaldo,
+  TrashedSaldo,
+} from "@/types/domain/request";
+import { FindAllSaldo, FindByCardNumber } from "@/types/domain/request/saldo";
 
 const useSaldoStore = create<SaldoStore>((set, get) => ({
   saldos: null,
@@ -50,8 +56,6 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
   setLoadingCreateSaldo: (value) => set({ loadingCreateSaldo: value }),
   setLoadingUpdateSaldo: (value) => set({ loadingUpdateSaldo: value }),
   setLoadingTrashedSaldo: (value) => set({ loadingTrashedSaldo: value }),
-  setLoadingRestoreSaldo: (value) => set({ loadingRestoreSaldo: value }),
-  setLoadingDeletePermanent: (value) => set({ loadingDeletePermanent: value }),
 
   setErrorGetSaldos: (value) => set({ errorGetSaldos: value }),
   setErrorGetSaldo: (value) => set({ errorGetSaldo: value }),
@@ -63,24 +67,22 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
   setErrorCreateSaldo: (value) => set({ errorCreateSaldo: value }),
   setErrorUpdateSaldo: (value) => set({ errorUpdateSaldo: value }),
   setErrorTrashedSaldo: (value) => set({ errorTrashedSaldo: value }),
-  setErrorRestoreSaldo: (value) => set({ errorRestoreSaldo: value }),
-  setErrorDeletePermanent: (value) => set({ errorDeletePermanent: value }),
 
-  findAllSaldos: async (search: string, page: number, pageSize: number) => {
+  findAllSaldos: async (req: FindAllSaldo) => {
     set({ loadingGetSaldos: true, errorGetSaldos: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/saldos", {
-        params: { search, page, pageSize },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         saldos: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetSaldos: false,
         errorGetSaldos: null,
@@ -90,15 +92,16 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingGetSaldos: false }),
         (message: any) => set({ errorGetSaldos: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdSaldo: async (id: number) => {
+  findByIdSaldo: async (req: FindByIdSaldo) => {
     set({ loadingGetSaldo: true, errorGetSaldo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/saldos/${id}`, {
+      const response = await myApi.get(`/saldos/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -111,6 +114,7 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingGetSaldo: false }),
         (message: any) => set({ errorGetSaldo: message }),
+        req.toast,
       );
     }
   },
@@ -139,49 +143,21 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveSaldo: false }),
         (message: any) => set({ errorGetActiveSaldo: message }),
+        null,
       );
     }
   },
 
-  findByTrashedSaldo: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
-    set({ loadingGetTrashedSaldo: true, errorGetTrashedSaldo: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/saldos/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        saldos: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedSaldo: false,
-        errorGetTrashedSaldo: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedSaldo: false }),
-        (message: any) => set({ errorGetTrashedSaldo: message }),
-      );
-    }
-  },
-
-  findByCardNumberSaldo: async (cardNumber: string) => {
+  findByCardNumberSaldo: async (req: FindByCardNumber) => {
     set({ loadingGetCardNumberSaldo: true, errorGetCardNumberSaldo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/saldos/card-number/${cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.get(
+        `/saldos/card-number/${req.cardNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       set({
         saldo: response.data,
         loadingGetCardNumberSaldo: false,
@@ -192,6 +168,7 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingGetCardNumberSaldo: false }),
         (message: any) => set({ errorGetCardNumberSaldo: message }),
+        req.toast,
       );
     }
   },
@@ -210,15 +187,16 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingCreateSaldo: false }),
         (message: any) => set({ errorCreateSaldo: message }),
+        req.toast,
       );
     }
   },
 
-  updateSaldo: async (id: number, req: UpdateSaldo) => {
+  updateSaldo: async (req: UpdateSaldo) => {
     set({ loadingUpdateSaldo: true, errorUpdateSaldo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/saldos/${id}`, req, {
+      const response = await myApi.put(`/saldos/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateSaldo: false, errorUpdateSaldo: null });
@@ -228,33 +206,16 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingUpdateSaldo: false }),
         (message: any) => set({ errorUpdateSaldo: message }),
+        req.toast,
       );
     }
   },
 
-  restoreSaldo: async (id: number) => {
-    set({ loadingRestoreSaldo: true, errorRestoreSaldo: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/saldos/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreSaldo: false, errorRestoreSaldo: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreSaldo: false }),
-        (message: any) => set({ errorRestoreSaldo: message }),
-      );
-    }
-  },
-
-  trashedSaldo: async (id: number) => {
+  trashedSaldo: async (req: TrashedSaldo) => {
     set({ loadingTrashedSaldo: true, errorTrashedSaldo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/saldos/trashed/${id}`, null, {
+      const response = await myApi.patch(`/saldos/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedSaldo: false, errorTrashedSaldo: null });
@@ -264,24 +225,7 @@ const useSaldoStore = create<SaldoStore>((set, get) => ({
         err,
         () => set({ loadingTrashedSaldo: false }),
         (message: any) => set({ errorTrashedSaldo: message }),
-      );
-    }
-  },
-
-  deleteSaldoPermanent: async (id: number) => {
-    set({ loadingDeletePermanent: true, errorDeletePermanent: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/saldos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingDeletePermanent: false, errorDeletePermanent: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingDeletePermanent: false }),
-        (message: any) => set({ errorDeletePermanent: message }),
+        req.toast,
       );
     }
   },

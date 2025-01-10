@@ -7,6 +7,7 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalMerchant from "@/store/merchant/modal";
+import { CreateMerchant } from "@/types/domain/request";
 
 export default function useCreateMerchant() {
   const { isModalVisible, showModal, hideModal } = useModalMerchant();
@@ -29,7 +30,13 @@ export default function useCreateMerchant() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createMerchant(validatedValues);
+      const req: CreateMerchant = {
+        user_id: validatedValues.user_id,
+        name: validatedValues.name,
+        toast: toast,
+      };
+
+      const result = await createMerchant(req);
 
       if (result) {
         toast({

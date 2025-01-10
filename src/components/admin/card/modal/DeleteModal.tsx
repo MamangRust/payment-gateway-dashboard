@@ -1,13 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
 import useModalCard from "@/store/card/modal";
 
 export function DeleteCard() {
@@ -29,16 +27,6 @@ export function DeleteCard() {
         open ? showModalDelete(deleteCardId!) : hideModalDelete()
       }
     >
-      <DialogTrigger asChild>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => showModalDelete(deleteCardId!)}
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          Delete Card
-        </Button>
-      </DialogTrigger>
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
           <DialogTitle>Delete Card</DialogTitle>

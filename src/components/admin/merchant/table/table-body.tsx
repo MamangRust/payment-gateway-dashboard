@@ -1,11 +1,12 @@
-import { flexRender } from '@tanstack/react-table';
-import { TableBody, TableRow, TableCell } from '@/components/ui/table';
+import { flexRender } from "@tanstack/react-table";
+import { TableBody, TableRow, TableCell } from "@/components/ui/table";
+import { TableBodyMerchantProps } from "@/types/table";
 
-const TableBodyMerchant = ({ table }: any) => (
+const TableBodyMerchant = ({ table }: TableBodyMerchantProps) => (
   <TableBody>
     {table.getRowModel().rows?.length ? (
       table.getRowModel().rows.map((row: any) => (
-        <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
           {row.getVisibleCells().map((cell: any) => (
             <TableCell key={cell.id}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}

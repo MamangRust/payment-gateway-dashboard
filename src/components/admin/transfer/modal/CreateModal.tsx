@@ -1,81 +1,44 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useRef } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
-import CreateTransferForm from '../form/CreateForm';
+} from "@/components/ui/dialog";
+import CreateTransferForm from "../form/CreateForm";
+import useModalTransfer from "@/store/transfer/modal";
+import { CreateTransferFormValues } from "@/schemas";
 
 export function AddTransfer() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    transfer_from: '',
-    transfer_to: '',
-    transfer_amount: '',
-    transfer_time: '',
-  });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const { isModalVisible, showModal, hideModal } = useModalTransfer();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleFormChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setFormErrors((prev) => ({ ...prev, [field]: '' })); // Clear error for field
+  const handleSubmit = (data: CreateTransferFormValues) => {
+    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
+    hideModal();
   };
 
-  const handleSubmit = () => {
-    const errors: Record<string, string> = {};
-    if (!formData.transfer_from)
-      errors.transfer_from = 'Transfer from is required.';
-    if (!formData.transfer_to) errors.transfer_to = 'Transfer to is required.';
-    if (!formData.transfer_amount || isNaN(Number(formData.transfer_amount))) {
-      errors.transfer_amount = 'Amount must be a valid number.';
-    }
-    if (!formData.transfer_time)
-      errors.transfer_time = 'Transfer time is required.';
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    console.log('Submitted Data:', formData);
-
-    // Reset form
-    setFormData({
-      transfer_from: '',
-      transfer_to: '',
-      transfer_amount: '',
-      transfer_time: '',
-    });
-    setIsOpen(false);
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default" size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Transfer
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={isModalVisible}
+      onOpenChange={(open) => (open ? showModal() : hideModal())}
+    >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
           <DialogTitle>Add New Transfer</DialogTitle>
         </DialogHeader>
-        <CreateTransferForm
-          formData={formData}
-          onFormChange={handleFormChange}
-          formErrors={formErrors}
-        />
+        <CreateTransferForm onSubmit={handleSubmit} ref={formRef} />
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button variant="outline" onClick={hideModal}>
             Cancel
           </Button>
-          <Button variant="default" onClick={handleSubmit}>
+          <Button variant="default" onClick={handleButtonSubmit}>
             Submit
           </Button>
         </DialogFooter>

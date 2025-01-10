@@ -1,8 +1,8 @@
 import useSaldoStore from "@/store/saldo/saldo";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
 import useModalSaldo from "@/store/saldo/modal";
+import { TrashedSaldo } from "@/types/domain/request";
 
 export default function useDeleteSaldo() {
   const {
@@ -28,12 +28,17 @@ export default function useDeleteSaldo() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedSaldo(deleteSaldoId as number);
+      const req: TrashedSaldo = {
+        id: deleteSaldoId as number,
+        toast: toast,
+      };
+
+      const result = await trashedSaldo(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "Saldo berhasil diupdate",
+          description: "Saldo berhasil dihapus",
           variant: "default",
         });
 
@@ -41,30 +46,19 @@ export default function useDeleteSaldo() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat saldo. Silakan coba lagi.",
+          description: "Gagal menghapus saldo. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorTrashedSaldo(errorMessage);
-        toast({
-          title: "Validation Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      } else {
-        setErrorTrashedSaldo(
-          error?.message || "Terjadi kesalahan saat menghapus saldo",
-        );
-        toast({
-          title: "Error",
-          description:
-            error?.message || "Terjadi kesalahan saat menghapus saldo",
-          variant: "destructive",
-        });
-      }
+      const errorMessage =
+        error?.message || "Terjadi kesalahan saat menghapus saldo";
+      setErrorTrashedSaldo(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoadingTrashedSaldo(false);
       hideModalDelete();

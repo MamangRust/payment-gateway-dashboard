@@ -29,16 +29,6 @@ export function DeleteTransfer() {
         open ? showModalDelete(deleteCardId!) : hideModalDelete()
       }
     >
-      <DialogTrigger asChild>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => showModalDelete(deleteCardId!)}
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          Delete Card
-        </Button>
-      </DialogTrigger>
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
           <DialogTitle>Delete Card</DialogTitle>

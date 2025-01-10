@@ -1,4 +1,6 @@
-export interface UpdateSaldo{
-    card_number: string;
-    total_balance: number;
+export interface UpdateSaldo {
+  id: number;
+  card_number: string;
+  total_balance: number;
+  toast: any;
 }

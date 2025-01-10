@@ -3,6 +3,14 @@ import { create } from "zustand";
 import { getAccessToken } from "../auth";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import {
+  CreateTopup,
+  FindAllTopup,
+  FindByIdTopup,
+  UpdateTopup,
+} from "@/types/domain/request/topup";
+import { FindByCardNumberTopup } from "@/types/domain/request/topup/findByCardNumber";
+import { TrashedTopup } from "@/types/domain/request/topup/trashed";
 
 const useTopupStore = create<TopupStore>((set, get) => ({
   topups: null,
@@ -49,8 +57,6 @@ const useTopupStore = create<TopupStore>((set, get) => ({
   setLoadingCreateTopup: (value) => set({ loadingCreateTopup: value }),
   setLoadingUpdateTopup: (value) => set({ loadingUpdateTopup: value }),
   setLoadingTrashedTopup: (value) => set({ loadingTrashedTopup: value }),
-  setLoadingRestoreTopup: (value) => set({ loadingRestoreTopup: value }),
-  setLoadingPermanentTopup: (value) => set({ loadingPermanentTopup: value }),
 
   setErrorGetTopups: (value) => set({ errorGetTopups: value }),
   setErrorGetTopup: (value) => set({ errorGetTopup: value }),
@@ -62,24 +68,22 @@ const useTopupStore = create<TopupStore>((set, get) => ({
   setErrorCreateTopup: (value) => set({ errorCreateTopup: value }),
   setErrorUpdateTopup: (value) => set({ errorUpdateTopup: value }),
   setErrorTrashedTopup: (value) => set({ errorTrashedTopup: value }),
-  setErrorRestoreTopup: (value) => set({ errorRestoreTopup: value }),
-  setErrorPermanentTopup: (value) => set({ errorPermanentTopup: value }),
 
-  findAllTopups: async (search: string, page: number, pageSize: number) => {
+  findAllTopups: async (req: FindAllTopup) => {
     set({ loadingGetTopups: true, errorGetTopups: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/topups", {
-        params: { search, page, pageSize },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         topups: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetTopups: false,
         errorGetTopups: null,
@@ -89,15 +93,16 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingGetTopups: false }),
         (message: any) => set({ errorGetTopups: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdTopup: async (id: number) => {
+  findByIdTopup: async (req: FindByIdTopup) => {
     set({ loadingGetTopup: true, errorGetTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/topups/${id}`, {
+      const response = await myApi.get(`/topups/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -110,6 +115,7 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingGetTopup: false }),
         (message: any) => set({ errorGetTopup: message }),
+        req.toast,
       );
     }
   },
@@ -138,49 +144,21 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveTopup: false }),
         (message: any) => set({ errorGetActiveTopup: message }),
+        null,
       );
     }
   },
 
-  findByTrashedTopup: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
-    set({ loadingGetTrashedTopup: true, errorGetTrashedTopup: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/topups/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        topups: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedTopup: false,
-        errorGetTrashedTopup: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedTopup: false }),
-        (message: any) => set({ errorGetTrashedTopup: message }),
-      );
-    }
-  },
-
-  findByCardNumberTopup: async (cardNumber: string) => {
+  findByCardNumberTopup: async (req: FindByCardNumberTopup) => {
     set({ loadingGetCardNumberTopup: true, errorGetCardNumberTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/topups/card-number/${cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.get(
+        `/topups/card-number/${req.cardNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       set({
         topup: response.data,
         loadingGetCardNumberTopup: false,
@@ -191,11 +169,12 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingGetCardNumberTopup: false }),
         (message: any) => set({ errorGetCardNumberTopup: message }),
+        req.toast,
       );
     }
   },
 
-  createTopup: async (req: any) => {
+  createTopup: async (req: CreateTopup) => {
     set({ loadingCreateTopup: true, errorCreateTopup: null });
     try {
       const token = getAccessToken();
@@ -209,15 +188,16 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingCreateTopup: false }),
         (message: any) => set({ errorCreateTopup: message }),
+        req.toast,
       );
     }
   },
 
-  updateTopup: async (id: number, req: any) => {
+  updateTopup: async (req: UpdateTopup) => {
     set({ loadingUpdateTopup: true, errorUpdateTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/topups/${id}`, req, {
+      const response = await myApi.put(`/topups/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateTopup: false, errorUpdateTopup: null });
@@ -227,33 +207,15 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingUpdateTopup: false }),
         (message: any) => set({ errorUpdateTopup: message }),
+        req.toast,
       );
     }
   },
-
-  restoreTopup: async (id: number) => {
-    set({ loadingRestoreTopup: true, errorRestoreTopup: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/topups/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreTopup: false, errorRestoreTopup: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreTopup: false }),
-        (message: any) => set({ errorRestoreTopup: message }),
-      );
-    }
-  },
-
-  trashedTopup: async (id: number) => {
+  trashedTopup: async (req: TrashedTopup) => {
     set({ loadingTrashedTopup: true, errorTrashedTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/topups/trashed/${id}`, null, {
+      const response = await myApi.patch(`/topups/trashed/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedTopup: false, errorTrashedTopup: null });
@@ -263,24 +225,7 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         err,
         () => set({ loadingTrashedTopup: false }),
         (message: any) => set({ errorTrashedTopup: message }),
-      );
-    }
-  },
-
-  deleteTopupPermanent: async (id: number) => {
-    set({ loadingPermanentTopup: true, errorPermanentTopup: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/topups/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingPermanentTopup: false, errorPermanentTopup: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingPermanentTopup: false }),
-        (message: any) => set({ errorPermanentTopup: message }),
+        req.toast,
       );
     }
   },

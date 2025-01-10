@@ -1,33 +1,44 @@
-import useUserStore from "@/store/user/user";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateUserFormValues, updateUserSchema } from "@/schemas";
+import useModalCard from "@/store/card/modal";
+import { UpdateCardFormValues, updateCardRequestSchema } from "@/schemas";
+import { UpdateCard } from "@/types/domain/request";
+import useCardStore from "@/store/card/card";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
 
-export default function useUpdateUser() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
-    useModalUser();
+export default function useUpdateCard() {
+  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editCardId } =
+    useModalCard();
 
   const {
-    updateUser,
-    setLoadingUpdateUser,
-    loadingUpdateUser,
-    setErrorUpdateUser,
-  } = useUserStore();
+    updateCard,
+    setLoadingUpdateCard,
+    loadingUpdateCard,
+    setErrorUpdateCard,
+  } = useCardStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: UpdateUserFormValues) => {
-    setLoadingUpdateUser(true);
+  const handleSubmit = async (data: UpdateCardFormValues) => {
+    setLoadingUpdateCard(true);
 
     try {
-      const validatedValues = updateUserSchema.parse(data);
+      const validatedValues = updateCardRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const req: UpdateCard = {
+        id: editCardId as number,
+        user_id: validatedValues.user_id,
+        card_type: validatedValues.card_type,
+        expire_date: validatedValues.expire_date,
+        cvv: validatedValues.cvv,
+        card_provider: validatedValues.card_type,
+        toast: toast,
+      };
+
+      const result = await updateCard(req);
 
       if (result) {
         toast({
@@ -47,14 +58,14 @@ export default function useUpdateUser() {
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorUpdateUser(errorMessage);
+        setErrorUpdateCard(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorUpdateUser(
+        setErrorUpdateCard(
           error?.message || "Terjadi kesalahan saat mengedit user",
         );
         toast({
@@ -64,14 +75,14 @@ export default function useUpdateUser() {
         });
       }
     } finally {
-      setLoadingUpdateUser(false);
+      setLoadingUpdateCard(false);
       hideModalEdit();
     }
   };
 
   return {
     handleSubmit,
-    loadingUpdateUser,
+    loadingUpdateCard,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,

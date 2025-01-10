@@ -1,37 +1,48 @@
-import useUserStore from "@/store/user/user";
+import useTransferStore from "@/store/transfer/transfer";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { CreateUserFormValues, createUserSchema } from "@/schemas";
+import {
+  CreateTransferFormValues,
+  createTransferRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransfer from "@/store/transfer/modal";
+import { CreateTransfer } from "@/types/domain/request";
 
-export default function useCreateUser() {
-  const { isModalVisible, showModal, hideModal } = useModalUser();
+export default function useCreateTransfer() {
+  const { isModalVisible, showModal, hideModal } = useModalTransfer();
 
   const {
-    createUser,
-    setLoadingCreateUser,
-    loadingCreateUser,
-    setErrorCreateUser,
-  } = useUserStore();
+    createTransfer,
+    setLoadingCreateTransfer,
+    loadingCreateTransfer,
+    setErrorCreateTransfer,
+  } = useTransferStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: CreateUserFormValues) => {
-    setLoadingCreateUser(true);
+  const handleSubmit = async (data: CreateTransferFormValues) => {
+    setLoadingCreateTransfer(true);
 
     try {
-      const validatedValues = createUserSchema.parse(data);
+      const validatedValues = createTransferRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createUser(validatedValues);
+      const req: CreateTransfer = {
+        transfer_from: validatedValues.transfer_from,
+        transfer_to: validatedValues.transfer_to,
+        transfer_amount: validatedValues.transfer_amount,
+        toast: toast,
+      };
+
+      const result = await createTransfer(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil dibuat",
+          description: "Transfer berhasil dibuat",
           variant: "default",
         });
 
@@ -39,38 +50,39 @@ export default function useCreateUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal membuat Transfer. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorCreateUser(errorMessage);
+        setErrorCreateTransfer(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorCreateUser(
-          error?.message || "Terjadi kesalahan saat membuat user",
+        setErrorCreateTransfer(
+          error?.message || "Terjadi kesalahan saat membuat Transfer",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat membuat user",
+          description:
+            error?.message || "Terjadi kesalahan saat membuat Transfer",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingCreateUser(false);
+      setLoadingCreateTransfer(false);
       hideModal();
     }
   };
 
   return {
     handleSubmit,
-    loadingCreateUser,
+    loadingCreateTransfer,
     isModalVisible,
     showModal,
     hideModal,

@@ -3,6 +3,15 @@ import { create } from "zustand";
 import { getAccessToken } from "../auth";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import {
+  CreateTransaction,
+  FindAllTransaction,
+  FindyByCardNumberTransaction,
+  FindyByIdTransaction,
+  FindyByMerchantTransaction,
+  TrashedTransaction,
+  UpdateTransaction,
+} from "@/types/domain/request";
 
 const useTransactionStore = create<TransactionStore>((set, get) => ({
   transactions: null,
@@ -56,12 +65,8 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingCreateTransaction: value }),
   setLoadingUpdateTransaction: (value) =>
     set({ loadingUpdateTransaction: value }),
-  setLoadingRestoreTransaction: (value) =>
-    set({ loadingRestoreTransaction: value }),
   setLoadingTrashedTransaction: (value) =>
     set({ loadingTrashedTransaction: value }),
-  setLoadingDeletePermanentTransaction: (value) =>
-    set({ loadingDeletePermanentTransaction: value }),
 
   setErrorGetTransactions: (value) => set({ errorGetTransactions: value }),
   setErrorGetTransaction: (value) => set({ errorGetTransaction: value }),
@@ -76,23 +81,15 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
 
   setErrorCreateTransaction: (value) => set({ errorCreateTransaction: value }),
   setErrorUpdateTransaction: (value) => set({ errorUpdateTransaction: value }),
-  setErrorRestoreTransaction: (value) =>
-    set({ errorRestoreTransaction: value }),
   setErrorTrashedTransaction: (value) =>
     set({ errorTrashedTransaction: value }),
-  setErrorDeletePermanentTransaction: (value) =>
-    set({ errorDeletePermanentTransaction: value }),
 
-  findAllTransactions: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
+  findAllTransactions: async (req: FindAllTransaction) => {
     set({ loadingGetTransactions: true, errorGetTransactions: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/transactions", {
-        params: { search, page, pageSize },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -100,10 +97,10 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
       set({
         transactions: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetTransactions: false,
         errorGetTransactions: null,
@@ -113,15 +110,16 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingGetTransactions: false }),
         (message: any) => set({ errorGetTransactions: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdTransaction: async (id: number) => {
+  findByIdTransaction: async (req: FindyByIdTransaction) => {
     set({ loadingGetTransaction: true, errorGetTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transactions/${id}`, {
+      const response = await myApi.get(`/transactions/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -134,11 +132,12 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingGetTransaction: false }),
         (message: any) => set({ errorGetTransaction: message }),
+        req.toast,
       );
     }
   },
 
-  findByCardNumberTransaction: async (cardNumber: string) => {
+  findByCardNumberTransaction: async (req: FindyByCardNumberTransaction) => {
     set({
       loadingGetCardNumberTransaction: true,
       errorGetCardNumberTransaction: null,
@@ -146,7 +145,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     try {
       const token = getAccessToken();
       const response = await myApi.get(
-        `/transactions/card-number/${cardNumber}`,
+        `/transactions/card-number/${req.cardNumber}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -161,18 +160,19 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingGetCardNumberTransaction: false }),
         (message: any) => set({ errorGetCardNumberTransaction: message }),
+        req.cardNumber,
       );
     }
   },
 
-  findByMerchantTransaction: async (merchantId: number) => {
+  findByMerchantTransaction: async (req: FindyByMerchantTransaction) => {
     set({
       loadingGetMerchantTransaction: true,
       errorGetMerchantTransaction: null,
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transactions/merchant/${merchantId}`, {
+      const response = await myApi.get(`/transactions/merchant/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -185,6 +185,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingGetMerchantTransaction: false }),
         (message: any) => set({ errorGetMerchantTransaction: message }),
+        req.toast,
       );
     }
   },
@@ -217,46 +218,12 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveTransaction: false }),
         (message: any) => set({ errorGetActiveTransaction: message }),
+        null,
       );
     }
   },
 
-  findByTrashedTransaction: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
-    set({
-      loadingGetTrashedTransaction: true,
-      errorGetTrashedTransaction: null,
-    });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/transactions/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transactions: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedTransaction: false,
-        errorGetTrashedTransaction: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedTransaction: false }),
-        (message: any) => set({ errorGetTrashedTransaction: message }),
-      );
-    }
-  },
-
-  createTransaction: async (req: any) => {
+  createTransaction: async (req: CreateTransaction) => {
     set({ loadingCreateTransaction: true, errorCreateTransaction: null });
     try {
       const token = getAccessToken();
@@ -270,15 +237,16 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingCreateTransaction: false }),
         (message: any) => set({ errorCreateTransaction: message }),
+        req.toast,
       );
     }
   },
 
-  updateTransaction: async (id: number, req: any) => {
+  updateTransaction: async (req: UpdateTransaction) => {
     set({ loadingUpdateTransaction: true, errorUpdateTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/transactions/${id}`, req, {
+      const response = await myApi.put(`/transactions/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateTransaction: false, errorUpdateTransaction: null });
@@ -288,35 +256,22 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingUpdateTransaction: false }),
         (message: any) => set({ errorUpdateTransaction: message }),
+        req.toast,
       );
     }
   },
 
-  restoreTransaction: async (id: number) => {
-    set({ loadingRestoreTransaction: true, errorRestoreTransaction: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/transactions/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreTransaction: false, errorRestoreTransaction: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreTransaction: false }),
-        (message: any) => set({ errorRestoreTransaction: message }),
-      );
-    }
-  },
-
-  trashedTransaction: async (id: number) => {
+  trashedTransaction: async (req: TrashedTransaction) => {
     set({ loadingTrashedTransaction: true, errorTrashedTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/transactions/trashed/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.patch(
+        `/transactions/trashed/${req.id}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       set({ loadingTrashedTransaction: false, errorTrashedTransaction: null });
       return response.data;
     } catch (err) {
@@ -324,30 +279,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         err,
         () => set({ loadingTrashedTransaction: false }),
         (message: any) => set({ errorTrashedTransaction: message }),
-      );
-    }
-  },
-
-  deleteTransactionPermanent: async (id: number) => {
-    set({
-      loadingDeletePermanentTransaction: true,
-      errorDeletePermanentTransaction: null,
-    });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/transactions/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentTransaction: false,
-        errorDeletePermanentTransaction: null,
-      });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingDeletePermanentTransaction: false }),
-        (message: any) => set({ errorDeletePermanentTransaction: message }),
+        req.toast,
       );
     }
   },

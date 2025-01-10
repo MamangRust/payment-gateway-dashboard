@@ -4,6 +4,9 @@ import { handleApiError } from "@/helpers/handleApi";
 import { UserStore } from "@/types/state/user";
 import { CreateUser, UpdateUser } from "@/types/domain/request";
 import { getAccessToken } from "../auth";
+import { FindAllUserTrashed } from "@/types/domain/request/user/trashed/list";
+import { RestoreUserTrashed } from "@/types/domain/request/user/trashed/restore";
+import { DeletePermanentUser } from "@/types/domain/request/user/trashed/delete";
 
 const useUserStore = create<UserStore>((set, get) => ({
   users: null,
@@ -11,7 +14,7 @@ const useUserStore = create<UserStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -23,8 +26,6 @@ const useUserStore = create<UserStore>((set, get) => ({
   loadingCreateUser: false,
   loadingUpdateUser: false,
   loadingTrashedUser: false,
-  loadingRestoreUser: false,
-  loadingDeleteUser: false,
 
   errorGetUsers: null,
   errorGetUser: null,
@@ -33,8 +34,6 @@ const useUserStore = create<UserStore>((set, get) => ({
   errorCreateUser: null,
   errorUpdateUser: null,
   errorTrashedUser: null,
-  errorRestoreUser: null,
-  errorDeleteUser: null,
 
   setErrorGetUsers: (value: string | null) => set({ errorGetUsers: value }),
   setErrorGetUser: (value: string | null) => set({ errorGetUser: value }),
@@ -46,9 +45,6 @@ const useUserStore = create<UserStore>((set, get) => ({
   setErrorUpdateUser: (value: string | null) => set({ errorUpdateUser: value }),
   setErrorTrashedUser: (value: string | null) =>
     set({ errorTrashedUser: value }),
-  setErrorRestoreUser: (value: string | null) =>
-    set({ errorRestoreUser: value }),
-  setErrorDeleteUser: (value: string | null) => set({ errorDeleteUser: value }),
 
   setLoadingGetUsers: (value: boolean) => set({ loadingGetUsers: value }),
   setLoadingGetUser: (value: boolean) => set({ loadingGetUser: value }),
@@ -59,20 +55,19 @@ const useUserStore = create<UserStore>((set, get) => ({
   setLoadingCreateUser: (value: boolean) => set({ loadingCreateUser: value }),
   setLoadingUpdateUser: (value: boolean) => set({ loadingUpdateUser: value }),
   setLoadingTrashedUser: (value: boolean) => set({ loadingTrashedUser: value }),
-  setLoadingRestoreUser: (value: boolean) => set({ loadingRestoreUser: value }),
-  setLoadingDeleteUser: (value: boolean) => set({ loadingDeleteUser: value }),
 
-  findAllUsers: async (search: string, page: number, pageSize: number) => {
+  findAllUsers: async (req: FindAllUserTrashed) => {
     set({ loadingGetUsers: true, errorGetUsers: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get(`/user`, {
-        params: { page, page_size: pageSize, search },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("response", response);
+
+      console.log(response.data);
 
       set({
         users: response.data.data,
@@ -86,21 +81,20 @@ const useUserStore = create<UserStore>((set, get) => ({
         errorGetUsers: null,
       });
     } catch (err) {
-      console.log("error: ", err);
-
       handleApiError(
         err,
         () => set({ loadingGetUsers: false }),
         (message: any) => set({ errorGetUsers: message }),
+        req.toast,
       );
     }
   },
 
-  findById: async (id: number) => {
+  findById: async (req: RestoreUserTrashed) => {
     set({ loadingGetUser: true, errorGetUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/users/${id}`, {
+      const response = await myApi.get(`/users/${req.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -111,6 +105,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         err,
         () => set({ loadingGetUser: false }),
         (message: any) => set({ errorGetUser: message }),
+        req.id,
       );
     }
   },
@@ -141,36 +136,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveUsers: false }),
         (message: any) => set({ errorGetActiveUsers: message }),
-      );
-    }
-  },
-
-  findByTrashed: async (search: string, page: number, pageSize: number) => {
-    set({ loadingGetTrashedUsers: true, errorGetTrashedUsers: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get(`/users/trashed`, {
-        params: { page, pageSize, search },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      set({
-        users: response.data.items,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTrashedUsers: false,
-        errorGetTrashedUsers: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedUsers: false }),
-        (message: any) => set({ errorGetTrashedUsers: message }),
+        null,
       );
     }
   },
@@ -200,17 +166,18 @@ const useUserStore = create<UserStore>((set, get) => ({
         err,
         () => set({ loadingCreateUser: false }),
         (message: any) => set({ errorCreateUser: message }),
+        req.toast,
       );
 
       return false;
     }
   },
 
-  updateUser: async (id: number, req: UpdateUser) => {
+  updateUser: async (req: UpdateUser) => {
     set({ loadingUpdateUser: true, errorUpdateUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/users/${id}`, req, {
+      const response = await myApi.put(`/users/${req.id}`, req, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -228,18 +195,19 @@ const useUserStore = create<UserStore>((set, get) => ({
         err,
         () => set({ loadingUpdateUser: false }),
         (message: any) => set({ errorUpdateUser: message }),
+        req.toast,
       );
 
       return false;
     }
   },
 
-  trashedUser: async (id: number) => {
+  trashedUser: async (req: DeletePermanentUser) => {
     set({ loadingTrashedUser: true, errorTrashedUser: null });
 
     try {
       const token = getAccessToken();
-      const response = await myApi.delete(`/users/trash/${id}`, {
+      const response = await myApi.delete(`/users/trash/${req.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -255,59 +223,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         err,
         () => set({ loadingTrashedUser: false }),
         (message: any) => set({ errorTrashedUser: message }),
-      );
-      return false;
-    }
-  },
-
-  restoreUser: async (id: number) => {
-    set({ loadingRestoreUser: true, errorRestoreUser: null });
-
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/users/restore/${id}`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.status === 200) {
-        set({ loadingRestoreUser: false, errorRestoreUser: null });
-        return true;
-      } else {
-        throw new Error("Restore User Gagal. Silahkan coba lagi");
-      }
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreUser: false }),
-        (message: any) => set({ errorRestoreUser: message }),
-      );
-      return false;
-    }
-  },
-
-  deleteUserPermanent: async (id: number) => {
-    set({ loadingDeleteUser: true, errorDeleteUser: null });
-
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === -200) {
-        set({ loadingDeleteUser: false, errorDeleteUser: null });
-        return true;
-      } else {
-        throw new Error("Delete Permanent User Gagal. Silahkan coba lagi");
-      }
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingDeleteUser: false }),
-        (message: any) => set({ errorDeleteUser: message }),
+        req.toast,
       );
       return false;
     }

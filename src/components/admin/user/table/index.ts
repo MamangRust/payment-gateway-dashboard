@@ -3,6 +3,7 @@ import TableBodySaldo from "./table-body";
 import TableFooterSaldo from "./table-footer";
 import TableActionSaldo from "./table-action";
 import { userColumns } from "./table-column";
+import TableUser from "./table-user";
 
 export {
   TableHeaderSaldo,
@@ -10,4 +11,5 @@ export {
   TableFooterSaldo,
   TableActionSaldo,
   userColumns,
+  TableUser,
 };

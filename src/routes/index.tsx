@@ -1,7 +1,7 @@
 import DashboardPage from "@/pages/admin/dashboard/dashboard";
 import LayoutAdmin from "@/layouts/admin";
 import ErrorPage from "@/pages/error";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import AuthLayout from "@/layouts/auth";
 import LoginPage from "@/pages/auth/login";
 import PointOfSalePage from "@/pages/admin/point-of-sale";
@@ -148,6 +148,11 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <UserPage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,
       },
     ],
   },

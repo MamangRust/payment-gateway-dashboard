@@ -19,7 +19,7 @@ export default function useLogin() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const loginResult = await login(validatedValues);
+      const loginResult = await login(validatedValues, toast);
 
       if (loginResult) {
         toast({

@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CreateUserFormValues, createUserRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalUser from "@/store/user/modal";
+import { CreateUser } from "@/types/domain/request";
 
 export default function useCreateUser() {
   const { isModalVisible, showModal, hideModal } = useModalUser();
@@ -26,7 +27,16 @@ export default function useCreateUser() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createUser(validatedValues);
+      const req: CreateUser = {
+        firstname: validatedValues.firstname,
+        lastname: validatedValues.lastname,
+        email: validatedValues.email,
+        password: validatedValues.password,
+        confirm_password: validatedValues.confirm_password,
+        toast: toast,
+      };
+
+      const result = await createUser(req);
 
       if (result) {
         toast({

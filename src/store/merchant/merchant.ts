@@ -2,7 +2,15 @@ import { create } from "zustand";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { MerchantStore } from "@/types/state/merchant/merchant";
-import { CreateMerchant, UpdateMerchant } from "@/types/domain/request";
+import {
+  CreateMerchant,
+  FindAllMerchant,
+  findByApiKeyMerchant,
+  FindByIdMerchant,
+  FindMerchantUser,
+  FindTrashedMerchant,
+  UpdateMerchant,
+} from "@/types/domain/request";
 import { getAccessToken } from "../auth";
 
 const useMerchantStore = create<MerchantStore>((set, get) => ({
@@ -37,8 +45,6 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   errorCreateMerchant: null,
   errorUpdateMerchant: null,
   errorTrashedMerchant: null,
-  errorRestoreMerchant: null,
-  errorDeletePermanentMerchant: null,
 
   setLoadingGetMerchants: (value) => set({ loadingGetMerchants: value }),
   setLoadingGetMerchant: (value) => set({ loadingGetMerchant: value }),
@@ -51,9 +57,6 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   setLoadingCreateMerchant: (value) => set({ loadingCreateMerchant: value }),
   setLoadingUpdateMerchant: (value) => set({ loadingUpdateMerchant: value }),
   setLoadingTrashedMerchant: (value) => set({ loadingTrashedMerchant: value }),
-  setLoadingRestoreMerchant: (value) => set({ loadingRestoreMerchant: value }),
-  setLoadingDeletePermanentMerchant: (value) =>
-    set({ loadingDeletePermanentMerchant: value }),
 
   setErrorGetMerchants: (value) => set({ errorGetMerchants: value }),
   setErrorGetMerchant: (value) => set({ errorGetMerchant: value }),
@@ -65,25 +68,22 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   setErrorCreateMerchant: (value) => set({ errorCreateMerchant: value }),
   setErrorUpdateMerchant: (value) => set({ errorUpdateMerchant: value }),
   setErrorTrashedMerchant: (value) => set({ errorTrashedMerchant: value }),
-  setErrorRestoreMerchant: (value) => set({ errorRestoreMerchant: value }),
-  setErrorDeletePermanentMerchant: (value: string | null) =>
-    set({ errorDeletePermanentMerchant: value }),
 
-  findAllMerchants: async (search: string, page: number, pageSize: number) => {
+  findAllMerchants: async (req: FindAllMerchant) => {
     set({ loadingGetMerchants: true, errorGetMerchants: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/merchants", {
-        params: { search, page, pageSize },
+        params: { page: req.page, pageSize: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         merchants: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetMerchants: false,
         errorGetMerchants: null,
@@ -93,15 +93,16 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingGetMerchants: false }),
         (message: any) => set({ errorGetMerchants: message }),
+        req.toast,
       );
     }
   },
 
-  findById: async (id: number) => {
+  findById: async (req: FindByIdMerchant) => {
     set({ loadingGetMerchant: true, errorGetMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/merchants/${id}`, {
+      const response = await myApi.get(`/merchants/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -114,15 +115,16 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingGetMerchant: false }),
         (message: any) => set({ errorGetMerchant: message }),
+        req.toast,
       );
     }
   },
 
-  findByApiKey: async (api_key: string) => {
+  findByApiKey: async (req: findByApiKeyMerchant) => {
     set({ loadingGetApiKey: true, errorGetApiKey: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/merchants/api-key/${api_key}`, {
+      const response = await myApi.get(`/merchants/api-key/${req.api_key}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -135,15 +137,16 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingGetApiKey: false }),
         (message: any) => set({ errorGetApiKey: message }),
+        req.toast,
       );
     }
   },
 
-  findByMerchantUser: async (user_id: number) => {
+  findByMerchantUser: async (req: FindMerchantUser) => {
     set({ loadingGetMerchantUser: true, errorGetMerchantUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/merchants/user/${user_id}`, {
+      const response = await myApi.get(`/merchants/user/${req.user_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -156,6 +159,7 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingGetMerchantUser: false }),
         (message: any) => set({ errorGetMerchantUser: message }),
+        req.toast,
       );
     }
   },
@@ -184,34 +188,7 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveMerchant: false }),
         (message: any) => set({ errorGetActiveMerchant: null }),
-      );
-    }
-  },
-
-  findByTrashed: async (search: string, page: number, pageSize: number) => {
-    set({ loadingGetTrashedMerchant: true, errorGetTrashedMerchant: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/merchants/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        merchants: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedMerchant: false,
-        errorGetTrashedMerchant: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedMerchant: false }),
-        (message: any) => set({ errorGetTrashedMerchant: message }),
+        null,
       );
     }
   },
@@ -230,15 +207,16 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingCreateMerchant: false }),
         (message: any) => set({ errorCreateMerchant: message }),
+        req.toast,
       );
     }
   },
 
-  updateMerchant: async (id: number, req: UpdateMerchant) => {
+  updateMerchant: async (req: UpdateMerchant) => {
     set({ loadingUpdateMerchant: true, errorUpdateMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/merchants/${id}`, req, {
+      const response = await myApi.put(`/merchants/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateMerchant: false, errorUpdateMerchant: null });
@@ -248,33 +226,15 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingUpdateMerchant: false }),
         (message: any) => set({ errorUpdateMerchant: message }),
+        req.toast,
       );
     }
   },
-
-  restoreMerchant: async (id: number) => {
-    set({ loadingRestoreMerchant: true, errorRestoreMerchant: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/merchants/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreMerchant: false, errorRestoreMerchant: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreMerchant: false }),
-        (message: any) => set({ errorRestoreMerchant: null }),
-      );
-    }
-  },
-
-  trashedMerchant: async (id: number) => {
+  trashedMerchant: async (req: FindTrashedMerchant) => {
     set({ loadingTrashedMerchant: true, errorTrashedMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/merchants/trashed/${id}`, null, {
+      const response = await myApi.patch(`/merchants/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedMerchant: false, errorTrashedMerchant: null });
@@ -284,30 +244,7 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         err,
         () => set({ loadingTrashedMerchant: false }),
         (message: any) => set({ errorTrashedMerchant: message }),
-      );
-    }
-  },
-
-  deleteMerchantPermanent: async (id: number) => {
-    set({
-      loadingDeletePermanentMerchant: true,
-      errorDeletePermanentMerchant: null,
-    });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/merchants/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentMerchant: false,
-        errorDeletePermanentMerchant: null,
-      });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingDeletePermanentMerchant: false }),
-        (message: any) => set({ errorDeletePermanentMerchant: message }),
+        req.toast,
       );
     }
   },

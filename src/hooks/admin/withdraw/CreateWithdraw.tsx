@@ -1,37 +1,48 @@
-import useUserStore from "@/store/user/user";
+import useWithdrawStore from "@/store/withdraw/withdraw";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { CreateUserFormValues, createUserSchema } from "@/schemas";
+import {
+  CreateWithdrawFormValues,
+  createWithdrawRequestSchema,
+} from "@/schemas";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalWithdraw from "@/store/withdraw/modal";
+import { CreateWithdraw } from "@/types/domain/request";
 
 export default function useCreateUser() {
-  const { isModalVisible, showModal, hideModal } = useModalUser();
+  const { isModalVisible, showModal, hideModal } = useModalWithdraw();
 
   const {
-    createUser,
-    setLoadingCreateUser,
-    loadingCreateUser,
-    setErrorCreateUser,
-  } = useUserStore();
+    createWithdraw,
+    setLoadingCreateWithdraw,
+    loadingCreateWithdraw,
+    setErrorCreateWithdraw,
+  } = useWithdrawStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: CreateUserFormValues) => {
-    setLoadingCreateUser(true);
+  const handleSubmit = async (data: CreateWithdrawFormValues) => {
+    setLoadingCreateWithdraw(true);
 
     try {
-      const validatedValues = createUserSchema.parse(data);
+      const validatedValues = createWithdrawRequestSchema.parse(data);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createUser(validatedValues);
+      const req: CreateWithdraw = {
+        card_number: validatedValues.card_number,
+        withdraw_amount: validatedValues.withdraw_amount,
+        withdraw_time: validatedValues.withdraw_time,
+        toast: toast,
+      };
+
+      const result = await createWithdraw(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil dibuat",
+          description: "withdraw berhasil dibuat",
           variant: "default",
         });
 
@@ -39,38 +50,39 @@ export default function useCreateUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal membuat withdraw. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorCreateUser(errorMessage);
+        setErrorCreateWithdraw(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorCreateUser(
-          error?.message || "Terjadi kesalahan saat membuat user",
+        setErrorCreateWithdraw(
+          error?.message || "Terjadi kesalahan saat membuat withdraw",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat membuat user",
+          description:
+            error?.message || "Terjadi kesalahan saat membuat withdraw",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingCreateUser(false);
+      setLoadingCreateWithdraw(false);
       hideModal();
     }
   };
 
   return {
     handleSubmit,
-    loadingCreateUser,
+    loadingCreateWithdraw,
     isModalVisible,
     showModal,
     hideModal,

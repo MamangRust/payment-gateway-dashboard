@@ -1,39 +1,39 @@
-import useUserStore from "@/store/user/user";
+import useTransactionStore from "@/store/transaction/transaction";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalTransaction from "@/store/transaction/modal";
 
 export default function useDeleteUser() {
   const {
-    deleteUserId,
+    deleteTransactionId,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalUser();
+  } = useModalTransaction();
 
   const {
-    trashedUser,
-    setLoadingTrashedUser,
-    loadingTrashedUser,
-    setErrorTrashedUser,
-  } = useUserStore();
+    trashedTransaction,
+    setLoadingTrashedTransaction,
+    loadingTrashedTransaction,
+    setErrorTrashedTransaction,
+  } = useTransactionStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    setLoadingTrashedUser(true);
+    setLoadingTrashedTransaction(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedUser(deleteUserId as number);
+      const result = await trashedTransaction(deleteTransactionId as number);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "Transaction berhasil dihapus",
           variant: "default",
         });
 
@@ -41,38 +41,39 @@ export default function useDeleteUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal menghapus Transaction. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorTrashedUser(errorMessage);
+        setErrorTrashedTransaction(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorTrashedUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorTrashedTransaction(
+          error?.message || "Terjadi kesalahan saat menghapus transaction",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat menghapus transaction",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingTrashedUser(false);
+      setLoadingTrashedTransaction(false);
       hideModalDelete();
     }
   };
 
   return {
     handleSubmit,
-    loadingTrashedUser,
+    loadingTrashedTransaction,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,

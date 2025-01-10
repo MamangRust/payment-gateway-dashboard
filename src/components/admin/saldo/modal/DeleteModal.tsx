@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogTrigger,
@@ -6,9 +6,9 @@ import {
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Trash } from 'lucide-react';
-import useModalSaldo from '@/store/saldo/modal';
+} from "@/components/ui/dialog";
+import { Trash } from "lucide-react";
+import useModalSaldo from "@/store/saldo/modal";
 
 export function DeleteSaldo() {
   const {
@@ -19,24 +19,23 @@ export function DeleteSaldo() {
   } = useModalSaldo();
 
   const handleDelete = () => {
-    
     hideModalDelete();
   };
 
   return (
-    <Dialog open={isModalVisibleDelete} onOpenChange={(open) => (open ? showModalDelete(deleteSaldoId!) : hideModalDelete())}>
-      <DialogTrigger asChild>
-        <Button variant="destructive" size="sm" onClick={() => showModalDelete(deleteSaldoId!)}>
-          <Trash className="mr-2 h-4 w-4" />
-          Delete Card
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={isModalVisibleDelete}
+      onOpenChange={(open) =>
+        open ? showModalDelete(deleteSaldoId!) : hideModalDelete()
+      }
+    >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
           <DialogTitle>Delete Card</DialogTitle>
         </DialogHeader>
         <div className="text-sm text-gray-600">
-          Are you sure you want to delete this card? This action cannot be undone.
+          Are you sure you want to delete this card? This action cannot be
+          undone.
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={hideModalDelete}>

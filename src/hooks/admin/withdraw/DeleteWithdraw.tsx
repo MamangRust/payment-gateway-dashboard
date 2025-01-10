@@ -1,39 +1,45 @@
-import useUserStore from "@/store/user/user";
+import useWithdrawStore from "@/store/withdraw/withdraw";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import useModalUser from "@/store/user/modal";
+import useModalWithdraw from "@/store/withdraw/modal";
+import { TrashedWithdraw } from "@/types/domain/request";
 
 export default function useDeleteUser() {
   const {
-    deleteUserId,
+    deleteWithdrawId,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalUser();
+  } = useModalWithdraw();
 
   const {
-    trashedUser,
-    setLoadingTrashedUser,
-    loadingTrashedUser,
-    setErrorTrashedUser,
-  } = useUserStore();
+    trashedWithdraw,
+    setLoadingTrashedWithdraw,
+    loadingTrashedWithdraw,
+    setErrorTrashedWithdraw,
+  } = useWithdrawStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    setLoadingTrashedUser(true);
+    setLoadingTrashedWithdraw(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedUser(deleteUserId as number);
+      const req: TrashedWithdraw = {
+        id: deleteWithdrawId as number,
+        toast: toast,
+      };
+
+      const result = await trashedWithdraw(req);
 
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "Withdraw berhasil dihapus",
           variant: "default",
         });
 
@@ -41,38 +47,39 @@ export default function useDeleteUser() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal menghapus withdraw. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const errorMessage = error.errors.map((err) => err.message).join(", ");
-        setErrorTrashedUser(errorMessage);
+        setErrorTrashedWithdraw(errorMessage);
         toast({
           title: "Validation Error",
           description: errorMessage,
           variant: "destructive",
         });
       } else {
-        setErrorTrashedUser(
-          error?.message || "Terjadi kesalahan saat mengedit user",
+        setErrorTrashedWithdraw(
+          error?.message || "Terjadi kesalahan saat menghapus withdraw",
         );
         toast({
           title: "Error",
-          description: error?.message || "Terjadi kesalahan saat mengedit user",
+          description:
+            error?.message || "Terjadi kesalahan saat menghapus withdraw",
           variant: "destructive",
         });
       }
     } finally {
-      setLoadingTrashedUser(false);
+      setLoadingTrashedWithdraw(false);
       hideModalDelete();
     }
   };
 
   return {
     handleSubmit,
-    loadingTrashedUser,
+    loadingTrashedWithdraw,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,

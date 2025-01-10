@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UpdateUserFormValues, updateUserRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalUser from "@/store/user/modal";
+import { UpdateUser } from "@/types/domain/request";
 
 export default function useUpdateUser() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
@@ -27,7 +28,17 @@ export default function useUpdateUser() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateUser(editUserId as number, validatedValues);
+      const req: UpdateUser = {
+        id: editUserId as number,
+        firstname: validatedValues.firstname,
+        lastname: validatedValues.lastname,
+        email: validatedValues.email,
+        password: validatedValues.password,
+        confirm_password: validatedValues.confirm_password,
+        toast: toast,
+      };
+
+      const result = await updateUser(req);
 
       if (result) {
         toast({

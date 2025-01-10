@@ -3,6 +3,14 @@ import { create } from "zustand";
 import { getAccessToken } from "../auth";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { FindAllWithdraw } from "@/types/domain/request/withdraw/list";
+import {
+  CreateWithdraw,
+  FindByCardNumberWithdraw,
+  FindByIdWithdraw,
+  TrashedWithdraw,
+  UpdateWithdraw,
+} from "@/types/domain/request";
 
 const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   withdraws: null,
@@ -51,9 +59,6 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   setLoadingCreateWithdraw: (value) => set({ loadingCreateWithdraw: value }),
   setLoadingUpdateWithdraw: (value) => set({ loadingUpdateWithdraw: value }),
   setLoadingTrashedWithdraw: (value) => set({ loadingTrashedWithdraw: value }),
-  setLoadingRestoreWithdraw: (value) => set({ loadingRestoreWithdraw: value }),
-  setLoadingPermanentWithdraw: (value) =>
-    set({ loadingPermanentWithdraw: value }),
 
   setErrorGetWithdraws: (value) => set({ errorGetWithdraws: value }),
   setErrorGetWithdraw: (value) => set({ errorGetWithdraw: value }),
@@ -66,24 +71,22 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   setErrorCreateWithdraw: (value) => set({ errorCreateWithdraw: value }),
   setErrorUpdateWithdraw: (value) => set({ errorUpdateWithdraw: value }),
   setErrorTrashedWithdraw: (value) => set({ errorTrashedWithdraw: value }),
-  setErrorRestoreWithdraw: (value) => set({ errorRestoreWithdraw: value }),
-  setErrorPermanentWithdraw: (value) => set({ errorPermanentWithdraw: value }),
 
-  findAllWithdraws: async (search: string, page: number, pageSize: number) => {
+  findAllWithdraws: async (req: FindAllWithdraw) => {
     set({ loadingGetWithdraws: true, errorGetWithdraws: null });
     try {
       const token = getAccessToken();
       const response = await myApi.get("/withdraws", {
-        params: { search, page, pageSize },
+        params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         withdraws: response.data.data,
         pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
+          currentPage: response.data.pagination.current_page,
+          pageSize: response.data.pagination.page_size,
+          totalItems: response.data.pagination.total_records,
+          totalPages: response.data.pagination.total_pages,
         },
         loadingGetWithdraws: false,
         errorGetWithdraws: null,
@@ -93,15 +96,16 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingGetWithdraws: false }),
         (message: any) => set({ errorGetWithdraws: message }),
+        req.toast,
       );
     }
   },
 
-  findByIdWithdraw: async (id: number) => {
+  findByIdWithdraw: async (req: FindByIdWithdraw) => {
     set({ loadingGetWithdraw: true, errorGetWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/withdraws/${id}`, {
+      const response = await myApi.get(`/withdraws/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
@@ -114,20 +118,24 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingGetWithdraw: false }),
         (message: any) => set({ errorGetWithdraw: message }),
+        req.toast,
       );
     }
   },
 
-  findByCardNumberWithdraw: async (cardNumber: string) => {
+  findByCardNumberWithdraw: async (req: FindByCardNumberWithdraw) => {
     set({
       loadingGetCardNumberWithdraw: true,
       errorGetCardNumberWithdraw: null,
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/withdraws/card-number/${cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.get(
+        `/withdraws/card-number/${req.cardNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       set({
         withdraw: response.data,
         loadingGetCardNumberWithdraw: false,
@@ -138,6 +146,7 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingGetCardNumberWithdraw: false }),
         (message: any) => set({ errorGetCardNumberWithdraw: message }),
+        req.toast,
       );
     }
   },
@@ -170,43 +179,12 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingGetActiveWithdraw: false }),
         (message: any) => set({ errorGetActiveWithdraw: message }),
+        null,
       );
     }
   },
 
-  findByTrashedWithdraw: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
-    set({ loadingGetTrashedWithdraw: true, errorGetTrashedWithdraw: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.get("/withdraws/trashed", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        withdraws: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetTrashedWithdraw: false,
-        errorGetTrashedWithdraw: null,
-      });
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingGetTrashedWithdraw: false }),
-        (message: any) => set({ errorGetTrashedWithdraw: message }),
-      );
-    }
-  },
-
-  createWithdraw: async (req: any) => {
+  createWithdraw: async (req: CreateWithdraw) => {
     set({ loadingCreateWithdraw: true, errorCreateWithdraw: null });
     try {
       const token = getAccessToken();
@@ -220,15 +198,16 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingCreateWithdraw: false }),
         (message: any) => set({ errorCreateWithdraw: message }),
+        req.toast,
       );
     }
   },
 
-  updateWithdraw: async (id: number, req: any) => {
+  updateWithdraw: async (req: UpdateWithdraw) => {
     set({ loadingUpdateWithdraw: true, errorUpdateWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/withdraws/${id}`, req, {
+      const response = await myApi.put(`/withdraws/${req.id}`, req, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingUpdateWithdraw: false, errorUpdateWithdraw: null });
@@ -238,33 +217,16 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingUpdateWithdraw: false }),
         (message: any) => set({ errorUpdateWithdraw: message }),
+        req.toast,
       );
     }
   },
 
-  restoreWithdraw: async (id: number) => {
-    set({ loadingRestoreWithdraw: true, errorRestoreWithdraw: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.patch(`/withdraws/restore/${id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreWithdraw: false, errorRestoreWithdraw: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingRestoreWithdraw: false }),
-        (message: any) => set({ errorRestoreWithdraw: message }),
-      );
-    }
-  },
-
-  trashedWithdraw: async (id: number) => {
+  trashedWithdraw: async (req: TrashedWithdraw) => {
     set({ loadingTrashedWithdraw: true, errorTrashedWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/withdraws/trashed/${id}`, null, {
+      const response = await myApi.patch(`/withdraws/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingTrashedWithdraw: false, errorTrashedWithdraw: null });
@@ -274,24 +236,7 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         err,
         () => set({ loadingTrashedWithdraw: false }),
         (message: any) => set({ errorTrashedWithdraw: message }),
-      );
-    }
-  },
-
-  deleteWithdrawPermanent: async (id: number) => {
-    set({ loadingPermanentWithdraw: true, errorPermanentWithdraw: null });
-    try {
-      const token = getAccessToken();
-      const response = await myApi.delete(`/withdraws/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingPermanentWithdraw: false, errorPermanentWithdraw: null });
-      return response.data;
-    } catch (err) {
-      handleApiError(
-        err,
-        () => set({ loadingPermanentWithdraw: false }),
-        (message: any) => set({ errorPermanentWithdraw: message }),
+        req.id,
       );
     }
   },

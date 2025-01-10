@@ -4,4 +4,5 @@ export interface CreateCard {
   expire_date: Date;
   cvv: string;
   card_provider: string;
+  toast: any;
 }

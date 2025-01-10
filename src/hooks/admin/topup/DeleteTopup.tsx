@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import useModalTopup from "@/store/topup/modal";
+import { TrashedTopup } from "@/types/domain/request/topup/trashed";
 
 export default function useDeleteTopup() {
   const {
@@ -28,7 +29,12 @@ export default function useDeleteTopup() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedTopup(deleteTopupId as number);
+      const req: TrashedTopup = {
+        id: deleteTopupId as number,
+        toast: toast,
+      };
+
+      const result = await trashedTopup(req);
 
       if (result) {
         toast({

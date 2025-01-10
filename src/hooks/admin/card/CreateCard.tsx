@@ -4,8 +4,9 @@ import { useToast } from "@/hooks/use-toast";
 import { CreateCardFormValues, createCardRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalCard from "@/store/card/modal";
+import { CreateCard } from "@/types/domain/request";
 
-export default function useCreateUser() {
+export default function useCreateCard() {
   const { isModalVisible, showModal, hideModal } = useModalCard();
 
   const {
@@ -26,7 +27,16 @@ export default function useCreateUser() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createCard(validatedValues);
+      const req: CreateCard = {
+        user_id: validatedValues.user_id,
+        card_type: validatedValues.card_type,
+        expire_date: validatedValues.expire_date,
+        cvv: validatedValues.cvv,
+        card_provider: validatedValues.card_type,
+        toast: toast,
+      };
+
+      const result = await createCard(req);
 
       if (result) {
         toast({

@@ -1,0 +1,44 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
+
+export function RestoreAllWithdrawTrashed() {
+  const { showModalRestoreAll, hideModalRestoreAll, isModalVisibleRestoreAll } =
+    useModalWithdrawTrashed();
+
+  const handleDelete = () => {
+    hideModalRestoreAll();
+  };
+
+  return (
+    <Dialog
+      open={isModalVisibleRestoreAll}
+      onOpenChange={(open) =>
+        open ? showModalRestoreAll() : hideModalRestoreAll()
+      }
+    >
+      <DialogContent className="max-w-md w-full">
+        <DialogHeader>
+          <DialogTitle>Restore All Withdraw</DialogTitle>
+        </DialogHeader>
+        <div className="text-sm text-gray-600">
+          Are you sure you want to restore all this withdraw?
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={hideModalRestoreAll}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

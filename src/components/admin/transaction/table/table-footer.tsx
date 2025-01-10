@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import PaginationDropdown from "@/components/admin/dropdown-pagination";
-import { TableFooterTransferProps } from "@/types/table";
+import {
+  TableFooterTransactionProps,
+  TableFooterTransferProps,
+} from "@/types/table";
 
 const TableFooterTransaction = ({
   table,
   pagination,
   onPageChange,
   onPageSizeChange,
-}: TableFooterTransferProps) => {
+}: TableFooterTransactionProps) => {
   const safePagination = {
     currentPage: pagination?.currentPage || 1,
     pageSize: pagination?.pageSize || 10,

@@ -1,4 +1,12 @@
-import { CreateWithdraw, UpdateWithdraw } from "@/types/domain/request";
+import {
+  CreateWithdraw,
+  FindByCardNumberWithdraw,
+  FindByIdWithdraw,
+  TrashedWithdraw,
+  UpdateWithdraw,
+} from "@/types/domain/request";
+import { FindByCardNumber } from "@/types/domain/request/saldo";
+import { FindAllWithdraw } from "@/types/domain/request/withdraw/list";
 import { Withdraw } from "@/types/model/withdraw";
 
 export interface WithdrawStore {
@@ -21,8 +29,6 @@ export interface WithdrawStore {
   loadingCreateWithdraw: boolean;
   loadingUpdateWithdraw: boolean;
   loadingTrashedWithdraw: boolean;
-  loadingRestoreWithdraw: boolean;
-  loadingPermanentWithdraw: boolean;
 
   // Error states
   errorGetWithdraws: string | null;
@@ -34,8 +40,6 @@ export interface WithdrawStore {
   errorCreateWithdraw: string | null;
   errorUpdateWithdraw: string | null;
   errorTrashedWithdraw: string | null;
-  errorRestoreWithdraw: string | null;
-  errorPermanentWithdraw: string | null;
 
   setLoadingGetWithdraws: (value: boolean) => void;
   setLoadingGetWithdraw: (value: boolean) => void;
@@ -46,8 +50,6 @@ export interface WithdrawStore {
   setLoadingCreateWithdraw: (value: boolean) => void;
   setLoadingUpdateWithdraw: (value: boolean) => void;
   setLoadingTrashedWithdraw: (value: boolean) => void;
-  setLoadingRestoreWithdraw: (value: boolean) => void;
-  setLoadingPermanentWithdraw: (value: boolean) => void;
 
   setErrorGetWithdraws: (value: string | null) => void;
   setErrorGetWithdraw: (value: string | null) => void;
@@ -58,30 +60,16 @@ export interface WithdrawStore {
   setErrorCreateWithdraw: (value: string | null) => void;
   setErrorUpdateWithdraw: (value: string | null) => void;
   setErrorTrashedWithdraw: (value: string | null) => void;
-  setErrorRestoreWithdraw: (value: string | null) => void;
-  setErrorPermanentWithdraw: (value: string | null) => void;
 
-  findAllWithdraws: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-  findByIdWithdraw: (id: number) => Promise<void>;
-  findByCardNumberWithdraw: (cardNumber: string) => Promise<void>;
+  findAllWithdraws: (req: FindAllWithdraw) => Promise<void>;
+  findByIdWithdraw: (req: FindByIdWithdraw) => Promise<void>;
+  findByCardNumberWithdraw: (req: FindByCardNumberWithdraw) => Promise<void>;
   findByActiveWithdraw: (
     search: string,
     page: number,
     pageSize: number,
   ) => Promise<void>;
-  findByTrashedWithdraw: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
-
   createWithdraw: (req: CreateWithdraw) => Promise<boolean>;
-  updateWithdraw: (id: number, req: UpdateWithdraw) => Promise<boolean>;
-  restoreWithdraw: (id: number) => Promise<boolean>;
-  trashedWithdraw: (id: number) => Promise<boolean>;
-  deleteWithdrawPermanent: (id: number) => Promise<boolean>;
+  updateWithdraw: (req: UpdateWithdraw) => Promise<boolean>;
+  trashedWithdraw: (req: TrashedWithdraw) => Promise<boolean>;
 }
