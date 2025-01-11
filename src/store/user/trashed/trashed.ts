@@ -57,7 +57,7 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     set({ loadingGetUsersTrashed: true, errorGetUsersTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/users/trashed", {
+      const response = await myApi.get("/user/trashed", {
         params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });

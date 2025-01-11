@@ -1,39 +1,39 @@
-import { Users, DollarSign, Repeat, FileText } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Chart from 'react-apexcharts';
+import { Users, DollarSign, Repeat, FileText } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Chart from "react-apexcharts";
 
 export default function DashboardTopups() {
   const barChartOptions = {
     chart: {
-      id: 'topup-method-chart',
+      id: "topup-method-chart",
       toolbar: { show: false },
     },
     xaxis: {
-      categories: ['Credit Card', 'Bank Transfer', 'E-Wallet'], // Top-up methods
+      categories: ["Credit Card", "Bank Transfer", "E-Wallet"],
     },
-    colors: ['#6366F1', '#22C55E', '#F59E0B'], // Color palette for the bars
+    colors: ["#6366F1", "#22C55E", "#F59E0B"],
     plotOptions: {
       bar: {
         borderRadius: 5,
-        columnWidth: '45%',
+        columnWidth: "45%",
       },
     },
   };
 
   const barChartSeries = [
     {
-      name: 'Topup Amount',
+      name: "Topup Amount",
       data: [5000, 3000, 2000], // Sample top-up amounts for each method
     },
   ];
 
   const pieChartOptions = {
     chart: {
-      id: 'topup-status-chart',
+      id: "topup-status-chart",
     },
-    labels: ['Success', 'Pending', 'Failed'],
-    colors: ['#22C55E', '#EAB308', '#EF4444'],
-    legend: { position: 'bottom' },
+    labels: ["Success", "Pending", "Failed"],
+    colors: ["#22C55E", "#EAB308", "#EF4444"],
+    legend: { position: "bottom" },
   };
 
   const pieChartSeries = [70, 20, 10]; // Sample top-up statuses (percentage)
@@ -46,11 +46,11 @@ export default function DashboardTopups() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Topups</CardTitle>
-            <DollarSign className="h-6 w-6 text-gray-500" />{' '}
+            <DollarSign className="h-6 w-6 text-gray-500" />{" "}
             {/* Icon Dollar Sign */}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">150</div>{' '}
+            <div className="text-2xl font-bold">150</div>{" "}
             {/* Sample total top-ups */}
           </CardContent>
         </Card>
@@ -64,7 +64,7 @@ export default function DashboardTopups() {
             <Repeat className="h-6 w-6 text-gray-500" /> {/* Icon Repeat */}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">105</div>{' '}
+            <div className="text-2xl font-bold">105</div>{" "}
             {/* Sample successful top-ups */}
           </CardContent>
         </Card>
@@ -75,11 +75,11 @@ export default function DashboardTopups() {
             <CardTitle className="text-sm font-medium">
               Topups Pending
             </CardTitle>
-            <FileText className="h-6 w-6 text-gray-500" />{' '}
+            <FileText className="h-6 w-6 text-gray-500" />{" "}
             {/* Icon File Text */}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">30</div>{' '}
+            <div className="text-2xl font-bold">30</div>{" "}
             {/* Sample pending top-ups */}
           </CardContent>
         </Card>
@@ -88,11 +88,11 @@ export default function DashboardTopups() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Topups Failed</CardTitle>
-            <FileText className="h-6 w-6 text-gray-500" />{' '}
+            <FileText className="h-6 w-6 text-gray-500" />{" "}
             {/* Icon File Text */}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15</div>{' '}
+            <div className="text-2xl font-bold">15</div>{" "}
             {/* Sample failed top-ups */}
           </CardContent>
         </Card>

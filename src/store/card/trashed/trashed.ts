@@ -57,7 +57,7 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     set({ loadingGetCardsTrashed: true, errorGetCardsTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/cards/trashed", {
+      const response = await myApi.get("/card/trashed", {
         params: { page: req.page, page_size: req.pageSize, search: req.search },
         headers: { Authorization: `Bearer ${token}` },
       });

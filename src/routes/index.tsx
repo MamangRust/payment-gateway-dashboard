@@ -25,6 +25,14 @@ import WithdrawPage from "@/pages/admin/withdraw/withdraw";
 import UserPage from "@/pages/admin/user/user";
 import TransferPage from "@/pages/admin/transfer/transfer";
 import RegisterPage from "@/pages/auth/register";
+import CardTrashedPage from "@/pages/admin/card/cardTrashed";
+import MerchantTrashedPage from "@/pages/admin/merchant/merchantTrashed";
+import SaldoTrashedPage from "@/pages/admin/saldo/saldoTrashed";
+import TopupTrashedPage from "@/pages/admin/topup/topupTrashed";
+import TransactionTrashedPage from "@/pages/admin/transaction/transactionTrashed";
+import TransferTrashedPage from "@/pages/admin/transfer/tansferTrashed";
+import UserTrashedPage from "@/pages/admin/user/userTrashed";
+import WithdrawTrashedPage from "@/pages/admin/withdraw/withdrawTrashed";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +91,10 @@ const router = createBrowserRouter([
         index: true,
         element: <CardPage />,
       },
+      {
+        path: "trashed",
+        element: <CardTrashedPage />,
+      },
     ],
   },
   {
@@ -93,6 +105,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <MerchantPage />,
+      },
+      {
+        path: "trashed",
+        element: <MerchantTrashedPage />,
       },
     ],
   },
@@ -105,6 +121,10 @@ const router = createBrowserRouter([
         index: true,
         element: <SaldoPage />,
       },
+      {
+        path: "trashed",
+        element: <SaldoTrashedPage />,
+      },
     ],
   },
   {
@@ -115,6 +135,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <TopupPage />,
+      },
+      {
+        path: "trashed",
+        element: <TopupTrashedPage />,
       },
     ],
   },
@@ -127,6 +151,10 @@ const router = createBrowserRouter([
         index: true,
         element: <TransactionPage />,
       },
+      {
+        path: "trashed",
+        element: <TransactionTrashedPage />,
+      },
     ],
   },
   {
@@ -137,6 +165,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <TransferPage />,
+      },
+      {
+        path: "trashed",
+        element: <TransferTrashedPage />,
       },
     ],
   },
@@ -149,6 +181,10 @@ const router = createBrowserRouter([
         index: true,
         element: <UserPage />,
         errorElement: <ErrorPage />,
+      },
+      {
+        path: "trashed",
+        element: <UserTrashedPage />,
       },
       {
         path: "*",
@@ -164,6 +200,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <WithdrawPage />,
+      },
+      {
+        path: "trashed",
+        element: <WithdrawTrashedPage />,
       },
     ],
   },
