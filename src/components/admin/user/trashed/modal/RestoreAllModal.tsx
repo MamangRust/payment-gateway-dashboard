@@ -6,15 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useRestoreAllUser from "@/hooks/admin/user/trashed/RestoreAll";
 import useModalUserTrashed from "@/store/user/trashed/modal";
 
 export function RestoreAllUserTrashed() {
-  const { showModalRestoreAll, hideModalRestoreAll, isModalVisibleRestoreAll } =
-    useModalUserTrashed();
-
-  const handleDelete = () => {
-    hideModalRestoreAll();
-  };
+  const {
+    handleSubmit,
+    loadingRestoreAllUserTrashed,
+    isModalVisibleRestoreAll,
+    showModalRestoreAll,
+    hideModalRestoreAll,
+  } = useRestoreAllUser();
 
   return (
     <Dialog
@@ -34,7 +36,7 @@ export function RestoreAllUserTrashed() {
           <Button variant="outline" onClick={hideModalRestoreAll}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

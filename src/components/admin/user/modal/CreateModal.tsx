@@ -7,22 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateUserForm from "../form/CreateForm";
-import useModalUser from "@/store/user/modal";
-import { CreateUserFormValues } from "@/schemas";
-import { useRef } from "react";
+import useCreateUser from "@/hooks/admin/user/CreateUser";
 
 export function AddUser() {
-  const { isModalVisible, showModal, hideModal } = useModalUser();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateUserFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateUser,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateUser();
 
   return (
     <Dialog

@@ -66,6 +66,7 @@ export default function useDeletePermanentTransaction() {
   };
 
   return {
+    deletePermanentTransactionId,
     handleSubmit,
     loadingDeletePermanentTransactionTrashed,
     isModalVisibleDeletePermanent,

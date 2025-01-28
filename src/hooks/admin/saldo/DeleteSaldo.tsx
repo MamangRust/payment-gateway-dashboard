@@ -66,6 +66,7 @@ export default function useDeleteSaldo() {
   };
 
   return {
+    deleteSaldoId,
     handleSubmit,
     loadingTrashedSaldo,
     isModalVisibleDelete,

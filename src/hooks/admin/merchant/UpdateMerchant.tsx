@@ -7,21 +7,41 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalMerchant from "@/store/merchant/modal";
-import { UpdateMerchant } from "@/types/domain/request";
+import { FindByIdMerchant, UpdateMerchant } from "@/types/domain/request";
+import { useEffect, useRef } from "react";
 
 export default function useUpdateMerchant() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editMerchantId } =
     useModalMerchant();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     updateMerchant,
     setLoadingUpdateMerchant,
     loadingUpdateMerchant,
     setErrorUpdateMerchant,
+
+    findById,
+    merchant,
   } = useMerchantStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editMerchantId !== null) {
+      const req: FindByIdMerchant = {
+        toast,
+        id: editMerchantId,
+      };
+
+      findById(req);
+    }
+  }, [isModalVisibleEdit, editMerchantId]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateMerchantFormValues) => {
     setLoadingUpdateMerchant(true);
@@ -32,12 +52,14 @@ export default function useUpdateMerchant() {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const req: UpdateMerchant = {
-        id: editMerchantId as number,
-        user_id: validatedValues.user_id,
+        merchant_id: Number(editMerchantId),
+        user_id: Number(validatedValues.user_id.value),
         name: validatedValues.name,
         status: validatedValues.status,
         toast: toast,
       };
+
+      console.log("merchant update", req);
 
       const result = await updateMerchant(req);
 
@@ -83,6 +105,10 @@ export default function useUpdateMerchant() {
   };
 
   return {
+    merchant,
+    editMerchantId,
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingUpdateMerchant,
     isModalVisibleEdit,

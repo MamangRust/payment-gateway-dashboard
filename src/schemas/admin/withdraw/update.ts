@@ -1,9 +1,14 @@
 import { z } from "zod";
 
+const CardIdSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
 export const updateWithdrawRequestSchema = z.object({
-  card_number: z.string().min(1).max(16),
-  withdraw_amount: z.number().int().min(1).max(16),
-  withdraw_time: z.string().min(1, "Withdraw time is required"),
+  card_number: CardIdSchema,
+  withdraw_amount: z.number().min(1).max(100000000),
+  withdraw_time: z.coerce.date(),
 });
 
 export type UpdateWithdrawFormValues = z.infer<

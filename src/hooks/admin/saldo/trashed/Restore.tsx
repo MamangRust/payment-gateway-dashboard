@@ -66,6 +66,7 @@ export default function useRestoreSaldo() {
   };
 
   return {
+    restoreSaldoId,
     handleSubmit,
     loadingRestoreSaldoTrashed,
     isModalVisibleRestore,

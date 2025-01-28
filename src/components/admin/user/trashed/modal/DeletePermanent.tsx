@@ -6,19 +6,18 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useDeletePermanentUser from "@/hooks/admin/user/trashed/Delete";
 import useModalUserTrashed from "@/store/user/trashed/modal";
 
 export function DeletePermanetUserTrashed() {
   const {
     deletePermanentUserId,
+    handleSubmit,
+    loadingDeletePermanentUserTrashed,
+    isModalVisibleDeletePermanent,
     showModalDeletePermanent,
     hideModalDeletePermanent,
-    isModalVisibleDeletePermanent,
-  } = useModalUserTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanent();
-  };
+  } = useDeletePermanentUser();
 
   return (
     <Dialog
@@ -40,7 +39,7 @@ export function DeletePermanetUserTrashed() {
           <Button variant="outline" onClick={hideModalDeletePermanent}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

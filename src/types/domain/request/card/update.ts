@@ -1,5 +1,5 @@
 export interface UpdateCard {
-  id: number;
+  card_id: number;
   user_id: number;
   card_type: string;
   expire_date: Date;

@@ -9,18 +9,17 @@ import {
 } from "@/components/ui/dialog";
 import { Trash } from "lucide-react";
 import useModalSaldo from "@/store/saldo/modal";
+import useDeleteSaldo from "@/hooks/admin/saldo/DeleteSaldo";
 
 export function DeleteSaldo() {
   const {
     deleteSaldoId,
+    handleSubmit,
+    loadingTrashedSaldo,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalSaldo();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteSaldo();
 
   return (
     <Dialog
@@ -41,7 +40,7 @@ export function DeleteSaldo() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

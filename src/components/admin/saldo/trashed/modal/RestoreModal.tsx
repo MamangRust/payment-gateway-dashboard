@@ -6,39 +6,37 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalMerchantTrashed from "@/store/merchant/trashed/modal";
+import useRestoreSaldo from "@/hooks/admin/saldo/trashed/Restore";
 
-export function RestoreMerchant() {
+export function RestoreSaldo() {
   const {
-    restoreMerchantId,
+    restoreSaldoId,
+    handleSubmit,
+    loadingRestoreSaldoTrashed,
+    isModalVisibleRestore,
     showModalRestore,
     hideModalRestore,
-    isModalVisibleRestore,
-  } = useModalMerchantTrashed();
-
-  const handleDelete = () => {
-    hideModalRestore();
-  };
+  } = useRestoreSaldo();
 
   return (
     <Dialog
       open={isModalVisibleRestore}
       onOpenChange={(open) =>
-        open ? showModalRestore(restoreMerchantId!) : hideModalRestore()
+        open ? showModalRestore(restoreSaldoId!) : hideModalRestore()
       }
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Restore Merchant</DialogTitle>
+          <DialogTitle>Restore Saldo</DialogTitle>
         </DialogHeader>
         <div className="text-sm text-gray-600">
-          Are you sure you want to restore this Merchant?
+          Are you sure you want to restore this Saldo?
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={hideModalRestore}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

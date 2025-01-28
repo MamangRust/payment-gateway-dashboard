@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,23 +6,34 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalWithdraw from "@/store/withdraw/modal";
 import UpdateWithdrawForm from "../form/UpdateForm";
-import { UpdateWithdrawFormValues } from "@/schemas";
+import useUpdateWithdraw from "@/hooks/admin/withdraw/UpdateWithdraw";
 
 export function UpdateWithdraw() {
-  const { editWithdrawId, isModalVisibleEdit, showModalEdit, hideModalEdit } =
-    useModalWithdraw();
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    formRef,
+    withdraw,
+    handleButtonSubmit,
+    editWithdrawId,
+    handleSubmit,
+    loadingUpdateWithdraw,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateWithdraw();
 
-  const handleSubmit = (data: UpdateWithdrawFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
+  const defaultValues = withdraw
+    ? {
+        card_number: {
+          value: withdraw.card_number,
+          label: "Loading...",
+        },
+        withdraw_amount: withdraw.withdraw_amount,
+        withdraw_time: withdraw.withdraw_time,
+      }
+    : undefined;
 
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  console.log("defaultValues", defaultValues);
 
   return (
     <Dialog
@@ -34,9 +44,13 @@ export function UpdateWithdraw() {
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Add New Withdraw</DialogTitle>
+          <DialogTitle>Edit Withdraw</DialogTitle>
         </DialogHeader>
-        <UpdateWithdrawForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateWithdrawForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

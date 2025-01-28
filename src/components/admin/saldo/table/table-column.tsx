@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Saldo } from "@/types/model";
 import TableActionSaldo from "./table-action";
+import { formatRupiah } from "@/helpers/formatRupiah";
 
 export const saldoColumns: ColumnDef<Saldo>[] = [
   {
@@ -38,10 +39,7 @@ export const saldoColumns: ColumnDef<Saldo>[] = [
     header: "Total Balance",
     cell: ({ row }) => {
       const totalBalance = row.getValue("total_balance") as number;
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(totalBalance);
+      const formatted = totalBalance ? formatRupiah(totalBalance) : "-";
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
@@ -50,10 +48,7 @@ export const saldoColumns: ColumnDef<Saldo>[] = [
     header: "Withdraw Amount",
     cell: ({ row }) => {
       const withdrawAmount = row.getValue("withdraw_amount") as number;
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(withdrawAmount);
+      const formatted = withdrawAmount ? formatRupiah(withdrawAmount) : "-";
       return <div className="text-right">{formatted}</div>;
     },
   },

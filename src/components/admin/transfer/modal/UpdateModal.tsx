@@ -7,23 +7,35 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalTransfer from "@/store/transfer/modal";
-import { UpdateTransferFormValues } from "@/schemas";
 import UpdateTransferForm from "../form/UpdateForm";
+import useUpdateTransfer from "@/hooks/admin/transfer/UpdateTransfer";
 
 export function UpdateTransfer() {
-  const { editTransferId, isModalVisibleEdit, showModalEdit, hideModalEdit } =
-    useModalTransfer();
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    editTransferId,
+    transfer,
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingUpdateTransfer,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateTransfer();
 
-  const handleSubmit = (data: UpdateTransferFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = transfer
+    ? {
+        transfer_from: {
+          value: transfer?.transfer_from,
+          label: "Loading...",
+        },
+        transfer_to: {
+          value: transfer?.transfer_to,
+          label: "Loading...",
+        },
+        transfer_amount: Number(transfer.transfer_amount),
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -34,9 +46,13 @@ export function UpdateTransfer() {
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Add New Transfer</DialogTitle>
+          <DialogTitle>Edit Transfer</DialogTitle>
         </DialogHeader>
-        <UpdateTransferForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateTransferForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

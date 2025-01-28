@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useTopupStore from "@/store/topup/topup";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +9,7 @@ import { CreateTopup } from "@/types/domain/request/topup";
 
 export default function useCreateTopup() {
   const { isModalVisible, showModal, hideModal } = useModalTopup();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     createTopup,
@@ -18,6 +20,10 @@ export default function useCreateTopup() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateTopupFormValues) => {
     setLoadingCreateTopup(true);
@@ -77,6 +83,8 @@ export default function useCreateTopup() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateTopup,
     isModalVisible,

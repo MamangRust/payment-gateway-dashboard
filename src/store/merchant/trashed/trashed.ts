@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import { DeletePermanentMerchant } from "@/types/domain/request/merchant/trashed/delete";
 import { FindAllMerchantTrashed } from "@/types/domain/request/merchant/trashed/list";
@@ -87,13 +88,15 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.patch(`/merchants/restore/${req.id}`, null, {
+      await myApi.post(`/merchants/restore/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingRestoreMerchantTrashed: false,
         errorRestoreMerchantTrashed: null,
       });
+
+      handleMessageAction("merchant", "restore");
 
       return true;
     } catch (err) {
@@ -115,13 +118,15 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/merchants/${req.id}`, {
+      await myApi.delete(`/merchants/permanent/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingDeletePermanentMerchantTrashed: false,
         errorDeletePermanentMerchantTrashed: null,
       });
+      handleMessageAction("merchant", "deletePermanent");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -146,6 +151,7 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
         loadingRestoreAllMerchantTrashed: false,
         errorRestoreAllMerchantTrashed: null,
       });
+      handleMessageAction("merchant", "restoreAll");
       return true;
     } catch (err) {
       handleApiError(
@@ -171,6 +177,8 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
         loadingDeletePermanentMerchantTrashed: false,
         errorDeletePermanentMerchantTrashed: null,
       });
+      handleMessageAction("merchant", "deleteAllPermanent");
+
       return true;
     } catch (err) {
       handleApiError(

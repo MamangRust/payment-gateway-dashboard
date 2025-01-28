@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import {
   DeletePermanentTransaction,
@@ -99,13 +100,15 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
       try {
         const token = getAccessToken();
-        await myApi.patch(`/transactions/restore/${req.id}`, null, {
+        await myApi.post(`/transactions/restore/${req.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         set({
           loadingRestoreTransactionTrashed: false,
           errorRestoreTransactionTrashed: null,
         });
+        handleMessageAction("transaction", "restore");
+
         return true;
       } catch (err) {
         handleApiError(
@@ -125,13 +128,15 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
       try {
         const token = getAccessToken();
-        await myApi.delete(`/transactions/${req.id}`, {
+        await myApi.delete(`/transactions/permanent/${req.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         set({
           loadingDeletePermanentTransactionTrashed: false,
           errorDeletePermanentTransactionTrashed: null,
         });
+        handleMessageAction("transaction", "deletePermanent");
+
         return true;
       } catch (err) {
         handleApiError(
@@ -156,6 +161,8 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
           loadingRestoreAllTransactionTrashed: false,
           errorRestoreAllTransactionTrashed: null,
         });
+        handleMessageAction("transaction", "restoreAll");
+
         return true;
       } catch (err) {
         handleApiError(
@@ -180,6 +187,8 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
           loadingDeletePermanentTransactionTrashed: false,
           errorDeletePermanentTransactionTrashed: null,
         });
+        handleMessageAction("transaction", "deleteAllPermanent");
+
         return response.data;
       } catch (err) {
         handleApiError(

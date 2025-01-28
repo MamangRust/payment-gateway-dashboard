@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,29 +6,37 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import CreateTransactionForm from "../form/CreateForm";
-import useModalTransaction from "@/store/transaction/modal";
-import { UpdateTransactionFormValues } from "@/schemas";
 import UpdateTransactionForm from "../form/UpdateForm";
+import useUpdateTransaction from "@/hooks/admin/transaction/UpdateTransaction";
 
 export function UpdateTransaction() {
   const {
     editTransactionId,
+    transaction,
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingUpdateTransaction,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,
-  } = useModalTransaction();
+  } = useUpdateTransaction();
 
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: UpdateTransactionFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = transaction
+    ? {
+        card_number: {
+          value: transaction.card_number,
+          label: "Loading...",
+        },
+        merchant_id: {
+          value: transaction.merchant_id,
+          label: "Loading...",
+        },
+        payment_method: transaction.payment_method,
+        amount: transaction.amount,
+        transaction_time: new Date(transaction.transaction_time),
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -40,9 +47,13 @@ export function UpdateTransaction() {
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Add New Transaction</DialogTitle>
+          <DialogTitle>Edit New Transaction</DialogTitle>
         </DialogHeader>
-        <UpdateTransactionForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateTransactionForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

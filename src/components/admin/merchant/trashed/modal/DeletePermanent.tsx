@@ -6,19 +6,18 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useDeletePermanentMerchant from "@/hooks/admin/merchant/trashed/Delete";
 import useModalMerchantTrashed from "@/store/merchant/trashed/modal";
 
 export function DeletePermanetMerchant() {
   const {
     deletePermanentMerchantId,
+    handleSubmit,
+    loadingDeletePermanentMerchantTrashed,
+    isModalVisibleDeletePermanent,
     showModalDeletePermanent,
     hideModalDeletePermanent,
-    isModalVisibleDeletePermanent,
-  } = useModalMerchantTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanent();
-  };
+  } = useDeletePermanentMerchant();
 
   return (
     <Dialog
@@ -40,7 +39,7 @@ export function DeletePermanetMerchant() {
           <Button variant="outline" onClick={hideModalDeletePermanent}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

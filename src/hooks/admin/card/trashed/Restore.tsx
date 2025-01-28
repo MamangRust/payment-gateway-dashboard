@@ -66,6 +66,7 @@ export default function useRestoreCard() {
   };
 
   return {
+    restoreCardId,
     handleSubmit,
     loadingRestoreCardTrashed,
     isModalVisibleRestore,

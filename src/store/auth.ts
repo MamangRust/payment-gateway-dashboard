@@ -211,8 +211,8 @@ const useAuthStore = create<AuthStore>()(
             set({
               loadingRefreshAccessToken: false,
               errorRefreshAccessToken: null,
-              refreshToken: response.data.data.refreshToken,
-              accessToken: response.data.data.accessToken,
+              refreshToken: response.data.data.refresh_token,
+              accessToken: response.data.data.access_token,
             });
           }
 

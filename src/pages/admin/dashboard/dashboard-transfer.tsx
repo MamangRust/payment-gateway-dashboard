@@ -1,182 +1,366 @@
-import { Users, Store, Repeat, FileText } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Chart from 'react-apexcharts';
+import { Users, Store, Repeat, FileText, ChevronDown } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Chart from "react-apexcharts";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { TableTransfer } from "@/components/admin/transfer";
+import useListTransfer from "@/hooks/admin/transfer/ListTransfer";
+import useTransferStore from "@/store/transfer/transfer";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { debounce } from "@/helpers/debounce";
+import { formatRupiah } from "@/helpers/formatRupiah";
+import ThemeChart from "@/components/ui/chart";
+import ChartSkeleton from "@/components/ui/chartSkeleton";
 
 export default function DashboardTransfers() {
-  // Bar Chart Options - Transfer Amount by Payment Method
-  const barChartOptions = {
-    chart: {
-      id: 'payment-method-transfer-chart',
-      toolbar: { show: false },
-    },
-    xaxis: {
-      categories: ['Credit Card', 'Bank Transfer', 'E-Wallet'], // Payment methods for transfers
-    },
-    colors: ['#6366F1', '#22C55E', '#F59E0B'],
-    plotOptions: {
-      bar: {
-        borderRadius: 5,
-        columnWidth: '45%',
-      },
-    },
-  };
+  const initialYear = useMemo(() => {
+    const currentDate = new Date();
+    return currentDate.getFullYear();
+  }, []);
 
-  const barChartSeries = [
-    {
-      name: 'Transfer Amount',
-      data: [5000, 3000, 2000], // Example transfer amounts for each method
-    },
-  ];
+  const [selectedYear, setSelectedYear] = useState<number>(initialYear);
 
-  // Doughnut Chart Options - Transfer Status
-  const doughnutChartOptions = {
-    chart: {
-      id: 'transfer-status-chart',
-    },
-    labels: ['Success', 'Pending', 'Failed'],
-    colors: ['#22C55E', '#EAB308', '#EF4444'],
-    legend: { position: 'bottom' },
-  };
+  const {
+    table,
+    search,
+    setSearch,
+    loadingGetTransfers,
+    pagination,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoadingWithDelay,
+    showModal,
+  } = useListTransfer();
+  const { toast } = useToast();
 
-  const doughnutChartSeries = [60, 30, 10]; // Example percentages for each transfer status
+  const {
+    findMonthStatusSuccess,
+    monthStatusSuccess,
+    loadingMonthStatusSuccess,
+    errorMonthStatusSuccess,
+    setLoadingMonthStatusSuccess,
+    setErrorMonthStatusSuccess,
+
+    findYearStatusSuccess,
+    yearStatusSuccess,
+    loadingYearStatusSuccess,
+    errorYearStatusSuccess,
+    setLoadingYearStatusSuccess,
+    setErrorYearStatusSuccess,
+
+    findMonthStatusFailed,
+    monthStatusFailed,
+    loadingMonthStatusFailed,
+    errorMonthStatusFailed,
+    setLoadingMonthStatusFailed,
+    setErrorMonthStatusFailed,
+
+    findYearStatusFailed,
+    yearStatusFailed,
+    loadingYearStatusFailed,
+    errorYearStatusFailed,
+    setLoadingYearStatusFailed,
+    setErrorYearStatusFailed,
+
+    findMonthTransferAmount,
+    monthTransferAmount,
+    loadingMonthTransferAmount,
+    errorMonthTransferAmount,
+    setLoadingMonthTransferAmount,
+    setErrorMonthTransferAmount,
+
+    findYearTransferAmount,
+    yearTransferAmount,
+    loadingYearTransferAmount,
+    setLoadingYearTransferAmount,
+    setErrorYearTransferAmount,
+  } = useTransferStore();
+
+  const monthlyAmount = useMemo(() => {
+    if (!monthTransferAmount || !Array.isArray(monthTransferAmount)) {
+      return Array(12).fill(0);
+    }
+
+    const balances = Array(12).fill(0);
+    const year = new Date().getFullYear();
+
+    monthTransferAmount.forEach((balance) => {
+      const monthIndex = new Date(`${balance.month} 1, ${year}`).getMonth();
+      if (balance.total_amount !== undefined) {
+        balances[monthIndex] = balance.total_amount;
+      }
+    });
+
+    return balances;
+  }, [monthTransferAmount]);
+
+  const yearlyAmount = useMemo(() => {
+    if (!yearTransferAmount || !Array.isArray(yearTransferAmount)) {
+      return Array(5).fill(0);
+    }
+
+    const balanceMap = new Map<number, number>();
+    yearTransferAmount.forEach((balance) => {
+      balanceMap.set(Number(balance.year), balance.total_amount);
+    });
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
+
+    return years.map((year) => balanceMap.get(year) || 0);
+  }, [yearTransferAmount]);
+
+  const fetchMonthlyAmount = useCallback(
+    async (year: number) => {
+      try {
+        setLoadingMonthTransferAmount(true);
+        setErrorMonthTransferAmount(null);
+
+        await findMonthTransferAmount(toast, year);
+      } catch (error) {
+        console.error("Failed to fetch monthly payment method:", error);
+        setErrorMonthTransferAmount("Failed to fetch monthly payment method");
+      } finally {
+        setLoadingMonthTransferAmount(false);
+      }
+    },
+    [
+      findMonthTransferAmount,
+      setLoadingMonthTransferAmount,
+      setErrorMonthTransferAmount,
+    ],
+  );
+
+  const fetchYearlyAmount = useCallback(
+    async (year: number) => {
+      try {
+        setLoadingYearTransferAmount(true);
+        setErrorYearTransferAmount(null);
+
+        await findYearTransferAmount(toast, year);
+      } catch (error) {
+        setErrorYearTransferAmount("Failed to fetch yearly balance");
+      } finally {
+        setLoadingYearTransferAmount(false);
+      }
+    },
+    [
+      findYearTransferAmount,
+      setLoadingYearTransferAmount,
+      setErrorYearTransferAmount,
+    ],
+  );
+
+  const debouncedFetchMonthlyAmount = debounce(fetchMonthlyAmount, 300);
+  const debouncedFetchYearlyAmount = debounce(fetchYearlyAmount, 300);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        debouncedFetchMonthlyAmount(selectedYear),
+        debouncedFetchYearlyAmount(selectedYear),
+      ]);
+    };
+
+    fetchData();
+
+    return () => {
+      debouncedFetchMonthlyAmount.cancel();
+      debouncedFetchYearlyAmount.cancel();
+    };
+  }, [selectedYear]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      {/* Grid Statistik */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        {/* Total Transfers */}
-        <Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-10">
+        <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Transfers
             </CardTitle>
-            <Repeat className="h-6 w-6 text-gray-500" /> {/* Icon Repeat */}
+            <Repeat className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">80</div>{' '}
-            {/* Example total transfers */}
+            <div className="text-2xl font-bold">80</div>{" "}
           </CardContent>
         </Card>
-
-        {/* Total Successful Transfers */}
-        <Card>
+        <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Successful Transfers
             </CardTitle>
-            <Repeat className="h-6 w-6 text-gray-500" /> {/* Icon Repeat */}
+            <Repeat className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">48</div>{' '}
-            {/* Example successful transfers */}
+            <div className="text-2xl font-bold">48</div>{" "}
           </CardContent>
         </Card>
 
-        {/* Total Pending Transfers */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Pending Transfers
             </CardTitle>
-            <Repeat className="h-6 w-6 text-gray-500" /> {/* Icon Repeat */}
+            <Repeat className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>{' '}
-            {/* Example pending transfers */}
+            <div className="text-2xl font-bold">24</div>{" "}
           </CardContent>
         </Card>
 
-        {/* Total Failed Transfers */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Failed Transfers
             </CardTitle>
-            <Repeat className="h-6 w-6 text-gray-500" /> {/* Icon Repeat */}
+            <Repeat className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>{' '}
-            {/* Example failed transfers */}
+            <div className="text-2xl font-bold">8</div>{" "}
           </CardContent>
         </Card>
       </div>
 
-      {/* Bar and Pie Charts */}
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Transfer Amount by Payment Method</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Chart
-              options={barChartOptions}
-              series={barChartSeries}
-              type="bar"
-              height={300}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Doughnut Chart for Transfer Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Transfer Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Chart
-              options={doughnutChartOptions}
-              series={doughnutChartSeries}
-              type="donut"
-              height={300}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Transfers Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Transfers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2 text-left">Transfer ID</th>
-                  <th className="p-2 text-left">From Card</th>
-                  <th className="p-2 text-left">To Card</th>
-                  <th className="p-2 text-left">Amount</th>
-                  <th className="p-2 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="even:bg-gray-50">
-                  <td className="p-2">#T12345</td>
-                  <td className="p-2">1234 5678 9876 5432</td>
-                  <td className="p-2">1234 5678 8765 4321</td>
-                  <td className="p-2">$1000</td>
-                  <td className="p-2 text-green-600">Success</td>
-                </tr>
-                <tr className="even:bg-gray-50">
-                  <td className="p-2">#T12346</td>
-                  <td className="p-2">1234 5678 8765 4321</td>
-                  <td className="p-2">1234 5678 6543 2109</td>
-                  <td className="p-2">$500</td>
-                  <td className="p-2 text-yellow-600">Pending</td>
-                </tr>
-                <tr className="even:bg-gray-50">
-                  <td className="p-2">#T12347</td>
-                  <td className="p-2">1234 5678 6543 2109</td>
-                  <td className="p-2">1234 5678 8765 4321</td>
-                  <td className="p-2">$2000</td>
-                  <td className="p-2 text-red-600">Failed</td>
-                </tr>
-              </tbody>
-            </table>
+      <div className="flex-1 flex flex-col min-h-0 space-y-8 mt-4">
+        <div className="flex justify-between">
+          <div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline">
+                  {/* {format(selectedMonth, "MMMM", { locale: id })}{" "} */}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  // selected={selectedMonth}
+                  // onSelect={(date) => {
+                  //   if (date) {
+                  //     setSelectedMonth(date);
+                  //     fetchMonthlyData(date);
+                  //   }
+                  // }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
-        </CardContent>
-      </Card>
+
+          <div>
+            {/* <YearPicker
+              selectedYear={selectedYear}
+              onYearChange={(date) => handleYearChange(date)}
+            /> */}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {loadingMonthTransferAmount ? (
+            <ChartSkeleton />
+          ) : (
+            <Card className="w-full shadow-lg rounded-md border">
+              <CardHeader>
+                <CardTitle>Monthly Amount</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ThemeChart
+                  options={{
+                    chart: {
+                      id: "monthly-amount-chart",
+                      toolbar: { show: false },
+                    },
+                    xaxis: {
+                      categories: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ],
+                    },
+                    yaxis: {
+                      title: { text: "Balance (Rp)" },
+                      labels: {
+                        formatter: (value) => formatRupiah(value),
+                      },
+                    },
+                    tooltip: {
+                      y: {
+                        formatter: (value) => formatRupiah(value),
+                      },
+                    },
+                    colors: ["#6366F1"],
+                  }}
+                  series={[{ name: "Monthly Balance", data: monthlyAmount }]}
+                  type="line"
+                  height={300}
+                />
+              </CardContent>
+            </Card>
+          )}
+          {loadingYearTransferAmount ? (
+            <ChartSkeleton />
+          ) : (
+            <Card className="w-full shadow-lg rounded-md border">
+              <CardHeader>
+                <CardTitle>Yearly Balances</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ThemeChart
+                  options={{
+                    chart: {
+                      id: "yearly-amount-chart",
+                      toolbar: { show: false },
+                    },
+                    xaxis: {
+                      categories: Array.from({ length: 5 }, (_, i) =>
+                        (new Date().getFullYear() - 4 + i).toString(),
+                      ),
+                    },
+                    yaxis: {
+                      title: { text: "Balance (Rp)" },
+                      labels: {
+                        formatter: (value) => formatRupiah(value),
+                      },
+                    },
+                    tooltip: {
+                      y: {
+                        formatter: (value) => formatRupiah(value),
+                      },
+                    },
+                    colors: ["#22C55E"],
+                  }}
+                  series={[{ name: "Yearly Amount", data: yearlyAmount }]}
+                  type="bar"
+                  height={300}
+                />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+      <TableTransfer
+        search={search}
+        setSearch={setSearch}
+        isLoadingWithDelay={isLoadingWithDelay}
+        loadingGetTransfers={loadingGetTransfers}
+        table={table}
+        pagination={pagination}
+        handlePageChange={handlePageChange}
+        handlePageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }

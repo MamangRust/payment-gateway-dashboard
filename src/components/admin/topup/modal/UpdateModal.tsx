@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,21 +9,32 @@ import {
 import useModalTopup from "@/store/topup/modal";
 import UpdateTopupForm from "../form/UpdateForm";
 import { UpdateTopupFormValues } from "@/schemas";
+import useUpdateTopup from "@/hooks/admin/topup/UpdateTopup";
 
 export function UpdateTopup() {
-  const { editTopupId, isModalVisibleEdit, showModalEdit, hideModalEdit } =
-    useModalTopup();
+  const {
+    editTopupId,
+    topup,
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingUpdateTopup,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateTopup();
 
-  const formRef = useRef<HTMLFormElement>(null);
+  const defaultValues = topup
+    ? {
+        card_number: {
+          value: topup.card_number,
+          label: "Loading...",
+        },
+        topup_amount: Number(topup.topup_amount),
+        topup_method: topup.topup_method,
+      }
+    : undefined;
 
-  const handleSubmit = (data: UpdateTopupFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
   return (
     <Dialog
       open={isModalVisibleEdit}
@@ -34,9 +44,13 @@ export function UpdateTopup() {
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Add New Top-up</DialogTitle>
+          <DialogTitle>Edit New Top-up</DialogTitle>
         </DialogHeader>
-        <UpdateTopupForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateTopupForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

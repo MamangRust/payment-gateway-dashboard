@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import useWithdrawStore from "@/store/withdraw/withdraw";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,9 +8,10 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalWithdraw from "@/store/withdraw/modal";
-import { UpdateWithdraw } from "@/types/domain/request";
+import { FindByIdWithdraw, UpdateWithdraw } from "@/types/domain/request";
+import { Edit } from "lucide-react";
 
-export default function useUpdateUser() {
+export default function useUpdateWithdraw() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editWithdrawId } =
     useModalWithdraw();
 
@@ -18,10 +20,32 @@ export default function useUpdateUser() {
     setLoadingUpdateWithdraw,
     loadingUpdateWithdraw,
     setErrorUpdateWithdraw,
+
+    withdraw,
+    findByIdWithdraw,
+    loadingGetWithdraw,
+    errorGetWithdraw,
   } = useWithdrawStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editWithdrawId != null) {
+      const req: FindByIdWithdraw = {
+        toast,
+        id: editWithdrawId,
+      };
+
+      findByIdWithdraw(req);
+    }
+  }, [isModalVisibleEdit, editWithdrawId]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateWithdrawFormValues) => {
     setLoadingUpdateWithdraw(true);
@@ -33,11 +57,13 @@ export default function useUpdateUser() {
 
       const req: UpdateWithdraw = {
         id: editWithdrawId as number,
-        card_number: validatedValues.card_number,
+        card_number: validatedValues.card_number.value,
         withdraw_amount: validatedValues.withdraw_amount,
         withdraw_time: validatedValues.withdraw_time,
         toast: toast,
       };
+
+      console.log("req", req);
 
       const result = await updateWithdraw(req);
 
@@ -83,6 +109,10 @@ export default function useUpdateUser() {
   };
 
   return {
+    withdraw,
+    formRef,
+    handleButtonSubmit,
+    editWithdrawId,
     handleSubmit,
     loadingUpdateWithdraw,
     isModalVisibleEdit,

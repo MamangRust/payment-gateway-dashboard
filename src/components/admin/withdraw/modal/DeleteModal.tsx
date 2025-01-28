@@ -7,26 +7,23 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
-import useModalCard from "@/store/card/modal";
+import useDeleteWithdraw from "@/hooks/admin/withdraw/DeleteWithdraw";
 
 export function DeleteWithdraw() {
   const {
-    deleteCardId,
+    handleSubmit,
+    loadingTrashedWithdraw,
+    deleteWithdrawId,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalCard();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteWithdraw();
 
   return (
     <Dialog
       open={isModalVisibleDelete}
       onOpenChange={(open) =>
-        open ? showModalDelete(deleteCardId!) : hideModalDelete()
+        open ? showModalDelete(deleteWithdrawId!) : hideModalDelete()
       }
     >
       <DialogContent className="max-w-md w-full">
@@ -40,7 +37,7 @@ export function DeleteWithdraw() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

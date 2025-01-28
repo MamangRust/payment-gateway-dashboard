@@ -66,6 +66,7 @@ export default function useDeletePermanentSaldo() {
   };
 
   return {
+    deletePermanentSaldoId,
     handleSubmit,
     loadingDeletePermanentSaldoTrashed,
     isModalVisibleDeletePermanent,

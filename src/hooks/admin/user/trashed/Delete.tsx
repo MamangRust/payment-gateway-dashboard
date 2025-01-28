@@ -66,6 +66,7 @@ export default function useDeletePermanentUser() {
   };
 
   return {
+    deletePermanentUserId,
     handleSubmit,
     loadingDeletePermanentUserTrashed,
     isModalVisibleDeletePermanent,

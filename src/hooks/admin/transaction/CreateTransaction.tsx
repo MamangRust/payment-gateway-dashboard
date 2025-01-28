@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useTransactionStore from "@/store/transaction/transaction";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,10 +8,17 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalTransaction from "@/store/transaction/modal";
+import { CreateTransaction } from "@/types/domain/request";
+import useMerchantStore from "@/store/merchant/merchant";
 
 export default function useCreateTransaction() {
   const { isModalVisible, showModal, hideModal } = useModalTransaction();
+  const formRef = useRef<HTMLFormElement>(null);
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
+  const { merchants } = useMerchantStore();
   const {
     createTransaction,
     setLoadingCreateTransaction,
@@ -29,7 +37,27 @@ export default function useCreateTransaction() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await createTransaction(validatedValues);
+      const selectedMerchant = merchants?.find(
+        (m) => m.id === validatedValues.merchant_id,
+      );
+
+      if (!selectedMerchant) {
+        throw new Error("Merchant tidak ditemukan");
+      }
+
+      const req: CreateTransaction = {
+        card_number: validatedValues.card_number,
+        amount: validatedValues.amount,
+        payment_method: validatedValues.payment_method,
+        merchant_id: validatedValues.merchant_id,
+        transaction_time: validatedValues.transaction_time,
+        api_key: selectedMerchant.api_key,
+        toast: toast,
+      };
+
+      console.log("req", req);
+
+      const result = await createTransaction(req);
 
       if (result) {
         toast({
@@ -73,6 +101,8 @@ export default function useCreateTransaction() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateTransaction,
     isModalVisible,

@@ -12,6 +12,8 @@ import {
 import { saldoColumns } from "@/components/admin/saldo/table/table-column";
 import useSaldoStore from "@/store/saldo/saldo";
 import useModalSaldo from "@/store/saldo/modal";
+import { FindAllSaldo } from "@/types/domain/request";
+import { useToast } from "@/hooks/use-toast";
 
 export default function useListSaldo() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -31,6 +33,7 @@ export default function useListSaldo() {
     findAllSaldos,
   } = useSaldoStore();
   const { showModal } = useModalSaldo();
+  const { toast } = useToast();
 
   const table = useReactTable({
     data: saldos || [],
@@ -71,7 +74,15 @@ export default function useListSaldo() {
     const fetchSaldos = async () => {
       try {
         setLoadingGetSaldos(true);
-        await findAllSaldos(search, currentPage, pageSize);
+
+        const searchReq: FindAllSaldo = {
+          search: search,
+          page: currentPage,
+          pageSize: pageSize,
+          toast: toast,
+        };
+
+        await findAllSaldos(searchReq);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {

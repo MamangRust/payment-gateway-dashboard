@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,22 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateSaldoForm from "../form/CreateForm";
-import useModalSaldo from "@/store/saldo/modal";
-import { CreateSaldoFormValues } from "@/schemas";
+import useCreateSaldo from "@/hooks/admin/saldo/CreateSaldo";
 
 export function AddSaldo() {
-  const { isModalVisible, showModal, hideModal } = useModalSaldo();
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateSaldoFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateSaldo,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateSaldo();
 
   return (
     <Dialog

@@ -1,10 +1,11 @@
+import { useEffect, useRef } from "react";
 import useTopupStore from "@/store/topup/topup";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { UpdateTopupFormValues, updateTopupRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalTopup from "@/store/topup/modal";
-import { UpdateTopup } from "@/types/domain/request/topup";
+import { FindByIdTopup, UpdateTopup } from "@/types/domain/request/topup";
 
 export default function useUpdateTopup() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editTopupId } =
@@ -15,10 +16,31 @@ export default function useUpdateTopup() {
     setLoadingUpdateTopup,
     loadingUpdateTopup,
     setErrorUpdateTopup,
+
+    topup,
+    findByIdTopup,
+    loadingGetTopup,
+    errorGetTopup,
   } = useTopupStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editTopupId != null) {
+      const req: FindByIdTopup = {
+        toast,
+        id: editTopupId,
+      };
+
+      findByIdTopup(req);
+    }
+  }, [isModalVisibleEdit, editTopupId]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateTopupFormValues) => {
     setLoadingUpdateTopup(true);
@@ -30,7 +52,7 @@ export default function useUpdateTopup() {
 
       const req: UpdateTopup = {
         id: editTopupId as number,
-        card_number: validatedValues.card_number,
+        card_number: validatedValues.card_number.value,
         topup_amount: validatedValues.topup_amount,
         topup_method: validatedValues.topup_method,
         toast: toast,
@@ -80,6 +102,10 @@ export default function useUpdateTopup() {
   };
 
   return {
+    topup,
+    editTopupId,
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingUpdateTopup,
     isModalVisibleEdit,

@@ -5,7 +5,7 @@ import { z } from "zod";
 import useModalWithdraw from "@/store/withdraw/modal";
 import { TrashedWithdraw } from "@/types/domain/request";
 
-export default function useDeleteUser() {
+export default function useDeleteWithdraw() {
   const {
     deleteWithdrawId,
     isModalVisibleDelete,
@@ -78,6 +78,7 @@ export default function useDeleteUser() {
   };
 
   return {
+    deleteWithdrawId,
     handleSubmit,
     loadingTrashedWithdraw,
     isModalVisibleDelete,

@@ -1,26 +1,23 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
+import useDeleteTopup from "@/hooks/admin/topup/DeleteTopup";
 import useModalTopup from "@/store/topup/modal";
 
 export function DeleteTopup() {
   const {
     deleteTopupId,
+    handleSubmit,
+    loadingTrashedTopup,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalTopup();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteTopup();
 
   return (
     <Dialog
@@ -41,7 +38,7 @@ export function DeleteTopup() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

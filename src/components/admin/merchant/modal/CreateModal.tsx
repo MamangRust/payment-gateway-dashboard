@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,22 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateMerchantForm from "../form/CreateForm";
-import useModalMerchant from "@/store/merchant/modal";
-import { CreateMerchantFormValues } from "@/schemas";
+import useCreateMerchant from "@/hooks/admin/merchant/CreateMerchant";
 
 export function AddMerchant() {
-  const { isModalVisible, showModal, hideModal } = useModalMerchant();
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateMerchantFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateMerchant,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateMerchant();
 
   return (
     <Dialog open={isModalVisible} onOpenChange={showModal}>

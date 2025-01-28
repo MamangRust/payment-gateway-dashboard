@@ -6,18 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useDeletePermanentAllTopup from "@/hooks/admin/topup/trashed/DeleteAll";
 import useModalTopupTrashed from "@/store/topup/trashed/modal";
 
 export function DeletePermanetAllTopupTrashed() {
   const {
+    handleSubmit,
+    loadingDeletePermanentAllTopupTrashed,
+    isModalVisibleDeletePermanentAll,
     showModalDeletePermanentAll,
     hideModalDeletePermanentAll,
-    isModalVisibleDeletePermanentAll,
-  } = useModalTopupTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanentAll();
-  };
+  } = useDeletePermanentAllTopup();
 
   return (
     <Dialog
@@ -37,7 +36,7 @@ export function DeletePermanetAllTopupTrashed() {
           <Button variant="outline" onClick={hideModalDeletePermanentAll}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

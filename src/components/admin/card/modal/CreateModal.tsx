@@ -7,22 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateCardForm from "../form/CreateForm";
-import useModalCard from "@/store/card/modal";
-import { useRef } from "react";
-import { CreateCardFormValues } from "@/schemas";
+import useCreateCard from "@/hooks/admin/card/CreateCard";
 
 export function AddCard() {
-  const { isModalVisible, showModal, hideModal } = useModalCard();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateCardFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    handleSubmit,
+    loadingCreateCard,
+    isModalVisible,
+    showModal,
+    hideModal,
+    formRef,
+    handleButtonSubmit,
+  } = useCreateCard();
 
   return (
     <Dialog

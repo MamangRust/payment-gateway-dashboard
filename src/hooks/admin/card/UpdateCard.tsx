@@ -2,15 +2,24 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import useModalCard from "@/store/card/modal";
 import { UpdateCardFormValues, updateCardRequestSchema } from "@/schemas";
-import { UpdateCard } from "@/types/domain/request";
+import { FindByIdCard, FindByIdUser, UpdateCard } from "@/types/domain/request";
 import useCardStore from "@/store/card/card";
 import { z } from "zod";
+import { useEffect, useRef } from "react";
+import useUserStore from "@/store/user/user";
 
 export default function useUpdateCard() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editCardId } =
     useModalCard();
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const {
+    card,
+    findByIdCard,
+    loadingGetCard,
+    errorGetCard,
+
     updateCard,
     setLoadingUpdateCard,
     loadingUpdateCard,
@@ -19,6 +28,21 @@ export default function useUpdateCard() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editCardId !== null) {
+      const req: FindByIdCard = {
+        toast,
+        id: editCardId,
+      };
+
+      findByIdCard(req);
+    }
+  }, [isModalVisibleEdit, editCardId, findByIdCard]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateCardFormValues) => {
     setLoadingUpdateCard(true);
@@ -29,14 +53,15 @@ export default function useUpdateCard() {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const req: UpdateCard = {
-        id: editCardId as number,
-        user_id: validatedValues.user_id,
+        card_id: editCardId as number,
+        user_id: Number(validatedValues.user_id.value),
         card_type: validatedValues.card_type,
         expire_date: validatedValues.expire_date,
         cvv: validatedValues.cvv,
-        card_provider: validatedValues.card_type,
+        card_provider: validatedValues.card_provider,
         toast: toast,
       };
+      console.log("hello", req);
 
       const result = await updateCard(req);
 
@@ -81,10 +106,14 @@ export default function useUpdateCard() {
   };
 
   return {
+    card,
     handleSubmit,
+    editCardId,
     loadingUpdateCard,
     isModalVisibleEdit,
     showModalEdit,
     hideModalEdit,
+    formRef,
+    handleButtonSubmit,
   };
 }

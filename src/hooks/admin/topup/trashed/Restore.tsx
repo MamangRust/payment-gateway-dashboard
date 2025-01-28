@@ -66,6 +66,7 @@ export default function useRestoreTopup() {
   };
 
   return {
+    restoreTopupId,
     handleSubmit,
     loadingRestoreTopupTrashed,
     isModalVisibleRestore,

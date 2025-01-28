@@ -6,19 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalCardTrashed from "@/store/card/trashed/modal";
+import useDeletePermanentCard from "@/hooks/admin/card/trashed/Delete";
 
 export function DeletePermanetCard() {
   const {
+    handleSubmit,
     deletePermanentCardId,
+    loadingDeletePermanentCardTrashed,
+    isModalVisibleDeletePermanent,
     showModalDeletePermanent,
     hideModalDeletePermanent,
-    isModalVisibleDeletePermanent,
-  } = useModalCardTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanent();
-  };
+  } = useDeletePermanentCard();
 
   return (
     <Dialog
@@ -40,7 +38,7 @@ export function DeletePermanetCard() {
           <Button variant="outline" onClick={hideModalDeletePermanent}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

@@ -1,7 +1,7 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -9,9 +9,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -19,44 +19,59 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Luffy from '@/assets/Luffy.jpg';
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Luffy from "@/assets/Luffy.jpg";
+import { useRef, useState } from "react";
 
 const profileFormSchema = z.object({
   firstName: z.string().min(2, {
-    message: 'First name must be at least 2 characters.',
+    message: "First name must be at least 2 characters.",
   }),
   lastName: z.string().min(2, {
-    message: 'Last name must be at least 2 characters.',
+    message: "Last name must be at least 2 characters.",
   }),
   email: z.string().email({
-    message: 'Please enter a valid email address.',
+    message: "Please enter a valid email address.",
   }),
   password: z.string().min(6, {
-    message: 'Password must be at least 6 characters.',
+    message: "Password must be at least 6 characters.",
   }),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
-  firstName: 'Renaldy',
-  lastName: 'Hidayat',
-  email: 'renaldy@example.com',
+  firstName: "Renaldy",
+  lastName: "Hidayat",
+  email: "renaldy@example.com",
 };
 
 export default function ProfilePage() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
-    mode: 'onChange',
+    mode: "onChange",
   });
 
-  function onSubmit(data: ProfileFormValues) {
-    // Handle form submission (e.g., update user profile in the database)
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      form.setValue("avatar", file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const onSubmit = (data: ProfileFormValues) => {
     console.log(data);
-  }
+  };
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -65,10 +80,20 @@ export default function ProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center space-x-4">
-                <Avatar className="w-20 h-20">
-                  <AvatarImage src={Luffy} alt="User" />
+                <Avatar
+                  className="w-20 h-20 cursor-pointer"
+                  onClick={handleAvatarClick}
+                >
+                  <AvatarImage src={previewImage || Luffy} alt="User" />
                   <AvatarFallback>RH</AvatarFallback>
                 </Avatar>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
                 <div>
                   <CardTitle>Renaldy Hidayat</CardTitle>
                   <CardDescription>Software Engineer</CardDescription>
@@ -170,7 +195,7 @@ export default function ProfilePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Here, you can add account-specific settings like password change */}
+                  {/* Account-specific settings */}
                 </CardContent>
                 <CardFooter>
                   <Button>Save Changes</Button>

@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import TableHeaderCard from "./table-header";
 import TableBodyCard from "./table-body";
 import TableFooterCard from "./table-footer";
+import useModalCard from "@/store/card/modal";
 
 const TableCard = ({
   search,
@@ -25,6 +26,7 @@ const TableCard = ({
   isLoadingWithDelay,
   loadingGetCards,
   table,
+  showModal,
   pagination,
   handlePageChange,
   handlePageSizeChange,
@@ -34,6 +36,10 @@ const TableCard = ({
       <CardHeader className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Table Card</h3>
+
+          <div className="space-x-2">
+            <Button onClick={() => showModal()}>Add</Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4">

@@ -31,12 +31,12 @@ const TableActionSaldo = ({ saldo }: TableActionSaldoProps) => {
           <Eye className="mr-2 h-4 w-4 text-gray-500" />
           View Details
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => showModalEdit(saldo.id)}>
+        <DropdownMenuItem onSelect={() => showModalEdit(saldo.saldo_id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem
-          onSelect={() => showModalDelete(saldo.id)}
+          onSelect={() => showModalDelete(saldo.saldo_id)}
           className="text-red-600"
         >
           <Trash className="mr-2 h-4 w-4 text-red-500" />

@@ -8,21 +8,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateTransferForm from "../form/CreateForm";
-import useModalTransfer from "@/store/transfer/modal";
-import { CreateTransferFormValues } from "@/schemas";
+import useCreateTransfer from "@/hooks/admin/transfer/CreateTransfer";
 
 export function AddTransfer() {
-  const { isModalVisible, showModal, hideModal } = useModalTransfer();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateTransferFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateTransfer,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateTransfer();
 
   return (
     <Dialog

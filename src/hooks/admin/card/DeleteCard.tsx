@@ -2,6 +2,7 @@ import useCardStore from "@/store/card/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import useModalCard from "@/store/card/modal";
+import { FindByIdCard } from "@/types/domain/request";
 
 export default function useDeleteCard() {
   const {
@@ -27,7 +28,12 @@ export default function useDeleteCard() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedCard(deleteCardId as number);
+      const req: FindByIdCard = {
+        id: deleteCardId as number,
+        toast,
+      };
+
+      const result = await trashedCard(req);
 
       if (result) {
         toast({
@@ -60,6 +66,7 @@ export default function useDeleteCard() {
   };
 
   return {
+    deleteCardId,
     handleSubmit,
     loadingTrashedCard,
     isModalVisibleDelete,

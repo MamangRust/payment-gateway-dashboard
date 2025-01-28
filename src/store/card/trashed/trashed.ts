@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import {
   DeletePermanentCard,
@@ -90,10 +91,12 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     set({ loadingRestoreCardTrashed: true, errorRestoreCardTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.post(`/cards/restore/${req.id}`, null, {
+      await myApi.post(`/card/restore/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ loadingRestoreCardTrashed: false, errorRestoreCardTrashed: null });
+
+      handleMessageAction("card", "restore");
 
       return true;
     } catch (err) {
@@ -115,13 +118,15 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.post(`/cards/${req.id}`, {
+      await myApi.post(`/card/permanent/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingDeletePermanentCardTrashed: false,
         errorDeletePermanentCardTrashed: null,
       });
+      handleMessageAction("card", "deletePermanent");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -140,12 +145,14 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/cards/restore/all");
+      await myApi.post("/card/restore/all");
 
       set({
         loadingDeletePermanentCardTrashed: false,
         errorDeletePermanentCardTrashed: null,
       });
+      handleMessageAction("card", "restoreAll");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -165,11 +172,13 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/cards/permanent/all");
+      await myApi.post("/card/permanent/all");
       set({
         loadingDeletePermanentCardTrashed: false,
         errorDeletePermanentCardTrashed: null,
       });
+      handleMessageAction("card", "deleteAllPermanent");
+
       return true;
     } catch (err) {
       handleApiError(

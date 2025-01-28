@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+
+import { RestoreTransferTrashed } from "@/types/domain/request";
 import useModalTransaferTrashed from "@/store/transfer/trashed/modal";
 import useTransferTrashedStore from "@/store/transfer/trashed/trashed";
-import { RestoreTransferTrashed } from "@/types/domain/request";
 
 export default function useRestoreTransfer() {
   const {
@@ -66,6 +67,7 @@ export default function useRestoreTransfer() {
   };
 
   return {
+    restoreTransferId,
     handleSubmit,
     loadingRestoreTransferTrashed,
     isModalVisibleRestore,

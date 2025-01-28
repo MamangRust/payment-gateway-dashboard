@@ -6,16 +6,46 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Bell, MessageSquare } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  Edit,
+  Trash2,
+  Undo,
+  Delete,
+  RotateCcw,
+  RotateCw,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationCommand } from "./command-notification";
 import { Notification } from "@/types/model";
 import useNotificationStore from "@/store/notication";
 
+const getIcon = (type: Notification["type"]) => {
+  switch (type) {
+    case "create":
+      return <Plus className="mr-2 h-4 w-4 text-green-500" />;
+    case "update":
+      return <Edit className="mr-2 h-4 w-4 text-blue-500" />;
+    case "trashed":
+      return <Trash2 className="mr-2 h-4 w-4 text-yellow-600" />;
+    case "restore":
+      return <Undo className="mr-2 h-4 w-4 text-emerald-600" />;
+    case "delete":
+      return <Delete className="mr-2 h-4 w-4 text-red-600" />;
+    case "restoreAll":
+      return <RotateCcw className="mr-2 h-4 w-4 text-teal-600" />;
+    case "deleteAll":
+      return <RotateCw className="mr-2 h-4 w-4 text-rose-600" />;
+    default:
+      return <MessageSquare className="mr-2 h-4 w-4 text-gray-500" />;
+  }
+};
+
 export function NotificationMenu() {
   const [openCommand, setOpenCommand] = useState(false);
   const { notifications, removeNotification } = useNotificationStore();
-
   const displayedNotifications = notifications.slice(0, 3);
 
   React.useEffect(() => {
@@ -48,13 +78,15 @@ export function NotificationMenu() {
             </DropdownMenuItem>
           ) : (
             <>
-              {displayedNotifications.map((notification: Notification) => (
+              {displayedNotifications.map((notification: any) => (
                 <DropdownMenuItem
                   key={notification.id}
                   onSelect={() => removeNotification(notification.id)}
                 >
-                  <MessageSquare className="mr-2 h-4 w-4 text-blue-500" />
-                  <span>{notification.message}</span>
+                  <div className="flex items-center">
+                    {getIcon(notification.type)}
+                    <span>{notification.message}</span>
+                  </div>
                 </DropdownMenuItem>
               ))}
               {notifications.length > 3 && (

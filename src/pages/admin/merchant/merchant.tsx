@@ -8,10 +8,10 @@ export default function MerchantPage() {
     setSearch,
     loadingGetMerchants,
     pagination,
+    showModal,
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModal,
   } = useListMerchant();
 
   return (

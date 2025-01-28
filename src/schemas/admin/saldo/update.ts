@@ -1,8 +1,13 @@
 import { z } from "zod";
 
+const CardIdSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
 export const updateSaldoRequestSchema = z.object({
-  card_number: z.string().min(1).max(16),
-  total_balance: z.number().int().min(1).max(16),
+  card_number: CardIdSchema,
+  total_balance: z.number().min(1).max(100000000),
 });
 
 export type UpdateSaldoFormValues = z.infer<typeof updateSaldoRequestSchema>;

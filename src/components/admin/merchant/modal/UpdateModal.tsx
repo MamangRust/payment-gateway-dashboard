@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,24 +6,32 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalMerchant from "@/store/merchant/modal";
 import UpdateMerchantForm from "../form/UpdateForm";
-import { UpdateMerchantFormValues } from "@/schemas";
+import useUpdateMerchant from "@/hooks/admin/merchant/UpdateMerchant";
 
 export function UpdateMerchant() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editMerchantId } =
-    useModalMerchant();
+  const {
+    merchant,
+    editMerchantId,
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingUpdateMerchant,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateMerchant();
 
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: UpdateMerchantFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = merchant
+    ? {
+        user_id: {
+          value: merchant.user_id?.toString(),
+          label: "Loading...",
+        },
+        name: merchant.name,
+        status: merchant.status,
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -37,7 +44,11 @@ export function UpdateMerchant() {
         <DialogHeader>
           <DialogTitle>Update Merchant</DialogTitle>
         </DialogHeader>
-        <UpdateMerchantForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateMerchantForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

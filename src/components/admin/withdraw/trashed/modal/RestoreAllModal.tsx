@@ -6,15 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useRestoreAllWithdraw from "@/hooks/admin/withdraw/trashed/RestoreAll";
 import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
 
 export function RestoreAllWithdrawTrashed() {
-  const { showModalRestoreAll, hideModalRestoreAll, isModalVisibleRestoreAll } =
-    useModalWithdrawTrashed();
-
-  const handleDelete = () => {
-    hideModalRestoreAll();
-  };
+  const {
+    handleSubmit,
+    loadingRestoreAllWithdrawTrashed,
+    isModalVisibleRestoreAll,
+    showModalRestoreAll,
+    hideModalRestoreAll,
+  } = useRestoreAllWithdraw();
 
   return (
     <Dialog
@@ -34,7 +36,7 @@ export function RestoreAllWithdrawTrashed() {
           <Button variant="outline" onClick={hideModalRestoreAll}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

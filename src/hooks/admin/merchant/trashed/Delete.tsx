@@ -66,6 +66,7 @@ export default function useDeletePermanentMerchant() {
   };
 
   return {
+    deletePermanentMerchantId,
     handleSubmit,
     loadingDeletePermanentMerchantTrashed,
     isModalVisibleDeletePermanent,

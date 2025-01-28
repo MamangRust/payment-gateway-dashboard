@@ -3,6 +3,7 @@ export interface CreateTransaction {
   amount: number;
   payment_method: string;
   merchant_id: number;
+  api_key: string;
   transaction_time: Date;
   toast: any;
 }

@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import {
   DeletePermanentTransfer,
@@ -91,13 +92,15 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.patch(`/transfers/restore/${req.id}`, null, {
+      await myApi.post(`/transfers/restore/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingRestoreTransferTrashed: false,
         errorRestoreTransferTrashed: null,
       });
+      handleMessageAction("transfer", "restore");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -117,13 +120,15 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/transfers/${req.id}`, {
+      await myApi.delete(`/transfers/permanent/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingDeletePermanentTransferTrashed: false,
         errorDeletePermanentTransferTrashed: null,
       });
+      handleMessageAction("transfer", "deletePermanent");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -148,6 +153,8 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
         loadingRestoreAllTransferTrashed: false,
         errorRestoreAllTransferTrashed: null,
       });
+      handleMessageAction("transfer", "restoreAll");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -173,6 +180,8 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
         loadingDeletePermanentTransferTrashed: false,
         errorDeletePermanentTransferTrashed: null,
       });
+
+      handleMessageAction("transfer", "deleteAllPermanent");
 
       return true;
     } catch (err) {

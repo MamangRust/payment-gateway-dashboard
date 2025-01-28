@@ -66,6 +66,7 @@ export default function useDeletePermanentWithdraw() {
   };
 
   return {
+    deletePermanentWithdrawId,
     handleSubmit,
     loadingDeletePermanentWithdrawTrashed,
     isModalVisibleDeletePermanent,

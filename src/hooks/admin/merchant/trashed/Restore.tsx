@@ -66,6 +66,7 @@ export default function useRestoreMerchant() {
   };
 
   return {
+    restoreMerchantId,
     handleSubmit,
     loadingRestoreMerchantTrashed,
     isModalVisibleRestore,

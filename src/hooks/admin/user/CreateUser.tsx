@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useUserStore from "@/store/user/user";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +19,12 @@ export default function useCreateUser() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateUserFormValues) => {
     setLoadingCreateUser(true);
@@ -79,6 +86,8 @@ export default function useCreateUser() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateUser,
     isModalVisible,

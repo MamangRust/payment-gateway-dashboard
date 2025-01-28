@@ -6,18 +6,16 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalTransactionTrashed from "@/store/transaction/trashed/modal";
+import useDeletePermanentAllTransaction from "@/hooks/admin/transaction/trashed/DeleteAll";
 
 export function DeletePermanetAllTransactionTrashed() {
   const {
+    handleSubmit,
+    loadingDeletePermanentAllTransactionTrashed,
+    isModalVisibleDeletePermanentAll,
     showModalDeletePermanentAll,
     hideModalDeletePermanentAll,
-    isModalVisibleDeletePermanentAll,
-  } = useModalTransactionTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanentAll();
-  };
+  } = useDeletePermanentAllTransaction();
 
   return (
     <Dialog
@@ -37,7 +35,7 @@ export function DeletePermanetAllTransactionTrashed() {
           <Button variant="outline" onClick={hideModalDeletePermanentAll}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

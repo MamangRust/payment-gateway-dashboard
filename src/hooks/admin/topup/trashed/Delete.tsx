@@ -66,6 +66,7 @@ export default function useDeletePermanentTopup() {
   };
 
   return {
+    deletePermanentTopupId,
     handleSubmit,
     loadingDeletePermanentTopupTrashed,
     isModalVisibleDeletePermanent,

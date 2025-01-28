@@ -6,19 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalUser from "@/store/user/modal";
+import useDeleteUser from "@/hooks/admin/user/DeleteUser";
 
 export function DeleteUser() {
   const {
     deleteUserId,
+    handleSubmit,
+    loadingTrashedUser,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalUser();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteUser();
 
   return (
     <Dialog
@@ -38,7 +36,7 @@ export function DeleteUser() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

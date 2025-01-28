@@ -66,6 +66,7 @@ export default function useRestoreWithdraw() {
   };
 
   return {
+    restoreWithdrawId,
     handleSubmit,
     loadingRestoreWithdrawTrashed,
     isModalVisibleRestore,

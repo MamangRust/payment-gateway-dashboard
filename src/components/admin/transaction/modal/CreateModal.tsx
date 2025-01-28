@@ -10,20 +10,18 @@ import {
 import CreateTransactionForm from "../form/CreateForm";
 import useModalTransaction from "@/store/transaction/modal";
 import { CreateTransactionFormValues } from "@/schemas";
+import useCreateTransaction from "@/hooks/admin/transaction/CreateTransaction";
 
 export function AddTransaction() {
-  const { isModalVisible, showModal, hideModal } = useModalTransaction();
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateTransactionFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateTransaction,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateTransaction();
 
   return (
     <Dialog

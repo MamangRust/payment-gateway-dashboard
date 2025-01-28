@@ -6,25 +6,24 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useRestoreWithdraw from "@/hooks/admin/withdraw/trashed/Restore";
 import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
 
 export function RestoreWithdraw() {
   const {
-    restoreUserId,
+    restoreWithdrawId,
+    handleSubmit,
+    loadingRestoreWithdrawTrashed,
+    isModalVisibleRestore,
     showModalRestore,
     hideModalRestore,
-    isModalVisibleRestore,
-  } = useModalWithdrawTrashed();
-
-  const handleDelete = () => {
-    hideModalRestore();
-  };
+  } = useRestoreWithdraw();
 
   return (
     <Dialog
       open={isModalVisibleRestore}
       onOpenChange={(open) =>
-        open ? showModalRestore(restoreUserId!) : hideModalRestore()
+        open ? showModalRestore(restoreWithdrawId!) : hideModalRestore()
       }
     >
       <DialogContent className="max-w-md w-full">
@@ -38,7 +37,7 @@ export function RestoreWithdraw() {
           <Button variant="outline" onClick={hideModalRestore}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

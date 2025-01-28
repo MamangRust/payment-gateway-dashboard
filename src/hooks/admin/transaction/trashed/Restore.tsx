@@ -66,6 +66,7 @@ export default function useRestoreTransaction() {
   };
 
   return {
+    restoreTransactionId,
     handleSubmit,
     loadingRestoreTransactionTrashed,
     isModalVisibleRestore,

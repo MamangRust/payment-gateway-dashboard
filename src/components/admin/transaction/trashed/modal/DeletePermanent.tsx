@@ -6,19 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalTransactionTrashed from "@/store/transaction/trashed/modal";
+import useDeletePermanentTransaction from "@/hooks/admin/transaction/trashed/Delete";
 
 export function DeletePermanetTransactionTrashed() {
   const {
     deletePermanentTransactionId,
+    handleSubmit,
+    loadingDeletePermanentTransactionTrashed,
+    isModalVisibleDeletePermanent,
     showModalDeletePermanent,
     hideModalDeletePermanent,
-    isModalVisibleDeletePermanent,
-  } = useModalTransactionTrashed();
-
-  const handleDelete = () => {
-    hideModalDeletePermanent();
-  };
+  } = useDeletePermanentTransaction();
 
   return (
     <Dialog
@@ -40,7 +38,7 @@ export function DeletePermanetTransactionTrashed() {
           <Button variant="outline" onClick={hideModalDeletePermanent}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

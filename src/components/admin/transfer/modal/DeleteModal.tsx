@@ -9,24 +9,23 @@ import {
 } from "@/components/ui/dialog";
 import { Trash } from "lucide-react";
 import useModalCard from "@/store/card/modal";
+import useDeleteTransfer from "@/hooks/admin/transfer/DeleteTransfer";
 
 export function DeleteTransfer() {
   const {
-    deleteCardId,
+    deleteTransferId,
+    handleSubmit,
+    loadingTrashedTransfer,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalCard();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteTransfer();
 
   return (
     <Dialog
       open={isModalVisibleDelete}
       onOpenChange={(open) =>
-        open ? showModalDelete(deleteCardId!) : hideModalDelete()
+        open ? showModalDelete(deleteTransferId!) : hideModalDelete()
       }
     >
       <DialogContent className="max-w-md w-full">
@@ -40,7 +39,7 @@ export function DeleteTransfer() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

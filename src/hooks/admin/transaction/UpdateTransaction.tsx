@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import useTransactionStore from "@/store/transaction/transaction";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +8,11 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalTransaction from "@/store/transaction/modal";
+import {
+  FindyByIdTransaction,
+  UpdateTransaction,
+} from "@/types/domain/request";
+import useMerchantStore from "@/store/merchant/merchant";
 
 export default function useUpdateTransaction() {
   const {
@@ -16,15 +22,38 @@ export default function useUpdateTransaction() {
     editTransactionId,
   } = useModalTransaction();
 
+  const { merchants } = useMerchantStore();
   const {
     updateTransaction,
     setLoadingUpdateTransaction,
     loadingUpdateTransaction,
     setErrorUpdateTransaction,
+
+    transaction,
+    findByIdTransaction,
+    loadingGetTransaction,
+    errorGetTransaction,
   } = useTransactionStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editTransactionId != null) {
+      const req: FindyByIdTransaction = {
+        toast,
+        id: editTransactionId,
+      };
+
+      findByIdTransaction(req);
+    }
+  }, [isModalVisibleEdit, editTransactionId]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateTransactionFormValues) => {
     setLoadingUpdateTransaction(true);
@@ -34,10 +63,28 @@ export default function useUpdateTransaction() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await updateTransaction(
-        editTransactionId as number,
-        validatedValues,
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      const selectedMerchant = merchants?.find(
+        (m) => m.id === validatedValues.merchant_id.value,
       );
+
+      if (!selectedMerchant) {
+        throw new Error("Merchant tidak ditemukan");
+      }
+
+      const req: UpdateTransaction = {
+        id: editTransactionId as number,
+        card_number: validatedValues.card_number.value,
+        amount: validatedValues.amount,
+        payment_method: validatedValues.payment_method,
+        merchant_id: validatedValues.merchant_id.value,
+        transaction_time: validatedValues.transaction_time,
+        api_key: selectedMerchant.api_key,
+        toast: toast,
+      };
+
+      const result = await updateTransaction(req);
 
       if (result) {
         toast({
@@ -80,6 +127,10 @@ export default function useUpdateTransaction() {
   };
 
   return {
+    transaction,
+    editTransactionId,
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingUpdateTransaction,
     isModalVisibleEdit,

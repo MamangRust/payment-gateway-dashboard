@@ -5,6 +5,7 @@ export default function TopupPage() {
   const {
     table,
     search,
+
     setSearch,
     loadingGetTopups,
     pagination,

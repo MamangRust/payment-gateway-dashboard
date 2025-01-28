@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import {
   DeletePermanentWithdraw,
@@ -89,13 +90,15 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.patch(`/withdraws/restore/${req.id}`, null, {
+      await myApi.post(`/withdraws/restore/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingRestoreWithdrawTrashed: false,
         errorRestoreWithdrawTrashed: null,
       });
+      handleMessageAction("withdraw", "restore");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -116,13 +119,15 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/withdraws/${req.id}`, {
+      await myApi.delete(`/withdraws/permanent/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingDeletePermanentWithdrawTrashed: false,
         errorDeletePermanentWithdrawTrashed: null,
       });
+      handleMessageAction("withdraw", "deletePermanent");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -146,6 +151,8 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
         loadingRestoreAllWithdrawTrashed: false,
         errorRestoreAllWithdrawTrashed: null,
       });
+      handleMessageAction("withdraw", "restoreAll");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -171,6 +178,8 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
         loadingDeletePermanentWithdrawTrashed: false,
         errorDeletePermanentWithdrawTrashed: null,
       });
+      handleMessageAction("withdraw", "deleteAllPermanent");
+
       return true;
     } catch (err) {
       handleApiError(

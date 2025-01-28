@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useWithdrawStore from "@/store/withdraw/withdraw";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +10,7 @@ import { z } from "zod";
 import useModalWithdraw from "@/store/withdraw/modal";
 import { CreateWithdraw } from "@/types/domain/request";
 
-export default function useCreateUser() {
+export default function useCreateWithdraw() {
   const { isModalVisible, showModal, hideModal } = useModalWithdraw();
 
   const {
@@ -21,6 +22,12 @@ export default function useCreateUser() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateWithdrawFormValues) => {
     setLoadingCreateWithdraw(true);
@@ -81,6 +88,8 @@ export default function useCreateUser() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateWithdraw,
     isModalVisible,

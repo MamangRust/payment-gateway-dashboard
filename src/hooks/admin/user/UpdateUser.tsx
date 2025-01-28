@@ -1,10 +1,11 @@
+import { useEffect, useRef } from "react";
 import useUserStore from "@/store/user/user";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { UpdateUserFormValues, updateUserRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalUser from "@/store/user/modal";
-import { UpdateUser } from "@/types/domain/request";
+import { FindByIdUser, UpdateUser } from "@/types/domain/request";
 
 export default function useUpdateUser() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editUserId } =
@@ -15,10 +16,32 @@ export default function useUpdateUser() {
     setLoadingUpdateUser,
     loadingUpdateUser,
     setErrorUpdateUser,
+
+    user,
+    findById,
+    loadingGetUser,
+    errorGetUser,
   } = useUserStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editUserId !== null) {
+      const req: FindByIdUser = {
+        toast,
+        id: editUserId,
+      };
+
+      findById(req);
+    }
+  }, [isModalVisibleEdit, editUserId, findById]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateUserFormValues) => {
     setLoadingUpdateUser(true);
@@ -29,7 +52,7 @@ export default function useUpdateUser() {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const req: UpdateUser = {
-        id: editUserId as number,
+        user_id: editUserId as number,
         firstname: validatedValues.firstname,
         lastname: validatedValues.lastname,
         email: validatedValues.email,
@@ -81,6 +104,10 @@ export default function useUpdateUser() {
   };
 
   return {
+    editUserId,
+    formRef,
+    user,
+    handleButtonSubmit,
     handleSubmit,
     loadingUpdateUser,
     isModalVisibleEdit,

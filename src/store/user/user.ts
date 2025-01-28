@@ -2,11 +2,16 @@ import { create } from "zustand";
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { UserStore } from "@/types/state/user";
-import { CreateUser, UpdateUser } from "@/types/domain/request";
+import {
+  CreateUser,
+  FindByIdUser,
+  TrashedUser,
+  UpdateUser,
+} from "@/types/domain/request";
 import { getAccessToken } from "../auth";
 import { FindAllUserTrashed } from "@/types/domain/request/user/trashed/list";
-import { RestoreUserTrashed } from "@/types/domain/request/user/trashed/restore";
-import { DeletePermanentUser } from "@/types/domain/request/user/trashed/delete";
+
+import { handleMessageAction } from "@/helpers/message";
 
 const useUserStore = create<UserStore>((set, get) => ({
   users: null,
@@ -90,22 +95,27 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
-  findById: async (req: RestoreUserTrashed) => {
+  findById: async (req: FindByIdUser) => {
     set({ loadingGetUser: true, errorGetUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/users/${req.id}`, {
+      const response = await myApi.get(`/user/${req.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      set({ user: response.data, loadingGetUser: false, errorGetUser: null });
+
+      set({
+        user: response.data.data,
+        loadingGetUser: false,
+        errorGetUser: null,
+      });
     } catch (err) {
       handleApiError(
         err,
         () => set({ loadingGetUser: false }),
         (message: any) => set({ errorGetUser: message }),
-        req.id,
+        req.toast,
       );
     }
   },
@@ -114,7 +124,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingGetActiveUsers: true, errorGetActiveUsers: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/users/active`, {
+      const response = await myApi.get(`/user/active`, {
         params: { page, pageSize, search },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -145,13 +155,25 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingCreateUser: true, errorCreateUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/users`, req, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      if (response.status == 201) {
+      const response = await myApi.post(
+        `/user/create`,
+        {
+          firstname: req.firstname,
+          lastname: req.lastname,
+          email: req.email,
+          password: req.password,
+          confirm_password: req.confirm_password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.status == 200) {
+        handleMessageAction("user", "create");
         set({
           loadingCreateUser: false,
           errorCreateUser: null,
@@ -177,14 +199,26 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingUpdateUser: true, errorUpdateUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/users/${req.id}`, req, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await myApi.post(
+        `/user/update/${req.user_id}`,
+        {
+          user_id: req.user_id,
+          firstname: req.firstname,
+          lastname: req.lastname,
+          email: req.email,
+          password: req.password,
+          confirm_password: req.confirm_password,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       if (response.status == 200) {
         set({ loadingUpdateUser: false, errorUpdateUser: null });
+        handleMessageAction("user", "update");
 
         return true;
       } else {
@@ -202,17 +236,19 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
-  trashedUser: async (req: DeletePermanentUser) => {
+  trashedUser: async (req: TrashedUser) => {
     set({ loadingTrashedUser: true, errorTrashedUser: null });
 
     try {
       const token = getAccessToken();
-      const response = await myApi.delete(`/users/trash/${req.id}`, {
+      const response = await myApi.post(`/user/trashed/${req.id}`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (response.status === 200) {
+        handleMessageAction("user", "trashed");
         set({ loadingTrashedUser: false, errorTrashedUser: null });
         return true;
       } else {

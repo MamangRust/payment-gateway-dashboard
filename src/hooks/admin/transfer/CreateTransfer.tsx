@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useTransferStore from "@/store/transfer/transfer";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -18,9 +19,13 @@ export default function useCreateTransfer() {
     loadingCreateTransfer,
     setErrorCreateTransfer,
   } = useTransferStore();
-
+  const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateTransferFormValues) => {
     setLoadingCreateTransfer(true);
@@ -81,6 +86,8 @@ export default function useCreateTransfer() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateTransfer,
     isModalVisible,

@@ -6,19 +6,18 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useDeleteCard from "@/hooks/admin/card/DeleteCard";
 import useModalCard from "@/store/card/modal";
 
 export function DeleteCard() {
   const {
     deleteCardId,
+    handleSubmit,
+    loadingTrashedCard,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalCard();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteCard();
 
   return (
     <Dialog
@@ -38,7 +37,7 @@ export function DeleteCard() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

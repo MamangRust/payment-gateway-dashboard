@@ -8,8 +8,10 @@ import {
 import { z } from "zod";
 import useModalMerchant from "@/store/merchant/modal";
 import { CreateMerchant } from "@/types/domain/request";
+import { useRef } from "react";
 
 export default function useCreateMerchant() {
+  const formRef = useRef<HTMLFormElement>(null);
   const { isModalVisible, showModal, hideModal } = useModalMerchant();
 
   const {
@@ -21,6 +23,10 @@ export default function useCreateMerchant() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateMerchantFormValues) => {
     setLoadingCreateMerchant(true);
@@ -80,6 +86,8 @@ export default function useCreateMerchant() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateMerchant,
     isModalVisible,

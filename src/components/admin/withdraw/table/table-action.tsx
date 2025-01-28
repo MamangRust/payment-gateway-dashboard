@@ -26,17 +26,19 @@ const TableActionWithdraw = ({ withdraw }: TableActionWithdrawProps) => {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onSelect={() => console.log("Viewing details for:", withdraw.id)}
+          onSelect={() =>
+            console.log("Viewing details for:", withdraw.withdraw_id)
+          }
         >
           <Eye className="mr-2 h-4 w-4 text-gray-500" />
           View Details
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => showModalEdit(withdraw.id)}>
+        <DropdownMenuItem onSelect={() => showModalEdit(withdraw.withdraw_id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem
-          onSelect={() => showModalDelete(withdraw.id)}
+          onSelect={() => showModalDelete(withdraw.withdraw_id)}
           className="text-red-600"
         >
           <Trash className="mr-2 h-4 w-4 text-red-500" />

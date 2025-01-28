@@ -7,20 +7,19 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useDeleteMerchant from "@/hooks/admin/merchant/DeleteMerchant";
 import useModalMerchant from "@/store/merchant/modal";
 import { Trash } from "lucide-react";
 
 export function DeleteMerchant() {
   const {
     deleteMerchantId,
+    handleSubmit,
+    loadingTrashedMerchant,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalMerchant();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteMerchant();
 
   return (
     <Dialog
@@ -41,7 +40,7 @@ export function DeleteMerchant() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

@@ -1,4 +1,4 @@
 export interface FindByCardNumber {
-  cardNumber: number;
+  cardNumber: string;
   toast: any;
 }

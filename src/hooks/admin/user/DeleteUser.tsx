@@ -39,15 +39,15 @@ export default function useDeleteUser() {
       if (result) {
         toast({
           title: "Success",
-          description: "User berhasil diupdate",
+          description: "User berhasil didelete",
           variant: "default",
         });
 
-        navigate(window.location.pathname);
+        // navigate(window.location.pathname);
       } else {
         toast({
           title: "Error",
-          description: "Gagal membuat user. Silakan coba lagi.",
+          description: "Gagal mendelete user. Silakan coba lagi.",
           variant: "destructive",
         });
       }
@@ -77,6 +77,7 @@ export default function useDeleteUser() {
   };
 
   return {
+    deleteUserId,
     handleSubmit,
     loadingTrashedUser,
     isModalVisibleDelete,

@@ -6,19 +6,18 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useRestoreMerchant from "@/hooks/admin/merchant/trashed/Restore";
 import useModalMerchantTrashed from "@/store/merchant/trashed/modal";
 
 export function RestoreMerchant() {
   const {
     restoreMerchantId,
+    handleSubmit,
+    loadingRestoreMerchantTrashed,
+    isModalVisibleRestore,
     showModalRestore,
     hideModalRestore,
-    isModalVisibleRestore,
-  } = useModalMerchantTrashed();
-
-  const handleDelete = () => {
-    hideModalRestore();
-  };
+  } = useRestoreMerchant();
 
   return (
     <Dialog
@@ -38,7 +37,7 @@ export function RestoreMerchant() {
           <Button variant="outline" onClick={hideModalRestore}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

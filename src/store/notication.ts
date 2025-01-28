@@ -1,20 +1,24 @@
-import { NotificationState } from "@/types/state/notification";
+import { Notification } from "@/types/model";
 import { create } from "zustand";
-import { persist, PersistOptions } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
-const useNotificationStore = create(
-  persist<NotificationState>(
+type NotificationState = {
+  notifications: Notification[];
+  addNotification: (message: string, type?: Notification["type"]) => void;
+  removeNotification: (id: number) => void;
+  clearAllNotifications: () => void;
+};
+
+const useNotificationStore = create<NotificationState>()(
+  persist(
     (set) => ({
-      notifications: [
-        { id: 1, message: "Dummy notification 1" },
-        { id: 2, message: "Dummy notification 2" },
-        { id: 3, message: "Dummy notification 3" },
-        { id: 4, message: "Dummy notification 4" },
-        { id: 5, message: "Dummy notification 5" },
-      ],
-      addNotification: (message) => {
+      notifications: [],
+      addNotification: (message, type) => {
         set((state) => ({
-          notifications: [...state.notifications, { id: Date.now(), message }],
+          notifications: [
+            ...state.notifications,
+            { id: Date.now(), message, type },
+          ],
         }));
       },
       removeNotification: (id) => {
@@ -24,11 +28,13 @@ const useNotificationStore = create(
           ),
         }));
       },
+      clearAllNotifications: () => {
+        set({ notifications: [] });
+      },
     }),
     {
       name: "notification-storage",
-      getStorage: () => localStorage,
-    } as PersistOptions<NotificationState>,
+    },
   ),
 );
 

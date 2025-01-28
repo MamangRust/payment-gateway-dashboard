@@ -6,15 +6,16 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalCardTrashed from "@/store/card/trashed/modal";
+import useRestoreAllCard from "@/hooks/admin/card/trashed/RestoreAll";
 
 export function RestoreAllCard() {
-  const { showModalRestoreAll, hideModalRestoreAll, isModalVisibleRestoreAll } =
-    useModalCardTrashed();
-
-  const handleDelete = () => {
-    hideModalRestoreAll();
-  };
+  const {
+    handleSubmit,
+    loadingRestoreAllCardTrashed,
+    isModalVisibleRestoreAll,
+    showModalRestoreAll,
+    hideModalRestoreAll,
+  } = useRestoreAllCard();
 
   return (
     <Dialog
@@ -34,7 +35,7 @@ export function RestoreAllCard() {
           <Button variant="outline" onClick={hideModalRestoreAll}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

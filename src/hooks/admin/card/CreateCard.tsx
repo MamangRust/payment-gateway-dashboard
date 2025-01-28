@@ -5,9 +5,11 @@ import { CreateCardFormValues, createCardRequestSchema } from "@/schemas";
 import { z } from "zod";
 import useModalCard from "@/store/card/modal";
 import { CreateCard } from "@/types/domain/request";
+import { useRef } from "react";
 
 export default function useCreateCard() {
   const { isModalVisible, showModal, hideModal } = useModalCard();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     createCard,
@@ -28,13 +30,14 @@ export default function useCreateCard() {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const req: CreateCard = {
-        user_id: validatedValues.user_id,
+        user_id: Number(validatedValues.user_id),
         card_type: validatedValues.card_type,
-        expire_date: validatedValues.expire_date,
+        expire_date: new Date(validatedValues.expire_date.toISOString()),
         cvv: validatedValues.cvv,
-        card_provider: validatedValues.card_type,
+        card_provider: validatedValues.card_provider,
         toast: toast,
       };
+      console.log("req", req);
 
       const result = await createCard(req);
 
@@ -78,11 +81,17 @@ export default function useCreateCard() {
     }
   };
 
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
+
   return {
     handleSubmit,
     loadingCreateCard,
     isModalVisible,
     showModal,
     hideModal,
+    formRef,
+    handleButtonSubmit,
   };
 }

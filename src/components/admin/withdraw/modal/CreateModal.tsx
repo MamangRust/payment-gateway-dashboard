@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,21 +7,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateWithdrawForm from "../form/CreateForm";
-import useModalWithdraw from "@/store/withdraw/modal";
-import { CreateWithdrawFormValues } from "@/schemas";
+import useCreateWithdraw from "@/hooks/admin/withdraw/CreateWithdraw";
 
 export function AddWithdraw() {
-  const { isModalVisible, showModal, hideModal } = useModalWithdraw();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (data: CreateWithdrawFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModal();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const {
+    formRef,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingCreateWithdraw,
+    isModalVisible,
+    showModal,
+    hideModal,
+  } = useCreateWithdraw();
 
   return (
     <Dialog

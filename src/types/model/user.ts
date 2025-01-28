@@ -1,3 +1,5 @@
+import { PaginationMeta } from "./card";
+
 export interface User {
   id: number;
   firstname: string;
@@ -15,4 +17,34 @@ export interface UserTrashed {
   created_at: string;
   updated_at: string;
   deleted_at: string;
+}
+
+export interface ApiResponsesUser {
+  status: string;
+  message: string;
+  data: User[];
+}
+
+export interface ApiResponseUserDelete {
+  status: string;
+  message: string;
+}
+
+export interface ApiResponseUserAll {
+  status: string;
+  message: string;
+}
+
+export interface ApiResponsePaginationUserDeleteAt {
+  status: string;
+  message: string;
+  data: UserTrashed[];
+  pagination: PaginationMeta;
+}
+
+export interface ApiResponsePaginationUser {
+  status: string;
+  message: string;
+  data: User[];
+  pagination: PaginationMeta;
 }

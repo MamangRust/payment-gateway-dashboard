@@ -6,19 +6,17 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalTransactionTrashed from "@/store/transaction/trashed/modal";
+import useRestoreTransaction from "@/hooks/admin/transaction/trashed/Restore";
 
 export function RestoreTransaction() {
   const {
     restoreTransactionId,
+    handleSubmit,
+    loadingRestoreTransactionTrashed,
+    isModalVisibleRestore,
     showModalRestore,
     hideModalRestore,
-    isModalVisibleRestore,
-  } = useModalTransactionTrashed();
-
-  const handleDelete = () => {
-    hideModalRestore();
-  };
+  } = useRestoreTransaction();
 
   return (
     <Dialog
@@ -38,7 +36,7 @@ export function RestoreTransaction() {
           <Button variant="outline" onClick={hideModalRestore}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

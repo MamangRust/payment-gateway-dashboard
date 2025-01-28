@@ -66,6 +66,7 @@ export default function useRestoreUser() {
   };
 
   return {
+    restoreUserId,
     handleSubmit,
     loadingRestoreUserTrashed,
     isModalVisibleRestore,

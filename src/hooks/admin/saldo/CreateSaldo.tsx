@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import useSaldoStore from "@/store/saldo/saldo";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +9,7 @@ import { CreateSaldo } from "@/types/domain/request";
 
 export default function useCreateSaldo() {
   const { isModalVisible, showModal, hideModal } = useModalSaldo();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     createSaldo,
@@ -18,6 +20,10 @@ export default function useCreateSaldo() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: CreateSaldoFormValues) => {
     setLoadingCreateSaldo(true);
@@ -76,6 +82,8 @@ export default function useCreateSaldo() {
   };
 
   return {
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingCreateSaldo,
     isModalVisible,

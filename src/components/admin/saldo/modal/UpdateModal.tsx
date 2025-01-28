@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,23 +6,31 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import CreateSaldoForm from "../form/CreateForm";
-import useModalSaldo from "@/store/saldo/modal";
-import { UpdateSaldoFormValues } from "@/schemas";
+import useUpdateSaldo from "@/hooks/admin/saldo/UpdateSaldo";
+import UpdateSaldoForm from "../form/UpdateForm";
 
 export function UpdateSaldo() {
-  const { editSaldoId, isModalVisibleEdit, showModalEdit, hideModalEdit } =
-    useModalSaldo();
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    editSaldoId,
+    formRef,
+    saldo,
+    handleButtonSubmit,
+    handleSubmit,
+    loadingUpdateSaldo,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateSaldo();
 
-  const handleSubmit = (data: UpdateSaldoFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = saldo
+    ? {
+        card_number: {
+          value: saldo.card_number,
+          label: saldo.card_number,
+        },
+        total_balance: saldo.total_balance,
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -34,9 +41,13 @@ export function UpdateSaldo() {
     >
       <DialogContent className="max-w-md w-full">
         <DialogHeader>
-          <DialogTitle>Add New Card</DialogTitle>
+          <DialogTitle>Edit New Saldo</DialogTitle>
         </DialogHeader>
-        <CreateSaldoForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateSaldoForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

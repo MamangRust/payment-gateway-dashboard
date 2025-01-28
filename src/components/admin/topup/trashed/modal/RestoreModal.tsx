@@ -6,19 +6,18 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useRestoreTopup from "@/hooks/admin/topup/trashed/Restore";
 import useModalTopupTrashed from "@/store/topup/trashed/modal";
 
 export function RestoreTopup() {
   const {
     restoreTopupId,
+    handleSubmit,
+    loadingRestoreTopupTrashed,
+    isModalVisibleRestore,
     showModalRestore,
     hideModalRestore,
-    isModalVisibleRestore,
-  } = useModalTopupTrashed();
-
-  const handleDelete = () => {
-    hideModalRestore();
-  };
+  } = useRestoreTopup();
 
   return (
     <Dialog
@@ -38,7 +37,7 @@ export function RestoreTopup() {
           <Button variant="outline" onClick={hideModalRestore}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

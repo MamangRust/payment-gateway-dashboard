@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import useTransferStore from "@/store/transfer/transfer";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,7 +8,7 @@ import {
 } from "@/schemas";
 import { z } from "zod";
 import useModalTransfer from "@/store/transfer/modal";
-import { UpdateTransfer } from "@/types/domain/request";
+import { FindByIdTransfer, UpdateTransfer } from "@/types/domain/request";
 
 export default function useUpdateTransfer() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editTransferId } =
@@ -18,10 +19,32 @@ export default function useUpdateTransfer() {
     setLoadingUpdateTransfer,
     loadingUpdateTransfer,
     setErrorUpdateTransfer,
+
+    transfer,
+    findByIdTransfer,
+    loadingGetTransfer,
+    errorGetTransfer,
   } = useTransferStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isModalVisibleEdit && editTransferId != null) {
+      const req: FindByIdTransfer = {
+        toast,
+        id: editTransferId,
+      };
+
+      findByIdTransfer(req);
+    }
+  }, [isModalVisibleEdit, editTransferId]);
+
+  const handleButtonSubmit = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const handleSubmit = async (data: UpdateTransferFormValues) => {
     setLoadingUpdateTransfer(true);
@@ -33,8 +56,8 @@ export default function useUpdateTransfer() {
 
       const req: UpdateTransfer = {
         id: editTransferId as number,
-        transfer_from: validatedValues.transfer_from,
-        transfer_to: validatedValues.transfer_to,
+        transfer_from: validatedValues.transfer_from.value,
+        transfer_to: validatedValues.transfer_to.value,
         transfer_amount: validatedValues.transfer_amount,
         toast: toast,
       };
@@ -83,6 +106,10 @@ export default function useUpdateTransfer() {
   };
 
   return {
+    transfer,
+    editTransferId,
+    formRef,
+    handleButtonSubmit,
     handleSubmit,
     loadingUpdateTransfer,
     isModalVisibleEdit,

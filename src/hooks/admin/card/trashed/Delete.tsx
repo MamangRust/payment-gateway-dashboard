@@ -67,6 +67,7 @@ export default function useDeletePermanentCard() {
 
   return {
     handleSubmit,
+    deletePermanentCardId,
     loadingDeletePermanentCardTrashed,
     isModalVisibleDeletePermanent,
     showModalDeletePermanent,

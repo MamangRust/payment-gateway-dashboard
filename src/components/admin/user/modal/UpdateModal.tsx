@@ -7,23 +7,31 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalUser from "@/store/user/modal";
-import { UpdateUserFormValues } from "@/schemas";
 import UpdateUserForm from "../form/UpdateForm";
+import useUpdateUser from "@/hooks/admin/user/UpdateUser";
 
 export function EditUser() {
-  const { editUserId, isModalVisibleEdit, showModalEdit, hideModalEdit } =
-    useModalUser();
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    formRef,
+    editUserId,
+    handleButtonSubmit,
+    handleSubmit,
+    user,
+    loadingUpdateUser,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+  } = useUpdateUser();
 
-  const handleSubmit = (data: UpdateUserFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
-
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = user
+    ? {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        password: "",
+        confirm_password: "",
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -36,7 +44,11 @@ export function EditUser() {
         <DialogHeader>
           <DialogTitle>Edit New User</DialogTitle>
         </DialogHeader>
-        <UpdateUserForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateUserForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

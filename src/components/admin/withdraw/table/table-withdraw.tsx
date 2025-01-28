@@ -22,6 +22,7 @@ import TableFooterWithdraw from "./table-footer";
 const TableWithdraw = ({
   search,
   setSearch,
+  showModal,
   isLoadingWithDelay,
   loadingGetWithdraws,
   table,
@@ -34,6 +35,10 @@ const TableWithdraw = ({
       <CardHeader className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Table Withdraw</h3>
+
+          <div className="space-x-2">
+            <Button onClick={() => showModal()}>Add</Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4">

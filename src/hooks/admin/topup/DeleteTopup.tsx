@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import useModalTopup from "@/store/topup/modal";
-import { TrashedTopup } from "@/types/domain/request/topup/trashed";
+import { TrashedTopup } from "@/types/domain/request/topup";
 
 export default function useDeleteTopup() {
   const {
@@ -78,6 +78,7 @@ export default function useDeleteTopup() {
   };
 
   return {
+    deleteTopupId,
     handleSubmit,
     loadingTrashedTopup,
     isModalVisibleDelete,

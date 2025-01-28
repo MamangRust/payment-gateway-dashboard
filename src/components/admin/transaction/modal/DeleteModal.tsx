@@ -9,18 +9,17 @@ import {
 } from "@/components/ui/dialog";
 import { Trash } from "lucide-react";
 import useModalTransaction from "@/store/transaction/modal";
+import useDeleteTransaction from "@/hooks/admin/transaction/DeleteTransaction";
 
 export function DeleteTransaction() {
   const {
     deleteTransactionId,
+    handleSubmit,
+    loadingTrashedTransaction,
     isModalVisibleDelete,
     showModalDelete,
     hideModalDelete,
-  } = useModalTransaction();
-
-  const handleDelete = () => {
-    hideModalDelete();
-  };
+  } = useDeleteTransaction();
 
   return (
     <Dialog
@@ -41,7 +40,7 @@ export function DeleteTransaction() {
           <Button variant="outline" onClick={hideModalDelete}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleSubmit}>
             Delete
           </Button>
         </DialogFooter>

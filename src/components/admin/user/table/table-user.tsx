@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import TableHeaderUser from "./table-header";
 import TableBodyUser from "./table-body";
 import TableFooterUser from "./table-footer";
+import useModalUser from "@/store/user/modal";
 
 const TableUser = ({
   search,
@@ -29,11 +30,17 @@ const TableUser = ({
   handlePageChange,
   handlePageSizeChange,
 }: any) => {
+  const { showModal } = useModalUser();
+
   return (
     <Card className="w-full shadow-lg rounded-md border">
       <CardHeader className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Table User</h3>
+
+          <div className="space-x-2">
+            <Button onClick={() => showModal()}>Add</Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4">

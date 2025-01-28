@@ -5,7 +5,7 @@ import { z } from "zod";
 import useModalMerchant from "@/store/merchant/modal";
 import { FindTrashedMerchant } from "@/types/domain/request";
 
-export default function useDeleteUser() {
+export default function useDeleteMerchant() {
   const {
     deleteMerchantId,
     isModalVisibleDelete,
@@ -78,6 +78,7 @@ export default function useDeleteUser() {
   };
 
   return {
+    deleteMerchantId,
     handleSubmit,
     loadingTrashedMerchant,
     isModalVisibleDelete,

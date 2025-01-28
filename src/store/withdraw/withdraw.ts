@@ -11,10 +11,20 @@ import {
   TrashedWithdraw,
   UpdateWithdraw,
 } from "@/types/domain/request";
+import { handleMessageAction } from "@/helpers/message";
 
 const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   withdraws: null,
   withdraw: null,
+
+  monthStatusSuccess: null,
+  yearStatusSuccess: null,
+
+  monthStatusFailed: null,
+  yearStatusFailed: null,
+
+  monthWithdrawAmount: null,
+  yearWithdrawAmount: null,
 
   pagination: {
     currentPage: 1,
@@ -22,6 +32,13 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
     totalItems: 0,
     totalPages: 0,
   },
+
+  loadingMonthStatusSuccess: false,
+  loadingYearStatusSuccess: false,
+  loadingMonthStatusFailed: false,
+  loadingYearStatusFailed: false,
+  loadingMonthWithdrawAmount: false,
+  loadingYearWithdrawAmount: false,
 
   loadingGetWithdraws: false,
   loadingGetWithdraw: false,
@@ -35,6 +52,13 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   loadingRestoreWithdraw: false,
   loadingPermanentWithdraw: false,
 
+  errorMonthStatusSuccess: null,
+  errorYearStatusSuccess: null,
+  errorMonthStatusFailed: null,
+  errorYearStatusFailed: null,
+  errorMonthWithdrawAmount: null,
+  errorYearWithdrawAmount: null,
+
   errorGetWithdraws: null,
   errorGetWithdraw: null,
   errorGetCardNumberWithdraw: null,
@@ -46,6 +70,19 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   errorTrashedWithdraw: null,
   errorRestoreWithdraw: null,
   errorPermanentWithdraw: null,
+
+  setLoadingMonthStatusSuccess: (value) =>
+    set({ loadingMonthStatusSuccess: value }),
+  setLoadingYearStatusSuccess: (value) =>
+    set({ loadingYearStatusSuccess: value }),
+  setLoadingMonthStatusFailed: (value) =>
+    set({ loadingMonthStatusFailed: value }),
+  setLoadingYearStatusFailed: (value) =>
+    set({ loadingYearStatusFailed: value }),
+  setLoadingMonthWithdrawAmount: (value) =>
+    set({ loadingMonthWithdrawAmount: value }),
+  setLoadingYearWithdrawAmount: (value) =>
+    set({ loadingYearWithdrawAmount: value }),
 
   setLoadingGetWithdraws: (value) => set({ loadingGetWithdraws: value }),
   setLoadingGetWithdraw: (value) => set({ loadingGetWithdraw: value }),
@@ -60,6 +97,16 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   setLoadingUpdateWithdraw: (value) => set({ loadingUpdateWithdraw: value }),
   setLoadingTrashedWithdraw: (value) => set({ loadingTrashedWithdraw: value }),
 
+  setErrorMonthStatusSuccess: (value) =>
+    set({ errorMonthStatusSuccess: value }),
+  setErrorYearStatusSuccess: (value) => set({ errorYearStatusSuccess: value }),
+  setErrorMonthStatusFailed: (value) => set({ errorMonthStatusFailed: value }),
+  setErrorYearStatusFailed: (value) => set({ errorYearStatusFailed: value }),
+  setErrorMonthWithdrawAmount: (value) =>
+    set({ errorMonthWithdrawAmount: value }),
+  setErrorYearWithdrawAmount: (value) =>
+    set({ errorYearWithdrawAmount: value }),
+
   setErrorGetWithdraws: (value) => set({ errorGetWithdraws: value }),
   setErrorGetWithdraw: (value) => set({ errorGetWithdraw: value }),
   setErrorGetCardNumberWithdraw: (value) =>
@@ -71,6 +118,218 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
   setErrorCreateWithdraw: (value) => set({ errorCreateWithdraw: value }),
   setErrorUpdateWithdraw: (value) => set({ errorUpdateWithdraw: value }),
   setErrorTrashedWithdraw: (value) => set({ errorTrashedWithdraw: value }),
+
+  findMonthStatusSuccess: async (toast: any, year: number, month: number) => {
+    set({ loadingMonthStatusSuccess: true, errorMonthStatusSuccess: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/month-success", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+          month,
+        },
+      });
+      set({
+        monthStatusSuccess: response.data.data,
+        loadingMonthStatusSuccess: false,
+        errorMonthStatusSuccess: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthStatusSuccess: false }),
+        (message: any) => set({ errorMonthStatusSuccess: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearStatusSuccess: async (toast: any, year: number) => {
+    set({ loadingYearStatusSuccess: true, errorYearStatusSuccess: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/year-success", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+        },
+      });
+      set({
+        yearStatusSuccess: response.data.data,
+        loadingYearStatusSuccess: false,
+        errorYearStatusSuccess: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearStatusSuccess: false }),
+        (message: any) => set({ errorYearStatusSuccess: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthStatusFailed: async (toast: any, year: number, month: number) => {
+    set({ loadingMonthStatusFailed: true, errorMonthStatusFailed: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/month-failed", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+          month,
+        },
+      });
+      set({
+        monthStatusFailed: response.data.data,
+        loadingMonthStatusFailed: false,
+        errorMonthStatusFailed: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthStatusFailed: false }),
+        (message: any) => set({ errorMonthStatusFailed: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearStatusFailed: async (toast: any, year: number) => {
+    set({ loadingYearStatusFailed: true, errorYearStatusFailed: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/year-failed", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+        },
+      });
+      set({
+        yearStatusFailed: response.data.data,
+        loadingYearStatusFailed: false,
+        errorYearStatusFailed: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearStatusFailed: false }),
+        (message: any) => set({ errorYearStatusFailed: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthWithdrawAmount: async (toast: any, year: number) => {
+    set({ loadingMonthWithdrawAmount: true, errorMonthWithdrawAmount: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/monthly-amount", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+        },
+      });
+      set({
+        monthWithdrawAmount: response.data.data,
+        loadingMonthWithdrawAmount: false,
+        errorMonthWithdrawAmount: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthWithdrawAmount: false }),
+        (message: any) => set({ errorMonthWithdrawAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearWithdrawAmount: async (toast: any, year: number) => {
+    set({ loadingYearWithdrawAmount: true, errorYearWithdrawAmount: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/yearly-amount", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+        },
+      });
+      set({
+        yearWithdrawAmount: response.data.data,
+        loadingYearWithdrawAmount: false,
+        errorYearWithdrawAmount: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearWithdrawAmount: false }),
+        (message: any) => set({ errorYearWithdrawAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthWithdrawAmountByCard: async (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => {
+    set({ loadingMonthWithdrawAmount: true, errorMonthWithdrawAmount: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/monthly-by-card", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+          card_number,
+        },
+      });
+      set({
+        monthWithdrawAmount: response.data.data,
+        loadingMonthWithdrawAmount: false,
+        errorMonthWithdrawAmount: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthWithdrawAmount: false }),
+        (message: any) => set({ errorMonthWithdrawAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearWithdrawAmountByCard: async (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => {
+    set({ loadingYearWithdrawAmount: true, errorYearWithdrawAmount: null });
+    try {
+      const token = getAccessToken();
+      const response = await myApi.get("/withdraws/yearly-by-card", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          year,
+          card_number,
+        },
+      });
+      set({
+        yearWithdrawAmount: response.data.data,
+        loadingYearWithdrawAmount: false,
+        errorYearWithdrawAmount: null,
+      });
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearWithdrawAmount: false }),
+        (message: any) => set({ errorYearWithdrawAmount: message }),
+        toast,
+      );
+    }
+  },
 
   findAllWithdraws: async (req: FindAllWithdraw) => {
     set({ loadingGetWithdraws: true, errorGetWithdraws: null });
@@ -108,8 +367,9 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
       const response = await myApi.get(`/withdraws/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       set({
-        withdraw: response.data,
+        withdraw: response.data.data,
         loadingGetWithdraw: false,
         errorGetWithdraw: null,
       });
@@ -188,9 +448,19 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
     set({ loadingCreateWithdraw: true, errorCreateWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post("/withdraws", req, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.post(
+        "/withdraws/create",
+        {
+          card_number: req.card_number,
+          withdraw_amount: req.withdraw_amount,
+          withdraw_time: req.withdraw_time,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      handleMessageAction("withdraw", "create");
+
       set({ loadingCreateWithdraw: false, errorCreateWithdraw: null });
       return response.data;
     } catch (err) {
@@ -207,9 +477,20 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
     set({ loadingUpdateWithdraw: true, errorUpdateWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.put(`/withdraws/${req.id}`, req, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await myApi.post(
+        `/withdraws/update/${req.id}`,
+        {
+          withdraw_id: req.id,
+          card_number: req.card_number,
+          withdraw_amount: req.withdraw_amount,
+          withdraw_time: req.withdraw_time,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      handleMessageAction("withdraw", "update");
+
       set({ loadingUpdateWithdraw: false, errorUpdateWithdraw: null });
       return response.data;
     } catch (err) {
@@ -226,9 +507,11 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
     set({ loadingTrashedWithdraw: true, errorTrashedWithdraw: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.patch(`/withdraws/trashed/${req.id}`, null, {
+      const response = await myApi.post(`/withdraws/trashed/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      handleMessageAction("withdraw", "restore");
       set({ loadingTrashedWithdraw: false, errorTrashedWithdraw: null });
       return response.data;
     } catch (err) {

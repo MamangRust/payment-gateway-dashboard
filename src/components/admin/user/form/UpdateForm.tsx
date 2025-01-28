@@ -1,20 +1,33 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { forwardRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateCardRequestSchema, UpdateUserFormValues } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { forwardRef } from "react";
-import { UserUpdateFormProps } from "@/types/form/user/update";
+import { UpdateUserFormValues, updateUserRequestSchema } from "@/schemas";
+
+interface UserUpdateFormProps {
+  onSubmit: (data: UpdateUserFormValues) => void;
+  defaultValues?: UpdateUserFormValues;
+}
 
 const UpdateUserForm = forwardRef<HTMLFormElement, UserUpdateFormProps>(
-  ({ onSubmit }, ref) => {
+  ({ onSubmit, defaultValues }, ref) => {
     const {
       register,
       handleSubmit,
       formState: { errors },
     } = useForm<UpdateUserFormValues>({
-      resolver: zodResolver(updateCardRequestSchema),
+      resolver: zodResolver(updateUserRequestSchema),
+      defaultValues: defaultValues || {
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+        confirm_password: "",
+      },
     });
+
+    console.log("Form errors:", errors);
 
     return (
       <form ref={ref} onSubmit={handleSubmit(onSubmit)} className="space-y-4">

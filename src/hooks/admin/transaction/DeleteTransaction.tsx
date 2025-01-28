@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import useModalTransaction from "@/store/transaction/modal";
+import { TrashedTransaction } from "@/types/domain/request";
 
-export default function useDeleteUser() {
+export default function useDeleteTransaction() {
   const {
     deleteTransactionId,
     isModalVisibleDelete,
@@ -28,7 +29,12 @@ export default function useDeleteUser() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedTransaction(deleteTransactionId as number);
+      const req: TrashedTransaction = {
+        id: deleteTransactionId as number,
+        toast: toast,
+      };
+
+      const result = await trashedTransaction(req);
 
       if (result) {
         toast({
@@ -72,6 +78,7 @@ export default function useDeleteUser() {
   };
 
   return {
+    deleteTransactionId,
     handleSubmit,
     loadingTrashedTransaction,
     isModalVisibleDelete,

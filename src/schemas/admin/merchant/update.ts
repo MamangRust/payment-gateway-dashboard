@@ -1,8 +1,13 @@
 import { z } from "zod";
 
+const UserIdSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
 export const updateMerchantRequestSchema = z.object({
   name: z.string(),
-  user_id: z.number().int().min(1),
+  user_id: UserIdSchema,
   status: z.string(),
 });
 

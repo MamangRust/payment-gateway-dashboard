@@ -5,13 +5,29 @@ import {
   TrashedWithdraw,
   UpdateWithdraw,
 } from "@/types/domain/request";
-import { FindByCardNumber } from "@/types/domain/request/saldo";
 import { FindAllWithdraw } from "@/types/domain/request/withdraw/list";
-import { Withdraw } from "@/types/model/withdraw";
+import {
+  Withdraw,
+  WithdrawMonthlyAmount,
+  WithdrawMonthStatusFailed,
+  WithdrawMonthStatusSuccess,
+  WithdrawYearlyAmount,
+  WithdrawYearStatusFailed,
+  WithdrawYearStatusSuccess,
+} from "@/types/model/withdraw";
 
 export interface WithdrawStore {
   withdraws: Withdraw[] | null;
   withdraw: Withdraw | null;
+
+  monthStatusSuccess: WithdrawMonthStatusSuccess[] | null;
+  yearStatusSuccess: WithdrawYearStatusSuccess[] | null;
+
+  monthStatusFailed: WithdrawMonthStatusFailed[] | null;
+  yearStatusFailed: WithdrawYearStatusFailed[] | null;
+
+  monthWithdrawAmount: WithdrawMonthlyAmount[] | null;
+  yearWithdrawAmount: WithdrawYearlyAmount[] | null;
 
   pagination: {
     currentPage: number;
@@ -19,6 +35,13 @@ export interface WithdrawStore {
     totalItems: number;
     totalPages: number;
   };
+
+  loadingMonthStatusSuccess: boolean;
+  loadingYearStatusSuccess: boolean;
+  loadingMonthStatusFailed: boolean;
+  loadingYearStatusFailed: boolean;
+  loadingMonthWithdrawAmount: boolean;
+  loadingYearWithdrawAmount: boolean;
 
   loadingGetWithdraws: boolean;
   loadingGetWithdraw: boolean;
@@ -31,6 +54,14 @@ export interface WithdrawStore {
   loadingTrashedWithdraw: boolean;
 
   // Error states
+
+  errorMonthStatusSuccess: string | null;
+  errorYearStatusSuccess: string | null;
+  errorMonthStatusFailed: string | null;
+  errorYearStatusFailed: string | null;
+  errorMonthWithdrawAmount: string | null;
+  errorYearWithdrawAmount: string | null;
+
   errorGetWithdraws: string | null;
   errorGetWithdraw: string | null;
   errorGetCardNumberWithdraw: string | null;
@@ -40,6 +71,13 @@ export interface WithdrawStore {
   errorCreateWithdraw: string | null;
   errorUpdateWithdraw: string | null;
   errorTrashedWithdraw: string | null;
+
+  setLoadingMonthStatusSuccess: (value: boolean) => void;
+  setLoadingYearStatusSuccess: (value: boolean) => void;
+  setLoadingMonthStatusFailed: (value: boolean) => void;
+  setLoadingYearStatusFailed: (value: boolean) => void;
+  setLoadingMonthWithdrawAmount: (value: boolean) => void;
+  setLoadingYearWithdrawAmount: (value: boolean) => void;
 
   setLoadingGetWithdraws: (value: boolean) => void;
   setLoadingGetWithdraw: (value: boolean) => void;
@@ -51,6 +89,13 @@ export interface WithdrawStore {
   setLoadingUpdateWithdraw: (value: boolean) => void;
   setLoadingTrashedWithdraw: (value: boolean) => void;
 
+  setErrorMonthStatusSuccess: (value: string | null) => void;
+  setErrorYearStatusSuccess: (value: string | null) => void;
+  setErrorMonthStatusFailed: (value: string | null) => void;
+  setErrorYearStatusFailed: (value: string | null) => void;
+  setErrorMonthWithdrawAmount: (value: string | null) => void;
+  setErrorYearWithdrawAmount: (value: string | null) => void;
+
   setErrorGetWithdraws: (value: string | null) => void;
   setErrorGetWithdraw: (value: string | null) => void;
   setErrorGetCardNumberWithdraw: (value: string | null) => void;
@@ -60,6 +105,32 @@ export interface WithdrawStore {
   setErrorCreateWithdraw: (value: string | null) => void;
   setErrorUpdateWithdraw: (value: string | null) => void;
   setErrorTrashedWithdraw: (value: string | null) => void;
+
+  findMonthStatusSuccess: (
+    toast: any,
+    year: number,
+    month: number,
+  ) => Promise<void>;
+  findYearStatusSuccess: (toast: any, year: number) => Promise<void>;
+  findMonthStatusFailed: (
+    toast: any,
+    year: number,
+    month: number,
+  ) => Promise<void>;
+  findYearStatusFailed: (toast: any, year: number) => Promise<void>;
+  findMonthWithdrawAmount: (toast: any, year: number) => Promise<void>;
+  findYearWithdrawAmount: (toast: any, year: number) => Promise<void>;
+
+  findMonthWithdrawAmountByCard: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearWithdrawAmountByCard: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
 
   findAllWithdraws: (req: FindAllWithdraw) => Promise<void>;
   findByIdWithdraw: (req: FindByIdWithdraw) => Promise<void>;

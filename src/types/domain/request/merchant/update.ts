@@ -1,5 +1,5 @@
 export interface UpdateMerchant {
-  id: number;
+  merchant_id: number;
   name: string;
   user_id: number;
   status: string;

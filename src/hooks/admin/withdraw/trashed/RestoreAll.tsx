@@ -1,34 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import useModalCardTrashed from "@/store/card/trashed/modal";
-import useCardTrashedStore from "@/store/card/trashed/trashed";
+import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
+import useWithdrawTrashedStore from "@/store/withdraw/trashed/trashed";
 
-export default function useRestoreAllCard() {
+export default function useRestoreAllWithdraw() {
   const { isModalVisibleRestoreAll, showModalRestoreAll, hideModalRestoreAll } =
-    useModalCardTrashed();
+    useModalWithdrawTrashed();
 
   const {
-    restoreCardAllTrashed,
-    setLoadingRestoreAllCardTrashed,
-    loadingRestoreAllCardTrashed,
-    setErrorRestoreAllCardTrashed,
-  } = useCardTrashedStore();
+    restoreWithdrawAllTrashed,
+    setLoadingRestoreAllWithdrawTrashed,
+    loadingRestoreAllWithdrawTrashed,
+    setErrorRestoreAllWithdrawTrashed,
+  } = useWithdrawTrashedStore();
 
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    setLoadingRestoreAllCardTrashed(true);
+    setLoadingRestoreAllWithdrawTrashed(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await restoreCardAllTrashed(toast);
+      const result = await restoreWithdrawAllTrashed(toast);
 
       if (result) {
         toast({
           title: "Success",
-          description: "Card berhasil dihapus",
+          description: "Withdraw berhasil dihapus",
           variant: "default",
         });
 
@@ -36,28 +36,28 @@ export default function useRestoreAllCard() {
       } else {
         toast({
           title: "Error",
-          description: "Gagal restore card. Silakan coba lagi.",
+          description: "Gagal restore Withdraw. Silakan coba lagi.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       const errorMessage =
-        error?.message || "Terjadi kesalahan saat restore card";
-      setErrorRestoreAllCardTrashed(errorMessage);
+        error?.message || "Terjadi kesalahan saat restore Withdraw";
+      setErrorRestoreAllWithdrawTrashed(errorMessage);
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
     } finally {
-      setLoadingRestoreAllCardTrashed(false);
+      setLoadingRestoreAllWithdrawTrashed(false);
       hideModalRestoreAll();
     }
   };
 
   return {
     handleSubmit,
-    loadingRestoreAllCardTrashed,
+    loadingRestoreAllWithdrawTrashed,
     isModalVisibleRestoreAll,
     showModalRestoreAll,
     hideModalRestoreAll,

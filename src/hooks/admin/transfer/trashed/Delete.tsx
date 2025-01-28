@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+
+import { DeletePermanentTransfer } from "@/types/domain/request";
 import useModalTransaferTrashed from "@/store/transfer/trashed/modal";
 import useTransferTrashedStore from "@/store/transfer/trashed/trashed";
-import { DeletePermanentTransfer } from "@/types/domain/request";
 
 export default function useDeletePermanentTransfer() {
   const {
@@ -66,6 +67,7 @@ export default function useDeletePermanentTransfer() {
   };
 
   return {
+    deletePermanentTransferId,
     handleSubmit,
     loadingDeletePermanentTransferTrashed,
     isModalVisibleDeletePermanent,

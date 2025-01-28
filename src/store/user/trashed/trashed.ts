@@ -1,5 +1,6 @@
 import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
+import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
 import {
   DeletePermanentUser,
@@ -86,9 +87,11 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     set({ loadingRestoreUserTrashed: true, errorRestoreUserTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.patch(`/users/restore/${req.id}`, null, {
+      await myApi.post(`/users/restore/${req.id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      handleMessageAction("user", "restore");
+
       set({ loadingRestoreUserTrashed: false, errorRestoreUserTrashed: null });
       return true;
     } catch (err) {
@@ -110,13 +113,16 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/users/${req.id}`, {
+      await myApi.delete(`/users/permanent/${req.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       set({
         loadingDeletePermanentUserTrashed: false,
         errorDeletePermanentUserTrashed: null,
       });
+
+      handleMessageAction("user", "deletePermanent");
+
       return true;
     } catch (err) {
       handleApiError(
@@ -141,6 +147,8 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
         loadingRestoreAllUserTrashed: false,
         errorRestoreAllUserTrashed: null,
       });
+
+      handleMessageAction("user", "restoreAll");
       return true;
     } catch (err) {
       handleApiError(
@@ -166,6 +174,8 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
         loadingDeletePermanentUserTrashed: false,
         errorDeletePermanentUserTrashed: null,
       });
+      handleMessageAction("user", "deleteAllPermanent");
+
       return true;
     } catch (err) {
       handleApiError(

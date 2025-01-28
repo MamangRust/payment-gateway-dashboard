@@ -6,24 +6,35 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import CreateCardForm from "../form/CreateForm";
-import useModalCard from "@/store/card/modal";
-import { useRef } from "react";
-import { UpdateCardFormValues } from "@/schemas";
+import useUpdateCard from "@/hooks/admin/card/UpdateCard";
+import UpdateCardForm from "../form/UpdateForm";
 
 export function UpdateCard() {
-  const { isModalVisibleEdit, showModalEdit, hideModalEdit, editCardId } =
-    useModalCard();
-  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    handleSubmit,
+    card,
 
-  const handleSubmit = (data: UpdateCardFormValues) => {
-    alert(`Submitted Data: ${JSON.stringify(data, null, 2)}`);
-    hideModalEdit();
-  };
+    editCardId,
+    loadingUpdateCard,
+    isModalVisibleEdit,
+    showModalEdit,
+    hideModalEdit,
+    formRef,
+    handleButtonSubmit,
+  } = useUpdateCard();
 
-  const handleButtonSubmit = () => {
-    formRef.current?.requestSubmit();
-  };
+  const defaultValues = card
+    ? {
+        user_id: {
+          value: card.user_id?.toString(),
+          label: "Loading...",
+        },
+        card_type: card.card_type,
+        expire_date: card.expire_date,
+        cvv: card.cvv,
+        card_provider: card.card_provider,
+      }
+    : undefined;
 
   return (
     <Dialog
@@ -36,7 +47,11 @@ export function UpdateCard() {
         <DialogHeader>
           <DialogTitle>Update Card</DialogTitle>
         </DialogHeader>
-        <CreateCardForm onSubmit={handleSubmit} ref={formRef} />
+        <UpdateCardForm
+          onSubmit={handleSubmit}
+          ref={formRef}
+          defaultValues={defaultValues}
+        />
         <DialogFooter>
           <Button variant="outline" onClick={hideModalEdit}>
             Cancel

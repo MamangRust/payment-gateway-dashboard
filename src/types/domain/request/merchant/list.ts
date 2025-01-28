@@ -4,3 +4,11 @@ export interface FindAllMerchant {
   pageSize: number;
   toast: any;
 }
+
+export interface FindAllMerchantTransaction {
+  merchant_id: number;
+  search: string;
+  page: number;
+  pageSize: number;
+  toast: any;
+}

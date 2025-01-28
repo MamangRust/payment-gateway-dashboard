@@ -6,8 +6,14 @@ import usePreviousPath from "@/hooks/utils/usePreviousPath";
 import { useToast } from "@/hooks/use-toast";
 
 const AuthProvider = ({ children }: any) => {
-  const { refreshAccessToken, isAuthenticated, logout, accessToken } =
-    useAuthStore();
+  const {
+    refreshAccessToken,
+    isAuthenticated,
+    logout,
+    accessToken,
+    user,
+    getMe,
+  } = useAuthStore();
   const { pathname } = useLocation();
   const previousPath = usePreviousPath();
   const [requestedLocation, setRequestedLocation] = useState<string | null>(
@@ -23,7 +29,6 @@ const AuthProvider = ({ children }: any) => {
         variant: "destructive",
       });
       setRequestedLocation(pathname);
-
       return;
     }
 
@@ -36,20 +41,34 @@ const AuthProvider = ({ children }: any) => {
 
         if (timeRemaining <= 0) {
           logout(toast);
-        } else {
-          const timeoutId = setTimeout(
-            async () => {
-              try {
-                await refreshAccessToken(toast);
-              } catch (error) {
-                logout(toast);
-              }
-            },
-            Math.min(timeRemaining - 60000, 15 * 60 * 1000),
-          );
-
-          return () => clearTimeout(timeoutId);
+          return;
         }
+
+        if (!user) {
+          getMe(toast)
+            .then(() => {
+              console.log("User data fetched successfully");
+            })
+            .catch((error) => {
+              console.error("Failed to fetch user data:", error);
+              logout(toast);
+            });
+        }
+
+        const intervalId = setInterval(
+          async () => {
+            try {
+              console.log("Refreshing token...");
+              await refreshAccessToken(toast);
+            } catch (error) {
+              console.error("Failed to refresh token:", error);
+              logout(toast);
+            }
+          },
+          15 * 60 * 1000,
+        );
+
+        return () => clearInterval(intervalId);
       } catch (error) {
         console.error("Error decoding token:", error);
         logout(toast);
@@ -62,6 +81,8 @@ const AuthProvider = ({ children }: any) => {
     logout,
     pathname,
     toast,
+    user,
+    getMe,
   ]);
 
   useEffect(() => {

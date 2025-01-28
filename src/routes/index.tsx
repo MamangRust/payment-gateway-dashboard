@@ -1,4 +1,3 @@
-import DashboardPage from "@/pages/admin/dashboard/dashboard";
 import LayoutAdmin from "@/layouts/admin";
 import ErrorPage from "@/pages/error";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -8,7 +7,7 @@ import PointOfSalePage from "@/pages/admin/point-of-sale";
 import TablePayment from "@/pages/admin/table";
 import TermsOfServicePage from "@/pages/TermOfService";
 import CompanyProfile from "@/pages/Home";
-import CardDashboard from "@/pages/admin/dashboard/dashboard-card";
+import CardDashboard from "@/pages/admin/dashboard/card/dashboard-card";
 import DashboardSaldo from "@/pages/admin/dashboard/dashboard-saldo";
 import DashboardMerchant from "@/pages/admin/dashboard/dashboard-merchant";
 import DashboardTopups from "@/pages/admin/dashboard/dashboard-topup";
@@ -33,6 +32,7 @@ import TransactionTrashedPage from "@/pages/admin/transaction/transactionTrashed
 import TransferTrashedPage from "@/pages/admin/transfer/tansferTrashed";
 import UserTrashedPage from "@/pages/admin/user/userTrashed";
 import WithdrawTrashedPage from "@/pages/admin/withdraw/withdrawTrashed";
+import DashboardCardByCardNumber from "@/pages/admin/dashboard/card/dashboard-card-bycardnumber";
 
 const router = createBrowserRouter([
   {
@@ -40,11 +40,6 @@ const router = createBrowserRouter([
     element: <LayoutAdmin />,
     errorElement: <ErrorPage />,
     children: [
-      {
-        index: true,
-        element: <DashboardPage />,
-        errorElement: <ErrorPage />,
-      },
       {
         path: "card",
         element: <CardDashboard />,
@@ -82,6 +77,18 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/dashboard/card/:card_number",
+    element: <LayoutAdmin />,
+    children: [
+      {
+        index: true,
+        element: <DashboardCardByCardNumber />,
+      },
+    ],
+    errorElement: <ErrorPage />,
+  },
+
   {
     path: "/cards",
     element: <LayoutAdmin />,

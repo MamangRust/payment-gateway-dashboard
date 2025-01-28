@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import useModalTransfer from "@/store/transfer/modal";
+import { TrashedTransfer } from "@/types/domain/request";
 
 export default function useDeleteTransfer() {
   const {
@@ -28,7 +29,12 @@ export default function useDeleteTransfer() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      const result = await trashedTransfer(deleteTransferId as number);
+      const req: TrashedTransfer = {
+        id: deleteTransferId as number,
+        toast: toast,
+      };
+
+      const result = await trashedTransfer(req);
 
       if (result) {
         toast({
@@ -72,6 +78,7 @@ export default function useDeleteTransfer() {
   };
 
   return {
+    deleteTransferId,
     handleSubmit,
     loadingTrashedTransfer,
     isModalVisibleDelete,
