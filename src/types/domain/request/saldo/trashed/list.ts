@@ -1,6 +1,6 @@
 export interface FindAllSaldoTrashed {
   search: string;
   page: number;
-  pageSize: number;
+  page_size: number;
   toast: any;
 }

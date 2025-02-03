@@ -81,7 +81,7 @@ export default function useListMerchantTrashed() {
         const searchReq: FindAllMerchantTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

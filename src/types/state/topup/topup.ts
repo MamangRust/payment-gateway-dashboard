@@ -36,7 +36,7 @@ export interface TopupStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -160,11 +160,7 @@ export interface TopupStore {
 
   findAllTopups: (req: FindAllTopup) => Promise<void>;
   findByIdTopup: (req: FindByIdTopup) => Promise<void>;
-  findByActiveTopup: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveTopup: (req: FindAllTopup) => Promise<void>;
   findByCardNumberTopup: (req: FindByCardNumberTopup) => Promise<void>;
   createTopup: (req: CreateTopup) => Promise<boolean>;
   updateTopup: (req: UpdateTopup) => Promise<boolean>;

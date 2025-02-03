@@ -155,7 +155,9 @@ export default function DashboardCard() {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
 
-    return years.map((year) => balanceMap.get(year) || 0);
+    const result = years.map((year) => balanceMap.get(year) || 0);
+
+    return result;
   }, [yearBalance]);
 
   const monthlyWithdraws = useMemo(() => {

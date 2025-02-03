@@ -78,7 +78,7 @@ export default function useListTransaction() {
         const searchReq: FindAllTransaction = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

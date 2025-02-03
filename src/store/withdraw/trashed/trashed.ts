@@ -7,15 +7,18 @@ import {
   FindAllWithdrawTrashed,
   RestoreWithdrawTrashed,
 } from "@/types/domain/request";
+import WithdrawTrashedCommand from "@/services/ipc/withdraw/withdraw_trashed";
+import WithdrawTrashedService from "@/services/api/withdraw/withdraw_trashed";
 import { WithdrawTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
   withdraws: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -58,21 +61,40 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     set({ loadingGetWithdrawsTrashed: true, errorGetWithdrawsTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/withdraws/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        withdraws: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetWithdrawsTrashed: false,
-        errorGetWithdrawsTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await WithdrawTrashedCommand.findAllWithdrawsTrashed(
+          token,
+          req,
+        );
+        set({
+          withdraws: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetWithdrawsTrashed: false,
+          errorGetWithdrawsTrashed: null,
+        });
+      } else {
+        const response = await WithdrawTrashedService.findAllWithdrawsTrashed(
+          req,
+          token,
+        );
+        set({
+          withdraws: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetWithdrawsTrashed: false,
+          errorGetWithdrawsTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -90,14 +112,22 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.post(`/withdraws/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingRestoreWithdrawTrashed: false,
-        errorRestoreWithdrawTrashed: null,
-      });
-      handleMessageAction("withdraw", "restore");
+
+      if (isTauri()) {
+        await WithdrawTrashedCommand.restoreWithdrawTrashed(token, req);
+        set({
+          loadingRestoreWithdrawTrashed: false,
+          errorRestoreWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "restore");
+      } else {
+        await WithdrawTrashedService.restoreWithdrawTrashed(req, token);
+        set({
+          loadingRestoreWithdrawTrashed: false,
+          errorRestoreWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -119,14 +149,22 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/withdraws/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentWithdrawTrashed: false,
-        errorDeletePermanentWithdrawTrashed: null,
-      });
-      handleMessageAction("withdraw", "deletePermanent");
+
+      if (isTauri()) {
+        await WithdrawTrashedCommand.deletePermanentWithdraw(token, req);
+        set({
+          loadingDeletePermanentWithdrawTrashed: false,
+          errorDeletePermanentWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "deletePermanent");
+      } else {
+        await WithdrawTrashedService.deletePermanentWithdraw(req, token);
+        set({
+          loadingDeletePermanentWithdrawTrashed: false,
+          errorDeletePermanentWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -146,12 +184,24 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/Withdraws/restore/all");
-      set({
-        loadingRestoreAllWithdrawTrashed: false,
-        errorRestoreAllWithdrawTrashed: null,
-      });
-      handleMessageAction("withdraw", "restoreAll");
+      const token = getAccessToken();
+      if (isTauri()) {
+        await WithdrawTrashedCommand.restoreWithdrawAllTrashed(token);
+
+        set({
+          loadingRestoreAllWithdrawTrashed: false,
+          errorRestoreAllWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "restoreAll");
+      } else {
+        await WithdrawTrashedService.restoreWithdrawAllTrashed(token);
+
+        set({
+          loadingRestoreAllWithdrawTrashed: false,
+          errorRestoreAllWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "restoreAll");
+      }
 
       return true;
     } catch (err) {
@@ -173,12 +223,25 @@ const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/withdraws/permanent/all");
-      set({
-        loadingDeletePermanentWithdrawTrashed: false,
-        errorDeletePermanentWithdrawTrashed: null,
-      });
-      handleMessageAction("withdraw", "deleteAllPermanent");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await WithdrawTrashedCommand.deletePermanentAllWithdraw(token);
+
+        set({
+          loadingDeletePermanentWithdrawTrashed: false,
+          errorDeletePermanentWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "deleteAllPermanent");
+      } else {
+        await WithdrawTrashedService.deletePermanentAllWithdraw(token);
+
+        set({
+          loadingDeletePermanentWithdrawTrashed: false,
+          errorDeletePermanentWithdrawTrashed: null,
+        });
+        handleMessageAction("withdraw", "deleteAllPermanent");
+      }
 
       return true;
     } catch (err) {

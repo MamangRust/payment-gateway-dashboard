@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface TokenResponse {
   access_token: string;
   refresh_token: string;
@@ -12,7 +14,7 @@ export interface ApiResponseLogin {
 export interface ApiResponseRegister {
   status: string;
   message: string;
-  data?: UserResponse;
+  data?: User;
 }
 
 export interface ApiResponseRefreshToken {
@@ -24,13 +26,5 @@ export interface ApiResponseRefreshToken {
 export interface ApiResponseGetMe {
   status: string;
   message: string;
-  data?: UserResponse;
-}
-
-export interface UserResponse {
-  id: number;
-  username: string;
-  email: string;
-  created_at: string;
-  updated_at: string;
+  data?: User;
 }

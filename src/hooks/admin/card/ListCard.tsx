@@ -80,7 +80,7 @@ export default function useListCard() {
         const searchReq: FindAllCard = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

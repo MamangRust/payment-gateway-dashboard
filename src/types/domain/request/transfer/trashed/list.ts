@@ -1,6 +1,6 @@
 export interface FindAllTransferTrashed {
   search: string;
   page: number;
-  pageSize: number;
+  page_size: number;
   toast: any;
 }

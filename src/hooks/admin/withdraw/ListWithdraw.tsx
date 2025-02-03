@@ -78,7 +78,7 @@ export default function useListWithdraw() {
         const searchReq: FindAllWithdraw = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

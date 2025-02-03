@@ -38,7 +38,7 @@ export interface TransferStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -144,21 +144,13 @@ export interface TransferStore {
     year: number,
     month: number,
   ) => Promise<void>;
-  findYearStatusSuccess: (
-    toast: any,
-    year: number,
-    month: number,
-  ) => Promise<void>;
+  findYearStatusSuccess: (toast: any, year: number) => Promise<void>;
   findMonthStatusFailed: (
     toast: any,
     year: number,
     month: number,
   ) => Promise<void>;
-  findYearStatusFailed: (
-    toast: any,
-    year: number,
-    month: number,
-  ) => Promise<void>;
+  findYearStatusFailed: (toast: any, year: number) => Promise<void>;
 
   findMonthTransferAmount: (toast: any, year: number) => Promise<void>;
   findYearTransferAmount: (toast: any, year: number) => Promise<void>;
@@ -188,11 +180,7 @@ export interface TransferStore {
   findByIdTransfer: (req: FindByIdTransfer) => Promise<void>;
   findByTransferFrom: (req: TransferFrom) => Promise<void>;
   findByTransferTo: (req: TransferTo) => Promise<void>;
-  findByActiveTransfer: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveTransfer: (req: FindAllTransfer) => Promise<void>;
   createTransfer: (req: CreateTransfer) => Promise<boolean>;
   updateTransfer: (req: UpdateTransfer) => Promise<boolean>;
   trashedTransfer: (req: TrashedTransfer) => Promise<boolean>;

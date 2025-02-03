@@ -1,7 +1,6 @@
 import { TopupStore } from "@/types/state/topup/topup";
 import { create } from "zustand";
 import { getAccessToken } from "../auth";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import {
   CreateTopup,
@@ -10,8 +9,11 @@ import {
   TrashedTopup,
   UpdateTopup,
 } from "@/types/domain/request/topup";
+import TopupService from "@/services/api/topup/topup";
+import TopupCommand from "@/services/ipc/topup/topup";
 import { FindByCardNumberTopup } from "@/types/domain/request/topup/findByCardNumber";
 import { handleMessageAction } from "@/helpers/message";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTopupStore = create<TopupStore>((set, get) => ({
   topups: null,
@@ -31,7 +33,7 @@ const useTopupStore = create<TopupStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -129,21 +131,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthStatusSuccess: true, errorMonthStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthStatusSuccess(
+          token,
           year,
           month,
-        },
-      });
+        );
 
-      console.log("status: succes", response.data.data);
+        set({
+          monthStatusSuccess: response.data,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      } else {
+        const response = await TopupService.findMonthStatusSuccess(
+          token,
+          year,
+          month,
+        );
 
-      set({
-        monthStatusSuccess: response.data.data,
-        loadingMonthStatusSuccess: false,
-        errorMonthStatusSuccess: null,
-      });
+        set({
+          monthStatusSuccess: response,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -158,19 +171,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearStatusSuccess: true, errorYearStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
 
-      console.log("status: year success", response.data.data);
-      set({
-        yearStatusSuccess: response.data.data,
-        loadingYearStatusSuccess: false,
-        errorYearStatusSuccess: null,
-      });
+      if (isTauri()) {
+        const response = await TopupCommand.findYearStatusSuccess(token, year);
+
+        set({
+          yearStatusSuccess: response.data,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      } else {
+        const response = await TopupService.findYearStatusSuccess(token, year);
+
+        set({
+          yearStatusSuccess: response,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -185,20 +203,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthStatusFailed: true, errorMonthStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthStatusFailed(
+          token,
           year,
           month,
-        },
-      });
-      console.log("status: month failed", response.data.data);
+        );
 
-      set({
-        monthStatusFailed: response.data.data,
-        loadingMonthStatusFailed: false,
-        errorMonthStatusFailed: null,
-      });
+        set({
+          monthStatusFailed: response.data,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      } else {
+        const response = await TopupService.findMonthStatusFailed(
+          token,
+          year,
+          month,
+        );
+
+        set({
+          monthStatusFailed: response,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -213,20 +243,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearStatusFailed: true, errorYearStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
 
-      console.log("status: year failed", response.data.data);
+      if (isTauri()) {
+        const response = await TopupCommand.findYearStatusFailed(token, year);
 
-      set({
-        yearStatusFailed: response.data.data,
-        loadingYearStatusFailed: false,
-        errorYearStatusFailed: null,
-      });
+        set({
+          yearStatusFailed: response.data,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      } else {
+        const response = await TopupService.findYearStatusFailed(token, year);
+
+        set({
+          yearStatusFailed: response,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -241,19 +275,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthTopupMethod: true, errorMonthTopupMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("month method", response.data.data);
 
-      set({
-        monthTopupMethod: response.data.data,
-        loadingMonthTopupMethod: false,
-        errorMonthTopupMethod: null,
-      });
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthTopupMethod(token, year);
+
+        set({
+          monthTopupMethod: response.data,
+          loadingMonthTopupMethod: false,
+          errorMonthTopupMethod: null,
+        });
+      } else {
+        const response = await TopupService.findMonthTopupMethod(token, year);
+
+        set({
+          monthTopupMethod: response,
+          loadingMonthTopupMethod: false,
+          errorMonthTopupMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -268,19 +307,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearTopupMethod: true, errorYearTopupMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("year method", response.data.data);
 
-      set({
-        yearTopupMethod: response.data.data,
-        loadingYearTopupMethod: false,
-        errorYearTopupMethod: null,
-      });
+      if (isTauri()) {
+        const response = await TopupCommand.findYearTopupMethod(token, year);
+
+        set({
+          yearTopupMethod: response.data,
+          loadingYearTopupMethod: false,
+          errorYearTopupMethod: null,
+        });
+      } else {
+        const response = await TopupService.findYearTopupMethod(token, year);
+
+        set({
+          yearTopupMethod: response,
+          loadingYearTopupMethod: false,
+          errorYearTopupMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -295,20 +339,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthTopupAmount: true, errorMonthTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-amounts", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
 
-      console.log("month amount", response.data.data);
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthTopupAmount(token, year);
 
-      set({
-        monthTopupAmount: response.data.data,
-        loadingMonthTopupAmount: false,
-        errorMonthTopupAmount: null,
-      });
+        set({
+          monthTopupAmount: response.data,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      } else {
+        const response = await TopupService.findMonthTopupAmount(token, year);
+
+        set({
+          monthTopupAmount: response,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -323,19 +371,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearTopupAmount: true, errorYearTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-amounts", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("year amount", response.data.data);
 
-      set({
-        yearTopupAmount: response.data.data,
-        loadingYearTopupAmount: false,
-        errorYearTopupAmount: null,
-      });
+      if (isTauri()) {
+        const response = await TopupCommand.findYearTopupAmount(token, year);
+
+        set({
+          yearTopupAmount: response.data,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      } else {
+        const response = await TopupService.findYearTopupAmount(token, year);
+
+        set({
+          yearTopupAmount: response,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -354,19 +407,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthTopupMethod: true, errorMonthTopupMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-methods-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthTopupMethodByCard(
+          token,
           year,
           card_number,
-        },
-      });
+        );
 
-      set({
-        monthTopupMethod: response.data,
-        loadingMonthTopupMethod: false,
-        errorMonthTopupMethod: null,
-      });
+        set({
+          monthTopupMethod: response.data,
+          loadingMonthTopupMethod: false,
+          errorMonthTopupMethod: null,
+        });
+      } else {
+        const response = await TopupService.findMonthTopupMethodCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthTopupMethod: response,
+          loadingMonthTopupMethod: false,
+          errorMonthTopupMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -385,18 +451,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearTopupMethod: true, errorYearTopupMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-methods-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findYearTopupMethodByCard(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTopupMethod: response.data,
-        loadingYearTopupMethod: false,
-        errorYearTopupMethod: null,
-      });
+        );
+
+        set({
+          yearTopupMethod: response.data,
+          loadingYearTopupMethod: false,
+          errorYearTopupMethod: null,
+        });
+      } else {
+        const response = await TopupService.findYearTopupMethodCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTopupMethod: response,
+          loadingYearTopupMethod: false,
+          errorYearTopupMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -415,18 +495,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingMonthTopupAmount: true, errorMonthTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/monthly-amounts-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findMonthTopupAmountByCard(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        monthTopupAmount: response.data,
-        loadingMonthTopupAmount: false,
-        errorMonthTopupAmount: null,
-      });
+        );
+
+        set({
+          monthTopupAmount: response.data,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      } else {
+        const response = await TopupService.findMonthTopupAmountCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthTopupAmount: response,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -445,18 +539,32 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingYearTopupAmount: true, errorYearTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/yearly-amounts-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TopupCommand.findYearTopupAmountByCard(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTopupAmount: response.data,
-        loadingYearTopupAmount: false,
-        errorYearTopupAmount: null,
-      });
+        );
+
+        set({
+          yearTopupAmount: response.data,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      } else {
+        const response = await TopupService.findYearTopupAmountCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTopupAmount: response,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -471,21 +579,36 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingGetTopups: true, errorGetTopups: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        topups: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTopups: false,
-        errorGetTopups: null,
-      });
+
+      if (isTauri()) {
+        const response = await TopupCommand.findAllTopups(token, req);
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTopups: false,
+          errorGetTopups: null,
+        });
+      } else {
+        const response = await TopupService.findAllTopups(token, req);
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTopups: false,
+          errorGetTopups: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -500,16 +623,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingGetTopup: true, errorGetTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/topups/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("response topup", response.data.data);
 
-      set({
-        topup: response.data.data,
-        loadingGetTopup: false,
-        errorGetTopup: null,
-      });
+      if (isTauri()) {
+        const response = await TopupCommand.findByIdTopup(token, req);
+
+        set({
+          topup: response.data,
+          loadingGetTopup: false,
+          errorGetTopup: null,
+        });
+      } else {
+        const response = await TopupService.findByIdTopup(token, req);
+
+        set({
+          topup: response,
+          loadingGetTopup: false,
+          errorGetTopup: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -520,25 +651,40 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     }
   },
 
-  findByActiveTopup: async (search: string, page: number, pageSize: number) => {
+  findByActiveTopup: async (req: FindAllTopup) => {
     set({ loadingGetActiveTopup: true, errorGetActiveTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/active", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        topups: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetActiveTopup: false,
-        errorGetActiveTopup: null,
-      });
+
+      if (isTauri()) {
+        const response = await TopupCommand.findByActiveTopup(token, req);
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTopup: false,
+          errorGetActiveTopup: null,
+        });
+      } else {
+        const response = await TopupService.findByActiveTopup(token, req);
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTopup: false,
+          errorGetActiveTopup: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -553,17 +699,24 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingGetCardNumberTopup: true, errorGetCardNumberTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        `/topups/card-number/${req.cardNumber}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      set({
-        topup: response.data,
-        loadingGetCardNumberTopup: false,
-        errorGetCardNumberTopup: null,
-      });
+
+      if (isTauri()) {
+        const response = await TopupCommand.findByCardNumberTopup(token, req);
+
+        set({
+          topup: response.data,
+          loadingGetCardNumberTopup: false,
+          errorGetCardNumberTopup: null,
+        });
+      } else {
+        const response = await TopupService.findByCardNumberTopup(token, req);
+
+        set({
+          topup: response,
+          loadingGetCardNumberTopup: false,
+          errorGetCardNumberTopup: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -578,21 +731,22 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingCreateTopup: true, errorCreateTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        "/topups/create",
-        {
-          card_number: req.card_number,
-          topup_amount: req.topup_amount,
-          topup_method: req.topup_method,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("topup", "create");
 
-      set({ loadingCreateTopup: false, errorCreateTopup: null });
-      return response.data;
+      if (isTauri()) {
+        await TopupCommand.createTopup(token, req);
+
+        handleMessageAction("topup", "create");
+
+        set({ loadingCreateTopup: false, errorCreateTopup: null });
+      } else {
+        await TopupService.createTopup(token, req);
+
+        handleMessageAction("topup", "create");
+
+        set({ loadingCreateTopup: false, errorCreateTopup: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -600,6 +754,8 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         (message: any) => set({ errorCreateTopup: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 
@@ -607,21 +763,22 @@ const useTopupStore = create<TopupStore>((set, get) => ({
     set({ loadingUpdateTopup: true, errorUpdateTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/topups/update/${req.id}`,
-        {
-          card_number: req.card_number,
-          topup_amount: req.topup_amount,
-          topup_method: req.topup_method,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("topup", "update");
 
-      set({ loadingUpdateTopup: false, errorUpdateTopup: null });
-      return response.data;
+      if (isTauri()) {
+        await TopupCommand.updateTopup(token, req);
+
+        handleMessageAction("topup", "update");
+
+        set({ loadingUpdateTopup: false, errorUpdateTopup: null });
+      } else {
+        await TopupService.updateTopup(token, req);
+
+        handleMessageAction("topup", "update");
+
+        set({ loadingUpdateTopup: false, errorUpdateTopup: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -629,19 +786,30 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         (message: any) => set({ errorUpdateTopup: message }),
         req.toast,
       );
+
+      return false;
     }
   },
   trashedTopup: async (req: TrashedTopup) => {
     set({ loadingTrashedTopup: true, errorTrashedTopup: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/topups/trashed/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      handleMessageAction("topup", "trashed");
 
-      set({ loadingTrashedTopup: false, errorTrashedTopup: null });
-      return response.data;
+      if (isTauri()) {
+        await TopupCommand.trashedTopup(token, req);
+
+        handleMessageAction("topup", "trashed");
+
+        set({ loadingTrashedTopup: false, errorTrashedTopup: null });
+      } else {
+        await TopupService.trashedTopup(token, req);
+
+        handleMessageAction("topup", "trashed");
+
+        set({ loadingTrashedTopup: false, errorTrashedTopup: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -649,6 +817,8 @@ const useTopupStore = create<TopupStore>((set, get) => ({
         (message: any) => set({ errorTrashedTopup: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 }));

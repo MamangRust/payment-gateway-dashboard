@@ -82,7 +82,7 @@ export default function useListCardTrashed() {
         const searchReq: FindAllTrashedCard = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

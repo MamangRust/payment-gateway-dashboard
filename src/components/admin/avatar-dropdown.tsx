@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import Luffy from '@/assets/Luffy.jpg';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import Luffy from "@/assets/Luffy.jpg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,10 +8,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import useAuthStore from "@/store/auth";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export function AvatarDropdown() {
+  const { logout } = useAuthStore();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(toast);
+    navigate("/auth/login");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,7 +45,9 @@ export function AvatarDropdown() {
         <DropdownMenuItem>Profile</DropdownMenuItem>
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLogout()}>
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

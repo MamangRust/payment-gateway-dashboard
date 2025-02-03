@@ -9,7 +9,7 @@ export interface TopupTrashedStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };

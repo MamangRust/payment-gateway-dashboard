@@ -78,7 +78,7 @@ export default function useListTransfer() {
         const searchReq: FindAllTransfer = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

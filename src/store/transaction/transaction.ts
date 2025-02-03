@@ -1,7 +1,6 @@
 import { TransactionStore } from "@/types/state/transaction/transaction";
 import { create } from "zustand";
 import { getAccessToken } from "../auth";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import {
   CreateTransaction,
@@ -12,7 +11,10 @@ import {
   TrashedTransaction,
   UpdateTransaction,
 } from "@/types/domain/request";
+import TransactionCommand from "@/services/ipc/transaction/transaction";
+import TransactionService from "@/services/api/transaction/transaction";
 import { handleMessageAction } from "@/helpers/message";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTransactionStore = create<TransactionStore>((set, get) => ({
   transactions: null,
@@ -32,7 +34,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -148,22 +150,37 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
   setErrorTrashedTransaction: (value) =>
     set({ errorTrashedTransaction: value }),
 
-  findMonthStatusSuccess: async (toast: any, year: number, month: string) => {
+  findMonthStatusSuccess: async (toast: any, year: number, month: number) => {
     set({ loadingMonthStatusSuccess: true, errorMonthStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/monthly-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findMonthStatusSuccessTransaction(
+            token,
+            year,
+            month,
+          );
+
+        set({
+          monthStatusSuccess: response.data,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      } else {
+        const response = await TransactionService.findMonthStatusSuccess(
+          token,
           year,
           month,
-        },
-      });
-      set({
-        monthStatusSuccess: response.data,
-        loadingMonthStatusSuccess: false,
-        errorMonthStatusSuccess: null,
-      });
+        );
+
+        set({
+          monthStatusSuccess: response,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -174,22 +191,35 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     }
   },
 
-  findYearStatusSuccess: async (toast: any, year: number, month: string) => {
+  findYearStatusSuccess: async (toast: any, year: number) => {
     set({ loadingYearStatusSuccess: true, errorYearStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findYearStatusSuccessTransaction(
+            token,
+            year,
+          );
+
+        set({
+          yearStatusSuccess: response.data,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      } else {
+        const response = await TransactionService.findYearStatusSuccess(
+          token,
           year,
-          month,
-        },
-      });
-      set({
-        yearStatusSuccess: response.data.data,
-        loadingYearStatusSuccess: false,
-        errorYearStatusSuccess: null,
-      });
+        );
+
+        set({
+          yearStatusSuccess: response,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -200,22 +230,37 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     }
   },
 
-  findMonthStatusFailed: async (toast: any, year: number, month: string) => {
+  findMonthStatusFailed: async (toast: any, year: number, month: number) => {
     set({ loadingMonthStatusFailed: true, errorMonthStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/monthly-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findMonthStatusFailedTransaction(
+            token,
+            year,
+            month,
+          );
+
+        set({
+          monthStatusFailed: response.data,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      } else {
+        const response = await TransactionService.findMonthStatusFailed(
+          token,
           year,
           month,
-        },
-      });
-      set({
-        monthStatusFailed: response.data.data,
-        loadingMonthStatusFailed: false,
-        errorMonthStatusFailed: null,
-      });
+        );
+
+        set({
+          monthStatusFailed: response,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -226,22 +271,32 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     }
   },
 
-  findYearStatusFailed: async (toast: any, year: number, month: string) => {
+  findYearStatusFailed: async (toast: any, year: number) => {
     set({ loadingYearStatusFailed: true, errorYearStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findYearStatusFailedTransaction(token, year);
+
+        set({
+          yearStatusFailed: response.data,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      } else {
+        const response = await TransactionService.findYearStatusFailed(
+          token,
           year,
-          month,
-        },
-      });
-      set({
-        yearStatusFailed: response.data.data,
-        loadingYearStatusFailed: false,
-        errorYearStatusFailed: null,
-      });
+        );
+
+        set({
+          yearStatusFailed: response,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -259,19 +314,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/monthly-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("month", response.data.data);
 
-      set({
-        monthTransactionMethod: response.data.data,
-        loadingMonthTransactionMethod: false,
-        errorMonthTransactionMethod: null,
-      });
+      if (isTauri()) {
+        const response = await TransactionCommand.findMonthTransactionMethod(
+          token,
+          year,
+        );
+
+        set({
+          monthTransactionMethod: response.data,
+          loadingMonthTransactionMethod: false,
+          errorMonthTransactionMethod: null,
+        });
+      } else {
+        const response = await TransactionService.findMonthTransactionMethod(
+          token,
+          year,
+        );
+
+        set({
+          monthTransactionMethod: response,
+          loadingMonthTransactionMethod: false,
+          errorMonthTransactionMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -289,17 +355,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findYearTransactionMethod(
+          token,
           year,
-        },
-      });
-      set({
-        yearTransactionMethod: response.data.data,
-        loadingYearTransactionMethod: false,
-        errorYearTransactionMethod: null,
-      });
+        );
+
+        set({
+          yearTransactionMethod: response.data,
+          loadingYearTransactionMethod: false,
+          errorYearTransactionMethod: null,
+        });
+      } else {
+        const response = await TransactionService.findYearTransactionMethod(
+          token,
+          year,
+        );
+
+        set({
+          yearTransactionMethod: response,
+          loadingYearTransactionMethod: false,
+          errorYearTransactionMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -316,17 +395,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/monthly-amounts", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findMonthTransactionMethod(
+          token,
           year,
-        },
-      });
-      set({
-        monthTransactionAmount: response.data.data,
-        loadingMonthTransactionAmount: false,
-        errorMonthTransactionAmount: null,
-      });
+        );
+
+        set({
+          monthTransactionAmount: response.data,
+          loadingMonthTransactionAmount: false,
+          errorMonthTransactionAmount: null,
+        });
+      } else {
+        const response = await TransactionService.findMonthTransactionMethod(
+          token,
+          year,
+        );
+
+        set({
+          monthTransactionAmount: response,
+          loadingMonthTransactionAmount: false,
+          errorMonthTransactionAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -344,17 +436,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-amounts", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findYearTransactionMethod(
+          token,
           year,
-        },
-      });
-      set({
-        yearTransactionAmount: response.data.data,
-        loadingYearTransactionAmount: false,
-        errorYearTransactionAmount: null,
-      });
+        );
+
+        set({
+          yearTransactionAmount: response.data,
+          loadingYearTransactionAmount: false,
+          errorYearTransactionAmount: null,
+        });
+      } else {
+        const response = await TransactionService.findYearTransactionMethod(
+          token,
+          year,
+        );
+
+        set({
+          yearTransactionAmount: response,
+          loadingYearTransactionAmount: false,
+          errorYearTransactionAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -376,21 +481,34 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/transactions/monthly-methods-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findMonthTransactionMethodByCard(
+            token,
             year,
             card_number,
-          },
-        },
-      );
-      set({
-        monthTransactionMethod: response.data,
-        loadingMonthTransactionMethod: false,
-        errorMonthTransactionMethod: null,
-      });
+          );
+
+        set({
+          monthTransactionMethod: response.data,
+          loadingMonthTransactionMethod: false,
+          errorMonthTransactionMethod: null,
+        });
+      } else {
+        const response =
+          await TransactionService.findMonthTransactionMethodCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransactionMethod: response,
+          loadingMonthTransactionMethod: false,
+          errorMonthTransactionMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -412,18 +530,33 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-methods-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findYearTransactionMethodByCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          yearTransactionMethod: response.data,
+          loadingYearTransactionMethod: false,
+          errorYearTransactionMethod: null,
+        });
+      } else {
+        const response = await TransactionService.findYearTransactionMethodCard(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTransactionMethod: response.data,
-        loadingYearTransactionMethod: false,
-        errorYearTransactionMethod: null,
-      });
+        );
+
+        set({
+          yearTransactionMethod: response,
+          loadingYearTransactionMethod: false,
+          errorYearTransactionMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -444,21 +577,34 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/transactions/monthly-amounts-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findMonthTransactionAmountByCard(
+            token,
             year,
             card_number,
-          },
-        },
-      );
-      set({
-        monthTransactionAmount: response.data,
-        loadingMonthTransactionAmount: false,
-        errorMonthTransactionAmount: null,
-      });
+          );
+
+        set({
+          monthTransactionAmount: response.data,
+          loadingMonthTransactionAmount: false,
+          errorMonthTransactionAmount: null,
+        });
+      } else {
+        const response =
+          await TransactionService.findMonthTransactionAmountCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransactionAmount: response,
+          loadingMonthTransactionAmount: false,
+          errorMonthTransactionAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -480,18 +626,33 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/yearly-amounts-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response =
+          await TransactionCommand.findYearTransactionAmountByCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          yearTransactionAmount: response.data,
+          loadingYearTransactionAmount: false,
+          errorYearTransactionAmount: null,
+        });
+      } else {
+        const response = await TransactionService.findYearTransactionAmountCard(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTransactionAmount: response.data,
-        loadingYearTransactionAmount: false,
-        errorYearTransactionAmount: null,
-      });
+        );
+
+        set({
+          yearTransactionAmount: response,
+          loadingYearTransactionAmount: false,
+          errorYearTransactionAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -506,22 +667,42 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingGetTransactions: true, errorGetTransactions: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      set({
-        transactions: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTransactions: false,
-        errorGetTransactions: null,
-      });
+      if (isTauri()) {
+        const response = await TransactionCommand.findAllTransactions(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      } else {
+        const response = await TransactionService.findAllTransactions(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -536,14 +717,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingGetTransaction: true, errorGetTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transactions/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transaction: response.data.data,
-        loadingGetTransaction: false,
-        errorGetTransaction: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findByIdTransaction(
+          token,
+          req,
+        );
+
+        set({
+          transaction: response.data,
+          loadingGetTransaction: false,
+          errorGetTransaction: null,
+        });
+      } else {
+        const response = await TransactionService.findByIdTransaction(
+          token,
+          req,
+        );
+
+        set({
+          transaction: response,
+          loadingGetTransaction: false,
+          errorGetTransaction: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -561,17 +758,28 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        `/transactions/card-number/${req.cardNumber}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      set({
-        transaction: response.data,
-        loadingGetCardNumberTransaction: false,
-        errorGetCardNumberTransaction: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findByCardNumberTransaction(
+          token,
+          req,
+        );
+        set({
+          transactions: response.data,
+          loadingGetCardNumberTransaction: false,
+          errorGetCardNumberTransaction: null,
+        });
+      } else {
+        const response = await TransactionService.findByCardNumberTransaction(
+          token,
+          req,
+        );
+        set({
+          transactions: response,
+          loadingGetCardNumberTransaction: false,
+          errorGetCardNumberTransaction: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -589,14 +797,30 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transactions/merchant/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transactions: response.data,
-        loadingGetMerchantTransaction: false,
-        errorGetMerchantTransaction: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findByMerchantTransaction(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response.data,
+          loadingGetMerchantTransaction: false,
+          errorGetMerchantTransaction: null,
+        });
+      } else {
+        const response = await TransactionService.findByMerchantTransaction(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response,
+          loadingGetMerchantTransaction: false,
+          errorGetMerchantTransaction: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -607,29 +831,44 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     }
   },
 
-  findByActiveTransaction: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
+  findByActiveTransaction: async (req: FindAllTransaction) => {
     set({ loadingGetActiveTransaction: true, errorGetActiveTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transactions/active", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transactions: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetActiveTransaction: false,
-        errorGetActiveTransaction: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransactionCommand.findByActiveTransaction(
+          token,
+          req,
+        );
+        set({
+          transactions: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTransaction: false,
+          errorGetActiveTransaction: null,
+        });
+      } else {
+        const response = await TransactionService.findByActiveTransaction(
+          token,
+          req,
+        );
+        set({
+          transactions: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTransaction: false,
+          errorGetActiveTransaction: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -644,26 +883,22 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingCreateTransaction: true, errorCreateTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        "/transactions/create",
-        {
-          card_number: req.card_number,
-          amount: req.amount,
-          merchant_id: req.merchant_id,
-          payment_method: req.payment_method,
-          transaction_time: req.transaction_time,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-API-Key": req.api_key,
-          },
-        },
-      );
-      handleMessageAction("transaction", "create");
 
-      set({ loadingCreateTransaction: false, errorCreateTransaction: null });
-      return response.data;
+      if (isTauri()) {
+        await TransactionCommand.createTransaction(token, req);
+
+        handleMessageAction("transaction", "create");
+
+        set({ loadingCreateTransaction: false, errorCreateTransaction: null });
+      } else {
+        await TransactionService.createTransaction(token, req);
+
+        handleMessageAction("transaction", "create");
+
+        set({ loadingCreateTransaction: false, errorCreateTransaction: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -671,6 +906,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         (message: any) => set({ errorCreateTransaction: message }),
         req.toast,
       );
+      return false;
     }
   },
 
@@ -678,27 +914,20 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingUpdateTransaction: true, errorUpdateTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/transactions/update/${req.id}`,
-        {
-          transaction_id: req.id,
-          card_number: req.card_number,
-          amount: req.amount,
-          merchant_id: req.merchant_id,
-          payment_method: req.payment_method,
-          transaction_time: req.transaction_time,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-API-Key": req.api_key,
-          },
-        },
-      );
-      handleMessageAction("transaction", "update");
 
-      set({ loadingUpdateTransaction: false, errorUpdateTransaction: null });
-      return response.data;
+      if (isTauri()) {
+        await TransactionCommand.updateTransaction(token, req);
+        handleMessageAction("transaction", "update");
+
+        set({ loadingUpdateTransaction: false, errorUpdateTransaction: null });
+      } else {
+        await TransactionService.updateTransaction(token, req);
+        handleMessageAction("transaction", "update");
+
+        set({ loadingUpdateTransaction: false, errorUpdateTransaction: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -706,6 +935,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         (message: any) => set({ errorUpdateTransaction: message }),
         req.toast,
       );
+      return false;
     }
   },
 
@@ -713,17 +943,28 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     set({ loadingTrashedTransaction: true, errorTrashedTransaction: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/transactions/trashed/${req.id}`,
-        null,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("transaction", "trashed");
 
-      set({ loadingTrashedTransaction: false, errorTrashedTransaction: null });
-      return response.data;
+      if (isTauri()) {
+        await TransactionCommand.trashedTransaction(token, req);
+
+        handleMessageAction("transaction", "trashed");
+
+        set({
+          loadingTrashedTransaction: false,
+          errorTrashedTransaction: null,
+        });
+      } else {
+        await TransactionService.trashedTransaction(token, req);
+
+        handleMessageAction("transaction", "trashed");
+
+        set({
+          loadingTrashedTransaction: false,
+          errorTrashedTransaction: null,
+        });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -731,6 +972,8 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         (message: any) => set({ errorTrashedTransaction: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 }));

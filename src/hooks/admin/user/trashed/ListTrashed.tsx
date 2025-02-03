@@ -81,7 +81,7 @@ export default function useListUserTrashed() {
         const searchReq: FindAllUserTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

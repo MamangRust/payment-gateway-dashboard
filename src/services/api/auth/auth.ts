@@ -37,7 +37,7 @@ class AuthService {
         req,
       );
       if (response.status === 201) {
-        return response.data.data; // Data user yang terdaftar
+        return response.data.data;
       }
       throw new Error(response.data.message || "Registration failed.");
     } catch (error: any) {
@@ -58,7 +58,7 @@ class AuthService {
         },
       });
       if (response.status === 200) {
-        return response.data.data; // Data user
+        return response.data.data;
       }
       throw new Error(response.data.message || "Failed to fetch user data.");
     } catch (error: any) {
@@ -74,6 +74,7 @@ class AuthService {
    * @returns TokenResponse (access_token & refresh_token)
    */
   async refreshAccessToken(
+    accessToken: string,
     refreshToken: string,
   ): Promise<ApiResponseRefreshToken["data"]> {
     try {
@@ -82,9 +83,14 @@ class AuthService {
         {
           refresh_token: refreshToken,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       );
       if (response.status === 200) {
-        return response.data.data; // Mengembalikan access_token & refresh_token
+        return response.data.data;
       }
       throw new Error(
         response.data.message || "Failed to refresh access token.",

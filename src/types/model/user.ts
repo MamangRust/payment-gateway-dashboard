@@ -19,6 +19,12 @@ export interface UserTrashed {
   deleted_at: string;
 }
 
+export interface ApiResponseUser {
+  status: string;
+  message: string;
+  data: User;
+}
+
 export interface ApiResponsesUser {
   status: string;
   message: string;

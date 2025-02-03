@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -7,15 +6,18 @@ import {
   FindAllTopupTrashed,
   RestoreTopupTrashed,
 } from "@/types/domain/request/topup";
+import TopupTrashedService from "@/services/api/topup/topup_trashed";
+import TopupTrashedCommand from "@/services/ipc/topup/topup_trashed";
 import { TopupTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
   topups: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -58,21 +60,42 @@ const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
     set({ loadingGetTopupsTrashed: true, errorGetTopupsTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/topups/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        topups: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTopupsTrashed: false,
-        errorGetTopupsTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await TopupTrashedCommand.findAllTopupsTrashed(
+          token,
+          req,
+        );
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTopupsTrashed: false,
+          errorGetTopupsTrashed: null,
+        });
+      } else {
+        const response = await TopupTrashedService.findAllTopupsTrashed(
+          req,
+          token,
+        );
+
+        set({
+          topups: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTopupsTrashed: false,
+          errorGetTopupsTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -87,14 +110,24 @@ const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
     set({ loadingRestoreTopupTrashed: true, errorRestoreTopupTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.post(`/topups/restore/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingRestoreTopupTrashed: false,
-        errorRestoreTopupTrashed: null,
-      });
-      handleMessageAction("topup", "restore");
+
+      if (isTauri()) {
+        await TopupTrashedCommand.restoreTopupTrashed(token, req);
+
+        set({
+          loadingRestoreTopupTrashed: false,
+          errorRestoreTopupTrashed: null,
+        });
+        handleMessageAction("topup", "restore");
+      } else {
+        await TopupTrashedService.restoreTopupTrashed(req, token);
+
+        set({
+          loadingRestoreTopupTrashed: false,
+          errorRestoreTopupTrashed: null,
+        });
+        handleMessageAction("topup", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -116,14 +149,24 @@ const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/topups/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentTopupTrashed: false,
-        errorDeletePermanentTopupTrashed: null,
-      });
-      handleMessageAction("topup", "deletePermanent");
+
+      if (isTauri()) {
+        await TopupTrashedCommand.deletePermanentTopup(token, req);
+
+        set({
+          loadingDeletePermanentTopupTrashed: false,
+          errorDeletePermanentTopupTrashed: null,
+        });
+        handleMessageAction("topup", "deletePermanent");
+      } else {
+        await TopupTrashedService.deletePermanentTopup(req, token);
+
+        set({
+          loadingDeletePermanentTopupTrashed: false,
+          errorDeletePermanentTopupTrashed: null,
+        });
+        handleMessageAction("topup", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -144,12 +187,25 @@ const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/topups/restore/all");
-      set({
-        loadingRestoreAllTopupTrashed: false,
-        errorRestoreAllTopupTrashed: null,
-      });
-      handleMessageAction("topup", "restoreAll");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await TopupTrashedCommand.restoreTopupAllTrashed(token);
+
+        set({
+          loadingRestoreAllTopupTrashed: false,
+          errorRestoreAllTopupTrashed: null,
+        });
+        handleMessageAction("topup", "restoreAll");
+      } else {
+        await TopupTrashedService.restoreTopupAllTrashed(token);
+
+        set({
+          loadingRestoreAllTopupTrashed: false,
+          errorRestoreAllTopupTrashed: null,
+        });
+        handleMessageAction("topup", "restoreAll");
+      }
 
       return true;
     } catch (err) {
@@ -170,12 +226,25 @@ const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/topups/permanent/all");
-      set({
-        loadingDeletePermanentTopupTrashed: false,
-        errorDeletePermanentTopupTrashed: null,
-      });
-      handleMessageAction("topup", "deleteAllPermanent");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await TopupTrashedCommand.deletePermanentAllTopup(token);
+
+        set({
+          loadingDeletePermanentTopupTrashed: false,
+          errorDeletePermanentTopupTrashed: null,
+        });
+        handleMessageAction("topup", "deleteAllPermanent");
+      } else {
+        await TopupTrashedService.deletePermanentAllTopup(token);
+
+        set({
+          loadingDeletePermanentTopupTrashed: false,
+          errorDeletePermanentTopupTrashed: null,
+        });
+        handleMessageAction("topup", "deleteAllPermanent");
+      }
 
       return true;
     } catch (err) {

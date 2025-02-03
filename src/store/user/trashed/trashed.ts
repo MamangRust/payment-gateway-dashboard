@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -9,13 +8,16 @@ import {
 } from "@/types/domain/request";
 import { UserTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import UserTrashedCommand from "@/services/ipc/user/user_trashed";
+import UserTrashedService from "@/services/api/user/user_trashed";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
   users: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -58,21 +60,45 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     set({ loadingGetUsersTrashed: true, errorGetUsersTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/user/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        users: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetUsersTrashed: false,
-        errorGetUsersTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await UserTrashedCommand.findAllUsersTrashed(
+          token,
+          req,
+        );
+
+        console.log("response", response);
+
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsersTrashed: false,
+          errorGetUsersTrashed: null,
+        });
+      } else {
+        const response = await UserTrashedService.findAllUsersTrashed(
+          req,
+          token,
+        );
+        console.log("response", response);
+
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsersTrashed: false,
+          errorGetUsersTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -87,12 +113,27 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     set({ loadingRestoreUserTrashed: true, errorRestoreUserTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.post(`/users/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      handleMessageAction("user", "restore");
 
-      set({ loadingRestoreUserTrashed: false, errorRestoreUserTrashed: null });
+      if (isTauri()) {
+        await UserTrashedCommand.restoreUserTrashed(token, req);
+
+        handleMessageAction("user", "restore");
+
+        set({
+          loadingRestoreUserTrashed: false,
+          errorRestoreUserTrashed: null,
+        });
+      } else {
+        await UserTrashedService.restoreUserTrashed(req, token);
+
+        handleMessageAction("user", "restore");
+
+        set({
+          loadingRestoreUserTrashed: false,
+          errorRestoreUserTrashed: null,
+        });
+      }
+
       return true;
     } catch (err) {
       handleApiError(
@@ -113,15 +154,24 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/users/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentUserTrashed: false,
-        errorDeletePermanentUserTrashed: null,
-      });
 
-      handleMessageAction("user", "deletePermanent");
+      if (isTauri()) {
+        await UserTrashedCommand.deletePermanentUser(token, req);
+        set({
+          loadingDeletePermanentUserTrashed: false,
+          errorDeletePermanentUserTrashed: null,
+        });
+
+        handleMessageAction("user", "deletePermanent");
+      } else {
+        await UserTrashedService.deletePermanentUser(req, token);
+        set({
+          loadingDeletePermanentUserTrashed: false,
+          errorDeletePermanentUserTrashed: null,
+        });
+
+        handleMessageAction("user", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -142,13 +192,28 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/users/restore/all");
-      set({
-        loadingRestoreAllUserTrashed: false,
-        errorRestoreAllUserTrashed: null,
-      });
+      const token = getAccessToken();
 
-      handleMessageAction("user", "restoreAll");
+      if (isTauri()) {
+        await UserTrashedCommand.restoreUserAllTrashed(token);
+
+        set({
+          loadingRestoreAllUserTrashed: false,
+          errorRestoreAllUserTrashed: null,
+        });
+
+        handleMessageAction("user", "restoreAll");
+      } else {
+        await UserTrashedService.restoreUserAllTrashed(token);
+
+        set({
+          loadingRestoreAllUserTrashed: false,
+          errorRestoreAllUserTrashed: null,
+        });
+
+        handleMessageAction("user", "restoreAll");
+      }
+
       return true;
     } catch (err) {
       handleApiError(
@@ -169,13 +234,25 @@ const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/users/permanent/all");
-      set({
-        loadingDeletePermanentUserTrashed: false,
-        errorDeletePermanentUserTrashed: null,
-      });
-      handleMessageAction("user", "deleteAllPermanent");
+      const token = getAccessToken();
 
+      if (isTauri()) {
+        await UserTrashedCommand.deletePermanentAllUser(token);
+
+        set({
+          loadingDeletePermanentUserTrashed: false,
+          errorDeletePermanentUserTrashed: null,
+        });
+        handleMessageAction("user", "deleteAllPermanent");
+      } else {
+        await UserTrashedService.deletePermanentAllUser(token);
+
+        set({
+          loadingDeletePermanentUserTrashed: false,
+          errorDeletePermanentUserTrashed: null,
+        });
+        handleMessageAction("user", "deleteAllPermanent");
+      }
       return true;
     } catch (err) {
       handleApiError(

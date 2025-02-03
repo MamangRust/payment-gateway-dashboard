@@ -1,17 +1,20 @@
 import { create } from "zustand";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { UserStore } from "@/types/state/user";
 import {
   CreateUser,
+  FindAllUser,
   FindByIdUser,
   TrashedUser,
   UpdateUser,
 } from "@/types/domain/request";
 import { getAccessToken } from "../auth";
+import UserService from "@/services/api/user/user";
+import UserCommand from "@/services/ipc/user/user";
 import { FindAllUserTrashed } from "@/types/domain/request/user/trashed/list";
 
 import { handleMessageAction } from "@/helpers/message";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useUserStore = create<UserStore>((set, get) => ({
   users: null,
@@ -19,7 +22,7 @@ const useUserStore = create<UserStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -65,26 +68,36 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingGetUsers: true, errorGetUsers: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/user`, {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      console.log(response.data);
+      if (isTauri()) {
+        const response = await UserCommand.findAllUsers(token, req);
 
-      set({
-        users: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetUsers: false,
-        errorGetUsers: null,
-      });
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsers: false,
+          errorGetUsers: null,
+        });
+      } else {
+        const response = await UserService.findAllUsers(token, req);
+
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsers: false,
+          errorGetUsers: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -99,17 +112,24 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingGetUser: true, errorGetUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/user/${req.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      set({
-        user: response.data.data,
-        loadingGetUser: false,
-        errorGetUser: null,
-      });
+      if (isTauri()) {
+        const response = await UserCommand.findByIdUser(token, req);
+
+        set({
+          user: response.data,
+          loadingGetUser: false,
+          errorGetUser: null,
+        });
+      } else {
+        const response = await UserService.findById(token, req);
+
+        set({
+          user: response.data,
+          loadingGetUser: false,
+          errorGetUser: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -120,27 +140,40 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
-  findByActive: async (search: string, page: number, pageSize: number) => {
+  findByActive: async (req: FindAllUser) => {
     set({ loadingGetActiveUsers: true, errorGetActiveUsers: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/user/active`, {
-        params: { page, pageSize, search },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      set({
-        users: response.data.items,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetActiveUsers: false,
-        errorGetActiveUsers: null,
-      });
+
+      if (isTauri()) {
+        const response = await UserCommand.findByActive(token, req);
+
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsers: false,
+          errorGetUsers: null,
+        });
+      } else {
+        const response = await UserService.findByActive(token, req);
+
+        set({
+          users: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetUsers: false,
+          errorGetUsers: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -156,33 +189,17 @@ const useUserStore = create<UserStore>((set, get) => ({
     try {
       const token = getAccessToken();
 
-      const response = await myApi.post(
-        `/user/create`,
-        {
-          firstname: req.firstname,
-          lastname: req.lastname,
-          email: req.email,
-          password: req.password,
-          confirm_password: req.confirm_password,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      if (isTauri()) {
+        await UserCommand.createUser(token, req);
 
-      if (response.status == 200) {
-        handleMessageAction("user", "create");
-        set({
-          loadingCreateUser: false,
-          errorCreateUser: null,
-          user: response.data.data,
-        });
-        return true;
+        handleMessageAction("", "");
       } else {
-        throw new Error("Create User gagal. Silahkan coba create lagi");
+        await UserService.createUser(token, req);
+
+        handleMessageAction("", "");
       }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -199,31 +216,14 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loadingUpdateUser: true, errorUpdateUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/user/update/${req.user_id}`,
-        {
-          user_id: req.user_id,
-          firstname: req.firstname,
-          lastname: req.lastname,
-          email: req.email,
-          password: req.password,
-          confirm_password: req.confirm_password,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
 
-      if (response.status == 200) {
-        set({ loadingUpdateUser: false, errorUpdateUser: null });
-        handleMessageAction("user", "update");
-
-        return true;
+      if (isTauri()) {
+        await UserCommand.updateUser(token, req);
       } else {
-        throw new Error("Update User gagal. Silahkan update lagi");
+        await UserService.updateUser(token, req);
       }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -241,19 +241,14 @@ const useUserStore = create<UserStore>((set, get) => ({
 
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/user/trashed/${req.id}`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      if (response.status === 200) {
-        handleMessageAction("user", "trashed");
-        set({ loadingTrashedUser: false, errorTrashedUser: null });
-        return true;
+      if (isTauri()) {
+        await UserCommand.trashedUser(token, req);
       } else {
-        throw new Error("Trashed User Gagal. Silahkan coba lagi");
+        await UserService.trashedUser(token, req);
       }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,

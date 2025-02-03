@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -6,14 +5,18 @@ import { DeletePermanentMerchant } from "@/types/domain/request/merchant/trashed
 import { FindAllMerchantTrashed } from "@/types/domain/request/merchant/trashed/list";
 import { RestoreMerchantTrashed } from "@/types/domain/request/merchant/trashed/restore";
 import { MerchantTrashedStore } from "@/types/state";
+
+import MerchantTrashedCommand from "@/services/ipc/merchant/merchant_trashed";
+import MerchantTrashedService from "@/services/api/merchant/merchant_trashed";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
   merchants: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -56,21 +59,40 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     set({ loadingGetMerchantsTrashed: true, errorGetMerchantsTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        merchants: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetMerchantsTrashed: false,
-        errorGetMerchantsTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantTrashedCommand.findAllMerchantsTrashed(
+          token,
+          req,
+        );
+        set({
+          merchants: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetMerchantsTrashed: false,
+          errorGetMerchantsTrashed: null,
+        });
+      } else {
+        const response = await MerchantTrashedService.findAllMerchantsTrashed(
+          req,
+          token,
+        );
+        set({
+          merchants: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetMerchantsTrashed: false,
+          errorGetMerchantsTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -88,15 +110,26 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.post(`/merchants/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingRestoreMerchantTrashed: false,
-        errorRestoreMerchantTrashed: null,
-      });
 
-      handleMessageAction("merchant", "restore");
+      if (isTauri()) {
+        await MerchantTrashedCommand.restoreMerchantTrashed(token, req);
+
+        set({
+          loadingRestoreMerchantTrashed: false,
+          errorRestoreMerchantTrashed: null,
+        });
+
+        handleMessageAction("merchant", "restore");
+      } else {
+        await MerchantTrashedService.restoreMerchantTrashed(req, token);
+
+        set({
+          loadingRestoreMerchantTrashed: false,
+          errorRestoreMerchantTrashed: null,
+        });
+
+        handleMessageAction("merchant", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -118,14 +151,24 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/merchants/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentMerchantTrashed: false,
-        errorDeletePermanentMerchantTrashed: null,
-      });
-      handleMessageAction("merchant", "deletePermanent");
+
+      if (isTauri()) {
+        await MerchantTrashedCommand.deletePermanentMerchant(token, req);
+
+        set({
+          loadingDeletePermanentMerchantTrashed: false,
+          errorDeletePermanentMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "deletePermanent");
+      } else {
+        await MerchantTrashedService.deletePermanentMerchant(req, token);
+
+        set({
+          loadingDeletePermanentMerchantTrashed: false,
+          errorDeletePermanentMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -146,12 +189,26 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/merchants/restore/all");
-      set({
-        loadingRestoreAllMerchantTrashed: false,
-        errorRestoreAllMerchantTrashed: null,
-      });
-      handleMessageAction("merchant", "restoreAll");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await MerchantTrashedCommand.restoreMerchantAllTrashed(token);
+
+        set({
+          loadingRestoreAllMerchantTrashed: false,
+          errorRestoreAllMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "restoreAll");
+      } else {
+        await MerchantTrashedService.restoreMerchantAllTrashed(token);
+
+        set({
+          loadingRestoreAllMerchantTrashed: false,
+          errorRestoreAllMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "restoreAll");
+      }
+
       return true;
     } catch (err) {
       handleApiError(
@@ -172,12 +229,23 @@ const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/merchants/permanent/all");
-      set({
-        loadingDeletePermanentMerchantTrashed: false,
-        errorDeletePermanentMerchantTrashed: null,
-      });
-      handleMessageAction("merchant", "deleteAllPermanent");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await MerchantTrashedCommand.deletePermanentAllMerchant(token);
+        set({
+          loadingDeletePermanentMerchantTrashed: false,
+          errorDeletePermanentMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "deleteAllPermanent");
+      } else {
+        await MerchantTrashedService.deletePermanentAllMerchant(token);
+        set({
+          loadingDeletePermanentMerchantTrashed: false,
+          errorDeletePermanentMerchantTrashed: null,
+        });
+        handleMessageAction("merchant", "deleteAllPermanent");
+      }
 
       return true;
     } catch (err) {

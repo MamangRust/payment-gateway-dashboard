@@ -11,9 +11,10 @@ import {
 } from "@tanstack/react-table";
 import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
 import useWithdrawTrashedStore from "@/store/withdraw/trashed/trashed";
-import { withdrawColumns } from "@/components/admin/withdraw";
+
 import { FindAllWithdrawTrashed } from "@/types/domain/request";
 import { useToast } from "@/hooks/use-toast";
+import { withdrawTrashedColumns } from "@/components/admin/withdraw";
 
 export default function useListWithdrawTrashed() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -40,7 +41,7 @@ export default function useListWithdrawTrashed() {
 
   const table = useReactTable({
     data: withdraws || [],
-    columns: withdrawColumns,
+    columns: withdrawTrashedColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -81,7 +82,7 @@ export default function useListWithdrawTrashed() {
         const searchReq: FindAllWithdrawTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

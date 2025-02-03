@@ -28,7 +28,7 @@ export default function useLogin() {
           variant: "default",
         });
 
-        navigate("/admin");
+        navigate("/dashboard/saldo");
       } else {
         toast({
           title: "Error",

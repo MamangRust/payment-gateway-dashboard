@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use super::card::PaginationMeta;
-
 #[derive(Serialize, Deserialize)]
 pub struct MerchantResponse {
     pub id: i32,
@@ -64,80 +62,15 @@ pub struct MerchantResponseYearlyAmount {
     pub total_amount: i32,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantMonthlyPaymentMethod {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponseMonthlyPaymentMethod>,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MerchantMonthlyTotalAmount {
+    pub month: String,
+    pub year: String,
+    pub total_amount: f64,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantYearlyPaymentMethod {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponseYearlyPaymentMethod>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantMonthlyAmount {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponseMonthlyAmount>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantYearlyAmount {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponseYearlyAmount>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponsesMerchant {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponse>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchant {
-    pub status: String,
-    pub message: String,
-    pub data: MerchantResponse,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantDelete {
-    pub status: String,
-    pub message: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponseMerchantAll {
-    pub status: String,
-    pub message: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponsePaginationMerchant {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponse>,
-    pub pagination: PaginationMeta,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponsePaginationMerchantDeleteAt {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantResponseDeleteAt>,
-    pub pagination: PaginationMeta,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ApiResponsePaginationMerchantTransaction {
-    pub status: String,
-    pub message: String,
-    pub data: Vec<MerchantTransactionResponse>,
-    pub pagination: PaginationMeta,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MerchantYearlyTotalAmount {
+    pub year: String,
+    pub total_amount: f64,
 }

@@ -9,13 +9,16 @@ import {
 } from "@/types/domain/request/card";
 import { CardTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import CardCommandTrashed from "@/services/ipc/card/card_trashed";
+import CardServiceTrashed from "@/services/api/card/card_trashed";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
   cards: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -58,21 +61,42 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     set({ loadingGetCardsTrashed: true, errorGetCardsTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        cards: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetCardsTrashed: false,
-        errorGetCardsTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await CardCommandTrashed.findAllCardsTrashed(
+          token,
+          req,
+        );
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetCardsTrashed: false,
+          errorGetCardsTrashed: null,
+        });
+      } else {
+        const response = await CardServiceTrashed.findAllCardsTrashed(
+          req,
+          token,
+        );
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetCardsTrashed: false,
+          errorGetCardsTrashed: null,
+        });
+      }
 
       return true;
     } catch (err) {
@@ -91,12 +115,26 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     set({ loadingRestoreCardTrashed: true, errorRestoreCardTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.post(`/card/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingRestoreCardTrashed: false, errorRestoreCardTrashed: null });
 
-      handleMessageAction("card", "restore");
+      if (isTauri()) {
+        await CardCommandTrashed.restoreCardTrashed(token, req);
+
+        set({
+          loadingRestoreCardTrashed: false,
+          errorRestoreCardTrashed: null,
+        });
+
+        handleMessageAction("card", "restore");
+      } else {
+        await CardServiceTrashed.restoreCardTrashed(req, token);
+
+        set({
+          loadingRestoreCardTrashed: false,
+          errorRestoreCardTrashed: null,
+        });
+
+        handleMessageAction("card", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -118,14 +156,24 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.post(`/card/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentCardTrashed: false,
-        errorDeletePermanentCardTrashed: null,
-      });
-      handleMessageAction("card", "deletePermanent");
+
+      if (isTauri()) {
+        await CardCommandTrashed.deletePermanentCard(token, req);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "deletePermanent");
+      } else {
+        await CardServiceTrashed.deletePermanentCard(req, token);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -145,13 +193,25 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/card/restore/all");
+      const token = getAccessToken();
 
-      set({
-        loadingDeletePermanentCardTrashed: false,
-        errorDeletePermanentCardTrashed: null,
-      });
-      handleMessageAction("card", "restoreAll");
+      if (isTauri()) {
+        await CardCommandTrashed.restoreAllCardsTrashed(token);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "restoreAll");
+      } else {
+        await CardServiceTrashed.restoreCardAllTrashed(token);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "restoreAll");
+      }
 
       return true;
     } catch (err) {
@@ -172,12 +232,25 @@ const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/card/permanent/all");
-      set({
-        loadingDeletePermanentCardTrashed: false,
-        errorDeletePermanentCardTrashed: null,
-      });
-      handleMessageAction("card", "deleteAllPermanent");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await CardCommandTrashed.deletePermanentAllCards(token);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "deleteAllPermanent");
+      } else {
+        await CardServiceTrashed.deletePermanentAllCard(token);
+
+        set({
+          loadingDeletePermanentCardTrashed: false,
+          errorDeletePermanentCardTrashed: null,
+        });
+        handleMessageAction("card", "deleteAllPermanent");
+      }
 
       return true;
     } catch (err) {

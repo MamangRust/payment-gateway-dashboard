@@ -79,7 +79,7 @@ export default function useListTopup() {
         const searchReq: FindAllTopup = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

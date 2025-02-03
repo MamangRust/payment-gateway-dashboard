@@ -37,7 +37,7 @@ export interface TransactionStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -126,23 +126,15 @@ export interface TransactionStore {
   findMonthStatusSuccess: (
     toast: any,
     year: number,
-    month: string,
+    month: number,
   ) => Promise<void>;
-  findYearStatusSuccess: (
-    toast: any,
-    year: number,
-    month: string,
-  ) => Promise<void>;
+  findYearStatusSuccess: (toast: any, year: number) => Promise<void>;
   findMonthStatusFailed: (
     toast: any,
     year: number,
-    month: string,
+    month: number,
   ) => Promise<void>;
-  findYearStatusFailed: (
-    toast: any,
-    year: number,
-    month: string,
-  ) => Promise<void>;
+  findYearStatusFailed: (toast: any, year: number) => Promise<void>;
   findMonthTransactionMethod: (toast: any, year: number) => Promise<void>;
   findYearTransactionMethod: (toast: any, year: number) => Promise<void>;
 
@@ -177,11 +169,7 @@ export interface TransactionStore {
     req: FindyByCardNumberTransaction,
   ) => Promise<void>;
   findByMerchantTransaction: (req: FindyByMerchantTransaction) => Promise<void>;
-  findByActiveTransaction: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveTransaction: (req: FindAllTransaction) => Promise<void>;
   createTransaction: (req: CreateTransaction) => Promise<boolean>;
   updateTransaction: (req: UpdateTransaction) => Promise<boolean>;
   trashedTransaction: (req: TrashedTransaction) => Promise<boolean>;

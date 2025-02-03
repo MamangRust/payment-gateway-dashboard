@@ -49,6 +49,17 @@ export interface MerchantYearlyAmount {
   total_amount: number;
 }
 
+export interface MerchantMonthlyTotalAmount {
+  month: string;
+  year: string;
+  total_amount: number;
+}
+
+export interface MerchantYearlyTotalAmount {
+  year: string;
+  total_amount: number;
+}
+
 export interface ApiResponseMerchantMonthlyPaymentMethod {
   status: string;
   message: string;
@@ -71,6 +82,18 @@ export interface ApiResponseMerchantYearlyAmount {
   status: string;
   message: string;
   data: MerchantYearlyAmount[];
+}
+
+export interface ApiResponseMerchantMonthlyTotalAmount {
+  status: string;
+  message: string;
+  data: MerchantMonthlyTotalAmount[];
+}
+
+export interface ApiResponseMerchantYearlyTotalAmount {
+  status: string;
+  message: string;
+  data: MerchantYearlyTotalAmount[];
 }
 
 export interface ApiResponsesMerchant {

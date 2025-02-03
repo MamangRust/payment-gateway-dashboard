@@ -13,7 +13,7 @@ export interface UserStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -54,11 +54,7 @@ export interface UserStore {
 
   findAllUsers: (req: FindAllUser) => Promise<void>;
   findById: (req: FindByIdUser) => Promise<void>;
-  findByActive: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActive: (req: FindAllUser) => Promise<void>;
 
   createUser: (req: CreateUser) => Promise<boolean>;
   updateUser: (req: UpdateUser) => Promise<boolean>;

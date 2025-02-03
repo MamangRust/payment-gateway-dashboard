@@ -28,7 +28,7 @@ export interface SaldoStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -106,11 +106,7 @@ export interface SaldoStore {
 
   findAllSaldos: (req: FindAllSaldo) => Promise<void>;
   findByIdSaldo: (req: FindByIdSaldo) => Promise<void>;
-  findByActiveSaldo: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveSaldo: (req: FindAllSaldo) => Promise<void>;
   findByCardNumberSaldo: (req: FindByCardNumberSaldo) => Promise<void>;
   createSaldo: (req: CreateSaldo) => Promise<boolean>;
   updateSaldo: (req: UpdateSaldo) => Promise<boolean>;

@@ -81,7 +81,7 @@ export default function useListSaldoTrashed() {
         const searchReq: FindAllSaldoTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

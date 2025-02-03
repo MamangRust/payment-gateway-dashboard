@@ -12,9 +12,11 @@ import {
   Merchant,
   MerchantMonthlyAmount,
   MerchantMonthlyPaymentMethod,
+  MerchantMonthlyTotalAmount,
   MerchantTransaction,
   MerchantYearlyAmount,
   MerchantYearlyPaymentMethod,
+  MerchantYearlyTotalAmount,
 } from "../../model/merchant";
 
 export interface MerchantStore {
@@ -29,16 +31,19 @@ export interface MerchantStore {
   monthAmount: MerchantMonthlyAmount[] | null;
   yearAmount: MerchantYearlyAmount[] | null;
 
+  monthTotalAmount: MerchantMonthlyTotalAmount[] | null;
+  yearTotalAmount: MerchantYearlyTotalAmount[] | null;
+
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
 
   paginationTransaction: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -49,11 +54,16 @@ export interface MerchantStore {
   loadingMonthAmount: boolean;
   loadingYearAmount: boolean;
 
+  loadingMonthTotalAmount: boolean;
+  loadingYearTotalAmount: boolean;
+
   errorMonthPaymentMethod: string | null;
   errorYearPaymentMethod: string | null;
 
   errorMonthAmount: string | null;
   errorYearAmount: string | null;
+  errorMonthTotalAmount: string | null;
+  errorYearTotalAmount: string | null;
 
   loadingGetMerchants: boolean;
   loadingGetTransactions: boolean;
@@ -85,6 +95,8 @@ export interface MerchantStore {
   setLoadingYearPaymentMethod: (value: boolean) => void;
   setLoadingMonthAmount: (value: boolean) => void;
   setLoadingYearAmount: (value: boolean) => void;
+  setLoadingMonthTotalAmount: (value: boolean) => void;
+  setLoadingYearTotalAmount: (value: boolean) => void;
 
   setLoadingGetMerchants: (value: boolean) => void;
   setLoadingGetTransactions: (value: boolean) => void;
@@ -102,6 +114,9 @@ export interface MerchantStore {
   setErrorMonthAmount: (value: string | null) => void;
   setErrorYearAmount: (value: string | null) => void;
 
+  setErrorMonthTotalAmount: (value: string | null) => void;
+  setErrorYearTotalAmount: (value: string | null) => void;
+
   setErrorGetMerchants: (value: string | null) => void;
   setErrorGetTransactions: (value: string | null) => void;
   setErrorGetMerchant: (value: string | null) => void;
@@ -117,6 +132,12 @@ export interface MerchantStore {
   findYearPaymentMethod: (toast: any, year: number) => Promise<void>;
   findMonthAmount: (toast: any, year: number) => Promise<void>;
   findYearAmount: (toast: any, year: number) => Promise<void>;
+  findMonthTotalAmount: (
+    toast: any,
+    year: number,
+    month: number,
+  ) => Promise<void>;
+  findYearTotalAmount: (toast: any, year: number) => Promise<void>;
 
   findMonthPaymentMethodByMerchant: (
     toast: any,
@@ -138,6 +159,20 @@ export interface MerchantStore {
   findYearAmountByMerchant: (
     toast: any,
     year: number,
+    merchant_id: number,
+  ) => Promise<void>;
+
+  findMonthTotalAmountByMerchant: (
+    toast: any,
+    year: number,
+    month: number,
+    merchant_id: number,
+  ) => Promise<void>;
+
+  findYearTotalAmountByMerchant: (
+    toast: any,
+    year: number,
+
     merchant_id: number,
   ) => Promise<void>;
 

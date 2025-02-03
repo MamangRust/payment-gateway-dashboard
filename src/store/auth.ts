@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { AuthStore } from "@/types/state/auth";
+import AuthService from "@/services/api/auth/auth";
+import AuthCommand from "@/services/api/auth/auth";
+import { isTauri } from "@tauri-apps/api/core";
 import { LoginRequest, RegisterRequest } from "@/types/domain/request";
 
 const useAuthStore = create<AuthStore>()(
@@ -49,14 +51,13 @@ const useAuthStore = create<AuthStore>()(
         });
 
         try {
-          const response = await myApi.post("/auth/login", req);
 
-          if (response.status === 200) {
-            const { access_token, refresh_token } = response.data.data;
+          if (isTauri()) {
+            const response = await AuthCommand.login(req);
 
             set({
-              accessToken: access_token,
-              refreshToken: refresh_token,
+              accessToken: response?.access_token,
+              refreshToken: response?.refresh_token,
               isAuthenticated: true,
             });
 
@@ -68,11 +69,28 @@ const useAuthStore = create<AuthStore>()(
             set({
               refreshTimer: timer,
             });
-
-            return true;
           } else {
-            throw new Error("Login gagal. Silakan coba lagi.");
+            const response = await AuthService.login(req);
+
+            set({
+              accessToken: response?.access_token,
+              refreshToken: response?.refresh_token,
+              isAuthenticated: true,
+            });
+
+            const timer = setInterval(
+              () => get().refreshAccessToken?.(toast),
+              15 * 60 * 1000,
+            );
+
+            set({
+              refreshTimer: timer,
+            });
           }
+
+
+
+          return true;
         } catch (error) {
           handleApiError(
             error,
@@ -125,17 +143,32 @@ const useAuthStore = create<AuthStore>()(
           errorRegister: null,
         });
         try {
-          const response = await myApi.post("/auth/register", req);
+          if (isTauri()) {
+            await AuthCommand.register(req);
 
-          if (response.status === 201) {
             set({
               loadingRegister: false,
               errorRegister: null,
             });
+
             return true;
           } else {
-            throw new Error("Registration failed");
+            await AuthService.register(req);
+
+
+            set({
+              loadingRegister: false,
+              errorRegister: null,
+            });
+
+
+            return true;
           }
+
+
+
+
+
         } catch (error) {
           handleApiError(
             error,
@@ -158,21 +191,32 @@ const useAuthStore = create<AuthStore>()(
           loadingGetMe: true,
           errorGetMe: null,
         });
+
         try {
-          const response = await myApi.get("/auth/me", {
-            headers: {
-              Authorization: `Bearer ${get().accessToken}`,
-            },
-          });
-          if (response.status == 200) {
+          const accessToken = get().accessToken;
+          if (!accessToken) {
+            throw new Error("No access token found.");
+          }
+
+          if (isTauri()) {
+            const response = await AuthCommand.getMe(accessToken)
+
             set({
               loadingGetMe: false,
               errorGetMe: null,
-              user: response.data.data,
+              user: response,
+            });
+
+          } else {
+            const response = await AuthService.getMe(accessToken);
+
+            set({
+              loadingGetMe: false,
+              errorGetMe: null,
+              user: response,
             });
           }
 
-          return response.data.data;
         } catch (error) {
           handleApiError(
             error,
@@ -180,9 +224,9 @@ const useAuthStore = create<AuthStore>()(
               set({
                 loadingGetMe: false,
               }),
-            (messsage: any) =>
+            (message: any) =>
               set({
-                errorGetMe: messsage,
+                errorGetMe: message,
               }),
             toast,
           );
@@ -195,28 +239,40 @@ const useAuthStore = create<AuthStore>()(
           errorRefreshAccessToken: null,
         });
         try {
-          const response = await myApi.post(
-            "/auth/refresh-token",
-            {
-              refresh_token: get().refreshToken,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${get().accessToken}`,
-              },
-            },
-          );
+          const accessToken = get().accessToken;
+          if (!accessToken) {
+            throw new Error("No access token found.");
+          }
 
-          if (response.status == 200) {
+          const refreshToken = get().accessToken;
+          if (!refreshToken) {
+            throw new Error("No refresh token found.");
+          }
+
+          if (isTauri()) {
+
+            const response = await AuthCommand.refreshAccessToken(accessToken, refreshToken);
             set({
               loadingRefreshAccessToken: false,
               errorRefreshAccessToken: null,
-              refreshToken: response.data.data.refresh_token,
-              accessToken: response.data.data.access_token,
+              refreshToken: response?.refresh_token,
+              accessToken: response?.access_token,
+            });
+
+          } else {
+            const response = await AuthService.refreshAccessToken(
+              accessToken,
+              refreshToken,
+            );
+            set({
+              loadingRefreshAccessToken: false,
+              errorRefreshAccessToken: null,
+              refreshToken: response?.refresh_token,
+              accessToken: response?.access_token,
             });
           }
 
-          return response.data.data;
+
         } catch (error) {
           handleApiError(
             error,

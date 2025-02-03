@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -7,8 +6,11 @@ import {
   FindAllTransactionTrashed,
   RestoreTransactionTrashed,
 } from "@/types/domain/request";
+import TransactionTrashedService from "@/services/api/transaction/transaction_trashed";
+import TransactionTrashedCommand from "@/services/ipc/transaction/transaction_trashed";
 import { TransactionTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTransactionTrashedStore = create<TransactionTrashedStore>(
   (set, get) => ({
@@ -16,7 +18,7 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
 
     pagination: {
       currentPage: 1,
-      pageSize: 10,
+      page_size: 10,
       totalItems: 0,
       totalPages: 0,
     },
@@ -62,27 +64,44 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
       try {
         const token = getAccessToken();
-        const response = await myApi.get("/transactions/trashed", {
-          params: {
-            page: req.page,
-            page_size: req.pageSize,
-            search: req.search,
-          },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        set({
-          transactions: response.data.data,
-          pagination: {
-            currentPage: response.data.pagination.current_page,
-            pageSize: response.data.pagination.page_size,
-            totalItems: response.data.pagination.total_records,
-            totalPages: response.data.pagination.total_pages,
-          },
-          loadingGetTransactionsTrashed: false,
-          errorGetTransactionsTrashed: null,
-        });
 
-        return response.data;
+        if (isTauri()) {
+          const response =
+            await TransactionTrashedCommand.findAllTransactionsTrashed(
+              token,
+              req,
+            );
+
+          set({
+            transactions: response.data,
+            pagination: {
+              currentPage: response.pagination.current_page,
+              page_size: response.pagination.page_size,
+              totalItems: response.pagination.total_records,
+              totalPages: response.pagination.total_pages,
+            },
+            loadingGetTransactionsTrashed: false,
+            errorGetTransactionsTrashed: null,
+          });
+        } else {
+          const response =
+            await TransactionTrashedService.findAllTransactionsTrashed(
+              req,
+              token,
+            );
+
+          set({
+            transactions: response.data,
+            pagination: {
+              currentPage: response.pagination.current_page,
+              page_size: response.pagination.page_size,
+              totalItems: response.pagination.total_records,
+              totalPages: response.pagination.total_pages,
+            },
+            loadingGetTransactionsTrashed: false,
+            errorGetTransactionsTrashed: null,
+          });
+        }
       } catch (err) {
         handleApiError(
           err,
@@ -100,14 +119,22 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
       try {
         const token = getAccessToken();
-        await myApi.post(`/transactions/restore/${req.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        set({
-          loadingRestoreTransactionTrashed: false,
-          errorRestoreTransactionTrashed: null,
-        });
-        handleMessageAction("transaction", "restore");
+
+        if (isTauri()) {
+          await TransactionTrashedCommand.restoreTransactionTrashed(token, req);
+          set({
+            loadingRestoreTransactionTrashed: false,
+            errorRestoreTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "restore");
+        } else {
+          await TransactionTrashedService.restoreTransactionTrashed(req, token);
+          set({
+            loadingRestoreTransactionTrashed: false,
+            errorRestoreTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "restore");
+        }
 
         return true;
       } catch (err) {
@@ -128,14 +155,30 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
       try {
         const token = getAccessToken();
-        await myApi.delete(`/transactions/permanent/${req.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        set({
-          loadingDeletePermanentTransactionTrashed: false,
-          errorDeletePermanentTransactionTrashed: null,
-        });
-        handleMessageAction("transaction", "deletePermanent");
+
+        if (isTauri()) {
+          await TransactionTrashedCommand.deletePermanentTransaction(
+            token,
+            req,
+          );
+
+          set({
+            loadingDeletePermanentTransactionTrashed: false,
+            errorDeletePermanentTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "deletePermanent");
+        } else {
+          await TransactionTrashedService.deletePermanentTransaction(
+            req,
+            token,
+          );
+
+          set({
+            loadingDeletePermanentTransactionTrashed: false,
+            errorDeletePermanentTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "deletePermanent");
+        }
 
         return true;
       } catch (err) {
@@ -156,12 +199,25 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
 
       try {
-        await myApi.post("/transactions/restore/all");
-        set({
-          loadingRestoreAllTransactionTrashed: false,
-          errorRestoreAllTransactionTrashed: null,
-        });
-        handleMessageAction("transaction", "restoreAll");
+        const token = getAccessToken();
+
+        if (isTauri()) {
+          await TransactionTrashedCommand.restoreTransactionAllTrashed(token);
+
+          set({
+            loadingRestoreAllTransactionTrashed: false,
+            errorRestoreAllTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "restoreAll");
+        } else {
+          await TransactionTrashedService.restoreTransactionAllTrashed(token);
+
+          set({
+            loadingRestoreAllTransactionTrashed: false,
+            errorRestoreAllTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "restoreAll");
+        }
 
         return true;
       } catch (err) {
@@ -182,14 +238,27 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
       });
 
       try {
-        const response = await myApi.post("/transactions/permanent/all");
-        set({
-          loadingDeletePermanentTransactionTrashed: false,
-          errorDeletePermanentTransactionTrashed: null,
-        });
-        handleMessageAction("transaction", "deleteAllPermanent");
+        const token = getAccessToken();
 
-        return response.data;
+        if (isTauri()) {
+          await TransactionTrashedCommand.deletePermanentAllTransaction(token);
+
+          set({
+            loadingDeletePermanentTransactionTrashed: false,
+            errorDeletePermanentTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "deleteAllPermanent");
+        } else {
+          await TransactionTrashedService.deletePermanentAllTransaction(token);
+
+          set({
+            loadingDeletePermanentTransactionTrashed: false,
+            errorDeletePermanentTransactionTrashed: null,
+          });
+          handleMessageAction("transaction", "deleteAllPermanent");
+        }
+
+        return true;
       } catch (err) {
         handleApiError(
           err,
@@ -198,6 +267,8 @@ const useTransactionTrashedStore = create<TransactionTrashedStore>(
             set({ errorDeletePermanentTransactionTrashed: message }),
           toast,
         );
+
+        return false;
       }
     },
   }),

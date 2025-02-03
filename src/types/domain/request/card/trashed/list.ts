@@ -1,6 +1,6 @@
 export interface FindAllTrashedCard {
   page: number;
-  pageSize: number;
+  page_size: number;
   search: string;
   toast: any;
 }

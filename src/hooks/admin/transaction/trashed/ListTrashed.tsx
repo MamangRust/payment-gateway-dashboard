@@ -81,7 +81,7 @@ export default function useListTransactionTrashed() {
         const searchReq: FindAllTransactionTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

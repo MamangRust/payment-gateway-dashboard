@@ -43,7 +43,7 @@ export interface TransferMonthStatusFailed {
 
 export interface TransferYearStatusFailed {
   year: string;
-  totalAmount: number;
+  total_amount: number;
   total_failed: number;
 }
 
@@ -119,12 +119,12 @@ export interface ApiResponsePaginationTransfer {
   status: string;
   message: string;
   data: Transfer[];
-  pagination?: PaginationMeta;
+  pagination: PaginationMeta;
 }
 
 export interface ApiResponsePaginationTransferDeleteAt {
   status: string;
   message: string;
   data: TransferTrashed[];
-  pagination?: PaginationMeta;
+  pagination: PaginationMeta;
 }

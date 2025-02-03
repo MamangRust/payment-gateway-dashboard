@@ -78,7 +78,7 @@ export default function useListSaldo() {
         const searchReq: FindAllSaldo = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

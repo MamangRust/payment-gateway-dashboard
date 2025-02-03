@@ -31,7 +31,7 @@ export interface WithdrawStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -135,11 +135,7 @@ export interface WithdrawStore {
   findAllWithdraws: (req: FindAllWithdraw) => Promise<void>;
   findByIdWithdraw: (req: FindByIdWithdraw) => Promise<void>;
   findByCardNumberWithdraw: (req: FindByCardNumberWithdraw) => Promise<void>;
-  findByActiveWithdraw: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveWithdraw: (req: FindAllWithdraw) => Promise<void>;
   createWithdraw: (req: CreateWithdraw) => Promise<boolean>;
   updateWithdraw: (req: UpdateWithdraw) => Promise<boolean>;
   trashedWithdraw: (req: TrashedWithdraw) => Promise<boolean>;

@@ -79,7 +79,7 @@ export default function useListUser() {
         const searchReq: FindAllUser = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

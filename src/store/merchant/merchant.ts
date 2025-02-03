@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { MerchantStore } from "@/types/state/merchant/merchant";
 import {
@@ -12,8 +11,11 @@ import {
   FindTrashedMerchant,
   UpdateMerchant,
 } from "@/types/domain/request";
+import MerchantService from "@/services/api/merchant/merchant";
+import MerchantCommand from "@/services/ipc/merchant/merchant";
 import { getAccessToken } from "../auth";
 import { handleMessageAction } from "@/helpers/message";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useMerchantStore = create<MerchantStore>((set, get) => ({
   merchants: null,
@@ -27,16 +29,19 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   monthAmount: null,
   yearAmount: null,
 
+  monthTotalAmount: null,
+  yearTotalAmount: null,
+
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
 
   paginationTransaction: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -45,6 +50,8 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   loadingYearPaymentMethod: false,
   loadingMonthAmount: false,
   loadingYearAmount: false,
+  loadingMonthTotalAmount: false,
+  loadingYearTotalAmount: false,
 
   loadingGetMerchants: false,
   loadingGetTransactions: false,
@@ -63,6 +70,8 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   errorYearPaymentMethod: null,
   errorMonthAmount: null,
   errorYearAmount: null,
+  errorMonthTotalAmount: null,
+  errorYearTotalAmount: null,
 
   errorGetMerchants: null,
   errorGetTransactions: null,
@@ -81,6 +90,10 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingYearPaymentMethod: value }),
   setLoadingMonthAmount: (value: boolean) => set({ loadingMonthAmount: value }),
   setLoadingYearAmount: (value: boolean) => set({ loadingYearAmount: value }),
+  setLoadingMonthTotalAmount: (value: boolean) =>
+    set({ loadingMonthTotalAmount: value }),
+  setLoadingYearTotalAmount: (value: boolean) =>
+    set({ loadingYearTotalAmount: value }),
 
   setLoadingGetMerchants: (value) => set({ loadingGetMerchants: value }),
   setLoadingGetTransactions: (value) => set({ loadingGetTransactions: value }),
@@ -101,6 +114,9 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
   setErrorMonthAmount: (value) => set({ errorMonthAmount: value }),
   setErrorYearAmount: (value) => set({ errorYearAmount: value }),
 
+  setErrorMonthTotalAmount: (value) => set({ errorMonthTotalAmount: value }),
+  setErrorYearTotalAmount: (value) => set({ errorYearTotalAmount: value }),
+
   setErrorGetMerchants: (value) => set({ errorGetMerchants: value }),
   setErrorGetTransactions: (value) => set({ errorGetTransactions: value }),
   setErrorGetMerchant: (value) => set({ errorGetMerchant: value }),
@@ -117,19 +133,30 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingMonthPaymentMethod: true, errorMonthPaymentMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/monthly-payment-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("response", response.data.data);
 
-      set({
-        monthPaymentMethod: response.data.data,
-        loadingMonthPaymentMethod: false,
-        errorMonthPaymentMethod: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthPaymentMethod(
+          token,
+          year,
+        );
+
+        set({
+          monthPaymentMethod: response.data,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthPaymentMethod(
+          token,
+          year,
+        );
+
+        set({
+          monthPaymentMethod: response,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -144,18 +171,30 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingYearPaymentMethod: true, errorYearPaymentMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/yearly-payment-methods", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
 
-      set({
-        yearPaymentMethod: response.data.data,
-        loadingYearPaymentMethod: false,
-        errorYearPaymentMethod: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearPaymentMethod(
+          token,
+          year,
+        );
+
+        set({
+          yearPaymentMethod: response.data,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findYearPaymentMethod(
+          token,
+          year,
+        );
+
+        set({
+          yearPaymentMethod: response,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -170,19 +209,24 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingMonthAmount: true, errorMonthAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/monthly-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
-      console.log("month amount:", response);
 
-      set({
-        monthAmount: response.data.data,
-        loadingMonthAmount: false,
-        errorMonthAmount: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthAmount(token, year);
+
+        set({
+          monthAmount: response.data,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthAmount(token, year);
+
+        set({
+          monthAmount: response,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -197,19 +241,96 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingYearAmount: true, errorYearAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/yearly-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-        },
-      });
 
-      console.log("year amount:", response);
-      set({
-        yearAmount: response.data.data,
-        loadingYearAmount: false,
-        errorYearAmount: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearAmount(token, year);
+
+        set({
+          yearAmount: response.data,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearAmount(token, year);
+
+        set({
+          yearAmount: response,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearAmount: false }),
+        (message: any) => set({ errorYearAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthTotalAmount: async (toast: any, year: number, month: number) => {
+    set({ loadingMonthTotalAmount: true, errorMonthTotalAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthTotalAmount(
+          token,
+          year,
+          month,
+        );
+
+        set({
+          monthTotalAmount: response.data,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthTotalAmount(
+          token,
+          year,
+          month,
+        );
+
+        set({
+          monthTotalAmount: response,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthTotalAmount: false }),
+        (message: any) => set({ errorMonthTotalAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearTotalAmount: async (toast: any, year: number) => {
+    set({ loadingYearAmount: true, errorYearAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearTotalAmount(token, year);
+
+        set({
+          yearTotalAmount: response.data,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearTotalAmount(token, year);
+
+        set({
+          yearTotalAmount: response,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -228,21 +349,32 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingMonthPaymentMethod: true, errorMonthPaymentMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/merchants/monthly-payment-methods-by-merchant",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            year,
-            merchant_id,
-          },
-        },
-      );
-      set({
-        monthPaymentMethod: response.data.data,
-        loadingMonthPaymentMethod: false,
-        errorMonthPaymentMethod: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthPaymentMethodByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          monthPaymentMethod: response.data,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthPaymentMethodByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          monthPaymentMethod: response,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -261,21 +393,32 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingYearPaymentMethod: true, errorYearPaymentMethod: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/merchants/yearly-payment-methods-by-merchant",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            year,
-            merchant_id,
-          },
-        },
-      );
-      set({
-        yearPaymentMethod: response.data.data,
-        loadingYearPaymentMethod: false,
-        errorYearPaymentMethod: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearPaymentMethodByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          yearPaymentMethod: response.data,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findYearPaymentMethodByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          yearPaymentMethod: response,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -294,21 +437,32 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingMonthAmount: true, errorMonthAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/merchants/monthly-amount-by-merchant",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            year,
-            merchant_id,
-          },
-        },
-      );
-      set({
-        monthAmount: response.data.data,
-        loadingMonthAmount: false,
-        errorMonthAmount: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthAmountByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          monthAmount: response.data,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthAmountByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          monthAmount: response,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -327,18 +481,32 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingYearAmount: true, errorYearAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/yearly-amount-by-merchant", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearAmountByMerchant(
+          token,
           year,
           merchant_id,
-        },
-      });
-      set({
-        yearAmount: response.data.data,
-        loadingYearAmount: false,
-        errorYearAmount: null,
-      });
+        );
+
+        set({
+          yearAmount: response.data,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearAmountByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          yearAmount: response,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -349,26 +517,131 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     }
   },
 
+  findMonthTotalAmountByMerchant: async (
+    toast: any,
+    year: number,
+    month: number,
+    merchant_id: number,
+  ) => {
+    set({ loadingMonthTotalAmount: true, errorMonthTotalAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthTotalAmountByMerchant(
+          token,
+          year,
+          month,
+          merchant_id,
+        );
+
+        set({
+          monthTotalAmount: response.data,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthTotalAmountByMerchant(
+          token,
+          year,
+          month,
+          merchant_id,
+        );
+
+        set({
+          monthTotalAmount: response,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthTotalAmount: false }),
+        (message: any) => set({ errorMonthTotalAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearTotalAmountByMerchant: async (
+    toast: any,
+    year: number,
+    merchant_id: number,
+  ) => {
+    set({ loadingYearTotalAmount: true, errorYearTotalAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearTotalAmountByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          yearTotalAmount: response.data,
+          loadingYearTotalAmount: false,
+          errorYearTotalAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearTotalAmountByMerchant(
+          token,
+          year,
+          merchant_id,
+        );
+
+        set({
+          yearTotalAmount: response,
+          loadingYearTotalAmount: false,
+          errorYearTotalAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearTotalAmount: false }),
+        (message: any) => set({ errorYearTotalAmount: message }),
+        toast,
+      );
+    }
+  },
+
   findAllMerchants: async (req: FindAllMerchant) => {
     set({ loadingGetMerchants: true, errorGetMerchants: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      set({
-        merchants: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetMerchants: false,
-        errorGetMerchants: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findAllMerchants(token, req);
+
+        set({
+          merchants: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetMerchants: false,
+          errorGetMerchants: null,
+        });
+      } else {
+        const response = await MerchantService.findAllMerchants(req, token);
+
+        set({
+          merchants: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetMerchants: false,
+          errorGetMerchants: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -383,22 +656,36 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingGetTransactions: true, errorGetTransactions: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/transactions", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      set({
-        transactions: response.data.data,
-        paginationTransaction: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTransactions: false,
-        errorGetTransactions: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findAllTransactions(token, req);
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      } else {
+        const response = await MerchantService.findAllTransaction(req, token);
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -413,22 +700,26 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingGetTransactions: true, errorGetTransactions: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/transactions", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      set({
-        transactions: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTransactions: false,
-        errorGetTransactions: null,
-      });
+      if (isTauri()) {
+      } else {
+        const response = await MerchantService.findAllTransactionByMerchant(
+          req,
+          token,
+        );
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -443,16 +734,24 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingGetMerchant: true, errorGetMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/merchants/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      console.log("response", response.data.data);
-      set({
-        merchant: response.data.data,
-        loadingGetMerchant: false,
-        errorGetMerchant: null,
-      });
+      if (isTauri()) {
+        const response = await MerchantCommand.findMerchantById(token, req);
+
+        set({
+          merchant: response.data,
+          loadingGetMerchant: false,
+          errorGetMerchant: null,
+        });
+      } else {
+        const response = await MerchantService.findById(req, token);
+
+        set({
+          merchant: response,
+          loadingGetMerchant: false,
+          errorGetMerchant: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -467,14 +766,24 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingGetApiKey: true, errorGetApiKey: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/merchants/api-key/${req.api_key}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        merchant: response.data,
-        loadingGetApiKey: false,
-        errorGetApiKey: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMerchantByApiKey(token, req);
+
+        set({
+          merchant: response.data,
+          loadingGetApiKey: false,
+          errorGetApiKey: null,
+        });
+      } else {
+        const response = await MerchantService.findByApiKey(req, token);
+
+        set({
+          merchant: response,
+          loadingGetApiKey: false,
+          errorGetApiKey: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -489,17 +798,24 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingGetMerchantUser: true, errorGetMerchantUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        `/merchants/merchant-user/${req.user_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      set({
-        merchants: response.data,
-        loadingGetMerchantUser: false,
-        errorGetMerchantUser: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMerchantByUser(token, req);
+
+        set({
+          merchants: response.data,
+          loadingGetMerchantUser: false,
+          errorGetMerchantUser: null,
+        });
+      } else {
+        const response = await MerchantService.findByMerchantUser(req, token);
+
+        set({
+          merchants: response,
+          loadingGetMerchantUser: false,
+          errorGetMerchantUser: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -510,25 +826,40 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     }
   },
 
-  findByActive: async (search: string, page: number, pageSize: number) => {
+  findByActive: async (req: FindAllMerchant) => {
     set({ loadingGetActiveMerchant: true, errorGetActiveMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/merchants/active", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        merchants: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetActiveMerchant: false,
-        errorGetActiveMerchant: null,
-      });
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findActiveMerchant(token, req);
+
+        set({
+          merchants: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      } else {
+        const response = await MerchantService.findByActive(req, token);
+
+        set({
+          merchants: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -543,20 +874,22 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingCreateMerchant: true, errorCreateMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        "/merchants/create",
-        {
-          name: req.name,
-          user_id: req.user_id,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("merchant", "create");
 
-      set({ loadingCreateMerchant: false, errorCreateMerchant: null });
-      return response.data;
+      if (isTauri()) {
+        await MerchantCommand.createMerchant(token, req);
+
+        handleMessageAction("merchant", "create");
+
+        set({ loadingCreateMerchant: false, errorCreateMerchant: null });
+      } else {
+        await MerchantService.createMerchant(req, token);
+
+        handleMessageAction("merchant", "create");
+
+        set({ loadingCreateMerchant: false, errorCreateMerchant: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -564,6 +897,8 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         (message: any) => set({ errorCreateMerchant: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 
@@ -571,26 +906,22 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     set({ loadingUpdateMerchant: true, errorUpdateMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/merchants/updates/${req.merchant_id}`,
-        {
-          merchant_id: req.merchant_id,
-          name: req.name,
-          user_id: req.user_id,
-          status: req.status,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      console.log("response req merchant", req);
 
-      console.log("response merchant", response.data.data);
+      if (isTauri()) {
+        await MerchantCommand.updateMerchant(token, req);
 
-      handleMessageAction("merchant", "update");
+        handleMessageAction("merchant", "update");
 
-      set({ loadingUpdateMerchant: false, errorUpdateMerchant: null });
-      return response.data;
+        set({ loadingUpdateMerchant: false, errorUpdateMerchant: null });
+      } else {
+        await MerchantService.updateMerchant(req, token);
+
+        handleMessageAction("merchant", "update");
+
+        set({ loadingUpdateMerchant: false, errorUpdateMerchant: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -598,19 +929,30 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         (message: any) => set({ errorUpdateMerchant: message }),
         req.toast,
       );
+
+      return false;
     }
   },
   trashedMerchant: async (req: FindTrashedMerchant) => {
     set({ loadingTrashedMerchant: true, errorTrashedMerchant: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/merchants/trashed/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      handleMessageAction("merchant", "trashed");
 
-      set({ loadingTrashedMerchant: false, errorTrashedMerchant: null });
-      return response.data;
+      if (isTauri()) {
+        await MerchantCommand.trashedMerchant(token, req);
+
+        handleMessageAction("merchant", "trashed");
+
+        set({ loadingTrashedMerchant: false, errorTrashedMerchant: null });
+      } else {
+        await MerchantService.trashedMerchant(req, token);
+
+        handleMessageAction("merchant", "trashed");
+
+        set({ loadingTrashedMerchant: false, errorTrashedMerchant: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -618,6 +960,7 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
         (message: any) => set({ errorTrashedMerchant: message }),
         req.toast,
       );
+      return false;
     }
   },
 }));

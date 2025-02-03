@@ -81,7 +81,7 @@ export default function useListTransferTrashed() {
         const searchReq: FindAllTransferTrashed = {
           search: search,
           page: currentPage,
-          pageSize: pageSize,
+          page_size: pageSize,
           toast: toast,
         };
 

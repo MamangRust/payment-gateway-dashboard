@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -8,15 +7,18 @@ import {
   RestoreSaldoTrashed,
 } from "@/types/domain/request";
 
+import SaldoTrashedCommand from "@/services/ipc/saldo/saldo_trashed";
+import SaldoTrashedService from "@/services/api/saldo/saldo_trashed";
 import { SaldoTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
   saldos: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -59,21 +61,42 @@ const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
     set({ loadingGetSaldosTrashed: true, errorGetSaldosTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/saldos/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        saldos: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetSaldosTrashed: false,
-        errorGetSaldosTrashed: null,
-      });
+
+      if (isTauri()) {
+        const response = await SaldoTrashedCommand.findAllSaldosTrashed(
+          token,
+          req,
+        );
+
+        set({
+          saldos: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetSaldosTrashed: false,
+          errorGetSaldosTrashed: null,
+        });
+      } else {
+        const response = await SaldoTrashedService.findAllSaldosTrashed(
+          req,
+          token,
+        );
+
+        set({
+          saldos: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetSaldosTrashed: false,
+          errorGetSaldosTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -88,14 +111,24 @@ const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
     set({ loadingRestoreSaldoTrashed: true, errorRestoreSaldoTrashed: null });
     try {
       const token = getAccessToken();
-      await myApi.post(`/saldos/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingRestoreSaldoTrashed: false,
-        errorRestoreSaldoTrashed: null,
-      });
-      handleMessageAction("saldo", "restore");
+
+      if (isTauri()) {
+        await SaldoTrashedCommand.restoreSaldoTrashed(token, req);
+
+        set({
+          loadingRestoreSaldoTrashed: false,
+          errorRestoreSaldoTrashed: null,
+        });
+        handleMessageAction("saldo", "restore");
+      } else {
+        await SaldoTrashedService.restoreSaldoTrashed(req, token);
+
+        set({
+          loadingRestoreSaldoTrashed: false,
+          errorRestoreSaldoTrashed: null,
+        });
+        handleMessageAction("saldo", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -117,14 +150,24 @@ const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/saldos/permanent/${req.toast}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentSaldoTrashed: false,
-        errorDeletePermanentSaldoTrashed: null,
-      });
-      handleMessageAction("saldo", "deletePermanent");
+
+      if (isTauri()) {
+        await SaldoTrashedCommand.deletePermanentSaldo(token, req);
+
+        set({
+          loadingDeletePermanentSaldoTrashed: false,
+          errorDeletePermanentSaldoTrashed: null,
+        });
+        handleMessageAction("saldo", "deletePermanent");
+      } else {
+        await SaldoTrashedService.deletePermanentSaldo(req, token);
+
+        set({
+          loadingDeletePermanentSaldoTrashed: false,
+          errorDeletePermanentSaldoTrashed: null,
+        });
+        handleMessageAction("saldo", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -145,13 +188,27 @@ const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/saldos/restore/all");
-      set({
-        loadingRestoreAllSaldoTrashed: false,
-        errorRestoreAllSaldoTrashed: null,
-      });
+      const token = getAccessToken();
 
-      handleMessageAction("saldo", "restoreAll");
+      if (isTauri()) {
+        await SaldoTrashedCommand.restoreSaldoAllTrashed(token);
+
+        set({
+          loadingRestoreAllSaldoTrashed: false,
+          errorRestoreAllSaldoTrashed: null,
+        });
+
+        handleMessageAction("saldo", "restoreAll");
+      } else {
+        await SaldoTrashedService.restoreSaldoAllTrashed(token);
+
+        set({
+          loadingRestoreAllSaldoTrashed: false,
+          errorRestoreAllSaldoTrashed: null,
+        });
+
+        handleMessageAction("saldo", "restoreAll");
+      }
 
       return true;
     } catch (err) {
@@ -173,13 +230,28 @@ const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/saldos/permanent/all");
-      set({
-        loadingDeletePermanentSaldoTrashed: false,
-        errorDeletePermanentSaldoTrashed: null,
-      });
+      const token = getAccessToken();
 
-      handleMessageAction("saldo", "deleteAllPermanent");
+      if (isTauri()) {
+        await SaldoTrashedCommand.deletePermanentAllSaldo(token);
+
+        set({
+          loadingDeletePermanentSaldoTrashed: false,
+          errorDeletePermanentSaldoTrashed: null,
+        });
+
+        handleMessageAction("saldo", "deleteAllPermanent");
+      } else {
+        await SaldoTrashedService.deletePermanentAllSaldo(token);
+
+        set({
+          loadingDeletePermanentSaldoTrashed: false,
+          errorDeletePermanentSaldoTrashed: null,
+        });
+
+        handleMessageAction("saldo", "deleteAllPermanent");
+      }
+
       return true;
     } catch (err) {
       handleApiError(

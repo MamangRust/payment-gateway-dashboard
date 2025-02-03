@@ -1,14 +1,6 @@
-import { Users, DollarSign, Repeat, FileText, ChevronDown } from "lucide-react";
+import { TrendingDown, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Chart from "react-apexcharts";
 import { TableWithdraw } from "@/components/admin/withdraw";
 import useListWithdraw from "@/hooks/admin/withdraw/ListWithdraw";
 import useWithdrawStore from "@/store/withdraw/withdraw";
@@ -17,6 +9,8 @@ import { debounce } from "@/helpers/debounce";
 import ChartSkeleton from "@/components/ui/chartSkeleton";
 import ThemeChart from "@/components/ui/chart";
 import { formatRupiah } from "@/helpers/formatRupiah";
+import { MonthPicker, months } from "@/components/ui/monthpicker";
+import { YearPicker } from "@/components/ui/yearpicker";
 
 export default function DashboardWithdraws() {
   const initialYear = useMemo(() => {
@@ -25,6 +19,16 @@ export default function DashboardWithdraws() {
   }, []);
   const { toast } = useToast();
 
+  const currentMonthIndex = new Date().getMonth();
+  const currentMonth = months[currentMonthIndex];
+
+  const [selectedMonth, setSelectedMonth] = useState<{
+    name: string;
+    number: number;
+  }>({
+    name: currentMonth.value,
+    number: currentMonth.number,
+  });
   const [selectedYear, setSelectedYear] = useState<number>(initialYear);
 
   const {
@@ -82,6 +86,140 @@ export default function DashboardWithdraws() {
     setErrorYearWithdrawAmount,
   } = useWithdrawStore();
 
+  const handleYearChange = (newYear: number) => {
+    setSelectedYear(newYear);
+  };
+
+  const handleMonthChange = (month: { name: string; number: number }) => {
+    setSelectedMonth(month);
+  };
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonths = currentDate.getMonth();
+
+  const previousMonth = currentMonths === 0 ? 11 : currentMonths - 1;
+  const previousYear = currentMonths === 0 ? currentYear - 1 : currentYear;
+
+  const calculatePercentageChange = (
+    current: number,
+    previous: number,
+  ): number => {
+    if (previous === 0) return 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const currentMonthSuccessData =
+    monthStatusSuccess && Array.isArray(monthStatusSuccess)
+      ? monthStatusSuccess.find(
+          (balance) =>
+            balance.month === monthNames[currentMonths] &&
+            balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousMonthSuccessData =
+    monthStatusSuccess && Array.isArray(monthStatusSuccess)
+      ? monthStatusSuccess?.find(
+          (balance) =>
+            balance.month === monthNames[previousMonth] &&
+            balance.year === previousYear.toString(),
+        )
+      : null;
+
+  const currentMonthSuccess = currentMonthSuccessData?.total_amount || 0;
+  const previousMonthSuccess = previousMonthSuccessData?.total_amount || 0;
+
+  const monthPercentageSuccessChange = calculatePercentageChange(
+    currentMonthSuccess,
+    previousMonthSuccess,
+  );
+
+  const currentYearSuccessData =
+    yearStatusSuccess && Array.isArray(yearStatusSuccess)
+      ? yearStatusSuccess.find(
+          (balance) => balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousYearSuccessData =
+    yearStatusSuccess && Array.isArray(yearStatusSuccess)
+      ? yearStatusSuccess.find(
+          (balance) => balance.year === (currentYear - 1).toString(),
+        )
+      : null;
+
+  const currentYearSuccess = currentYearSuccessData?.total_amount || 0;
+  const previousYearSucces = previousYearSuccessData?.total_amount || 0;
+
+  const yearPercentageSuccessChange = calculatePercentageChange(
+    currentYearSuccess,
+    previousYearSucces,
+  );
+
+  const currentMonthFailedData =
+    monthStatusFailed && Array.isArray(monthStatusFailed)
+      ? monthStatusFailed.find(
+          (balance) =>
+            balance.month === monthNames[currentMonths] &&
+            balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousMonthFailedData =
+    monthStatusFailed && Array.isArray(monthStatusFailed)
+      ? monthStatusFailed?.find(
+          (balance) =>
+            balance.month === monthNames[previousMonth] &&
+            balance.year === previousYear.toString(),
+        )
+      : null;
+
+  const currentMonthFailed = currentMonthFailedData?.total_amount || 0;
+  const previousMonthFailed = previousMonthFailedData?.total_amount || 0;
+
+  const monthPercentageFailedChange = calculatePercentageChange(
+    currentMonthFailed,
+    previousMonthFailed,
+  );
+
+  const currentYearFailedData =
+    yearStatusFailed && Array.isArray(yearStatusFailed)
+      ? yearStatusFailed.find(
+          (balance) => balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousYearFailedData =
+    yearStatusFailed && Array.isArray(yearStatusFailed)
+      ? yearStatusFailed.find(
+          (balance) => balance.year === (currentYear - 1).toString(),
+        )
+      : null;
+
+  const currentYearFailed = currentYearFailedData?.total_amount || 0;
+  const previousYearFailed = previousYearFailedData?.total_amount || 0;
+
+  const yearPercentageFailedChange = calculatePercentageChange(
+    currentYearFailed,
+    previousYearFailed,
+  );
+
   const monthlyAmount = useMemo(() => {
     if (!monthWithdrawAmount || !Array.isArray(monthWithdrawAmount)) {
       return Array(12).fill(0);
@@ -115,6 +253,86 @@ export default function DashboardWithdraws() {
 
     return years.map((year) => balanceMap.get(year) || 0);
   }, [yearWithdrawAmount]);
+
+  const fetchMonthlySuccess = useCallback(
+    async (year: number, month: number) => {
+      try {
+        setLoadingMonthStatusSuccess(true);
+        setErrorMonthStatusSuccess(null);
+
+        await findMonthStatusSuccess(toast, year, month);
+      } catch (error) {
+        setErrorMonthStatusSuccess("Failed to fetch monthly balance");
+      } finally {
+        setLoadingMonthStatusSuccess(false);
+      }
+    },
+    [
+      findMonthStatusSuccess,
+      setLoadingMonthStatusSuccess,
+      setErrorMonthStatusSuccess,
+    ],
+  );
+
+  const fetchYearlySuccess = useCallback(
+    async (year: number) => {
+      try {
+        setLoadingYearStatusSuccess(true);
+        setErrorYearStatusSuccess(null);
+
+        await findYearStatusSuccess(toast, year);
+      } catch (error) {
+        setErrorYearStatusSuccess("Failed to fetch yearly balance");
+      } finally {
+        setLoadingYearStatusSuccess(false);
+      }
+    },
+    [
+      findYearStatusSuccess,
+      setLoadingYearStatusSuccess,
+      setLoadingYearStatusSuccess,
+    ],
+  );
+
+  const fetchMonthlyFailed = useCallback(
+    async (year: number, month: number) => {
+      try {
+        setLoadingMonthStatusFailed(true);
+        setErrorMonthStatusFailed(null);
+
+        await findMonthStatusFailed(toast, year, month);
+      } catch (error) {
+        setErrorMonthStatusFailed("Failed to fetch monthly balance");
+      } finally {
+        setLoadingMonthStatusFailed(false);
+      }
+    },
+    [
+      findMonthStatusFailed,
+      setLoadingMonthStatusFailed,
+      setErrorMonthStatusFailed,
+    ],
+  );
+
+  const fetchYearlyFailed = useCallback(
+    async (year: number) => {
+      try {
+        setLoadingYearStatusFailed(true);
+        setErrorYearStatusFailed(null);
+
+        await findYearStatusFailed(toast, year);
+      } catch (error) {
+        setErrorYearStatusFailed("Failed to fetch yearly balance");
+      } finally {
+        setLoadingYearStatusFailed(false);
+      }
+    },
+    [
+      findYearStatusFailed,
+      setLoadingYearStatusFailed,
+      setLoadingYearStatusFailed,
+    ],
+  );
 
   const fetchMonthlyAmount = useCallback(
     async (year: number) => {
@@ -157,12 +375,24 @@ export default function DashboardWithdraws() {
     ],
   );
 
+  const debouncedFetchMonthlyFailed = debounce(fetchMonthlyFailed, 300);
+  const debouncedFetchYearlyFailed = debounce(fetchYearlyFailed, 300);
+
+  const debouncedFetchMonthlySuccess = debounce(fetchMonthlySuccess, 300);
+  const debouncedFetchYearlySuccess = debounce(fetchYearlySuccess, 300);
+
   const debouncedFetchMonthlyAmount = debounce(fetchMonthlyAmount, 300);
   const debouncedFetchYearlyAmount = debounce(fetchYearlyAmount, 300);
 
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([
+        debouncedFetchMonthlySuccess(selectedYear, selectedMonth.number),
+        debouncedFetchYearlySuccess(selectedYear),
+
+        debouncedFetchMonthlyFailed(selectedYear, selectedMonth.number),
+        debouncedFetchYearlyFailed(selectedYear),
+
         debouncedFetchMonthlyAmount(selectedYear),
         debouncedFetchYearlyAmount(selectedYear),
       ]);
@@ -171,79 +401,116 @@ export default function DashboardWithdraws() {
     fetchData();
 
     return () => {
+      debouncedFetchMonthlyFailed.cancel();
+      debouncedFetchYearlyFailed.cancel();
+
+      debouncedFetchMonthlySuccess.cancel();
+      debouncedFetchYearlySuccess.cancel();
+
       debouncedFetchMonthlyAmount.cancel();
       debouncedFetchYearlyAmount.cancel();
     };
-  }, [selectedYear]);
+  }, [selectedYear, selectedMonth]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-10">
-        <Card>
+        <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Withdraws
-            </CardTitle>
-            <DollarSign className="h-6 w-6 text-gray-500" />{" "}
+            <CardTitle className="text-sm font-medium">Month success</CardTitle>
+            <Wallet className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">150</div>
+            <div className="text-2xl font-bold">
+              {currentMonthSuccess
+                ? formatRupiah(currentMonthSuccess)
+                : "Data tidak tersedia"}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {previousMonthSuccess
+                ? `${monthPercentageSuccessChange >= 0 ? "↑" : "↓"} ${Math.abs(monthPercentageSuccessChange).toFixed(2)}% dari bulan sebelumnya`
+                : "Tidak ada data bulan sebelumnya"}
+            </p>
           </CardContent>
         </Card>
-
-        <Card>
+        <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Amount Withdrawn
-            </CardTitle>
-            <Repeat className="h-6 w-6 text-gray-500" />
+            <CardTitle className="text-sm font-medium">Year Success</CardTitle>
+            <TrendingDown className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$1200</div>
+            <div className="text-2xl font-bold">
+              {currentYearSuccess
+                ? formatRupiah(currentYearSuccess)
+                : "Data tidak tersedia"}
+            </div>
+            {currentYearSuccess && previousYearSuccessData ? (
+              <p className="text-sm text-muted-foreground">
+                {yearPercentageSuccessChange >= 0 ? "↑" : "↓"}{" "}
+                {Math.abs(yearPercentageSuccessChange).toFixed(2)}% dari tahun
+                sebelumnya
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Tidak ada data tahun sebelumnya
+              </p>
+            )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Pending Withdrawals
-            </CardTitle>
-            <FileText className="h-6 w-6 text-gray-500" /> {/* Icon FileText */}
+            <CardTitle className="text-sm font-medium">Month Failed</CardTitle>
+            <Wallet className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">25</div>
+            <div className="text-2xl font-bold">
+              {currentMonthFailed
+                ? formatRupiah(currentMonthFailed)
+                : "Data tidak tersedia"}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {previousMonthFailed
+                ? `${monthPercentageFailedChange >= 0 ? "↑" : "↓"} ${Math.abs(monthPercentageFailedChange).toFixed(2)}% dari bulan sebelumnya`
+                : "Tidak ada data bulan sebelumnya"}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="w-full shadow-lg rounded-md border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Year Failed</CardTitle>
+            <TrendingDown className="h-6 w-6 text-gray-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {currentYearFailed
+                ? formatRupiah(currentYearFailed)
+                : "Data tidak tersedia"}
+            </div>
+            {currentYearFailed && previousYearFailedData ? (
+              <p className="text-sm text-muted-foreground">
+                {yearPercentageFailedChange >= 0 ? "↑" : "↓"}{" "}
+                {Math.abs(yearPercentageFailedChange).toFixed(2)}% dari tahun
+                sebelumnya
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Tidak ada data tahun sebelumnya
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
       <div className="flex-1 flex flex-col min-h-0 space-y-8 mt-4">
         <div className="flex justify-between">
           <div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  {/* {format(selectedMonth, "MMMM", { locale: id })}{" "} */}
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  // selected={selectedMonth}
-                  // onSelect={(date) => {
-                  //   if (date) {
-                  //     setSelectedMonth(date);
-                  //     fetchMonthlyData(date);
-                  //   }
-                  // }}
-                />
-              </PopoverContent>
-            </Popover>
+            <MonthPicker onMonthChange={handleMonthChange} />
           </div>
 
           <div>
-            {/* <YearPicker
-                  selectedYear={selectedYear}
-                  onYearChange={(date) => handleYearChange(date)}
-                /> */}
+            <YearPicker
+              selectedYear={selectedYear}
+              onYearChange={(date) => handleYearChange(date)}
+            />
           </div>
         </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">

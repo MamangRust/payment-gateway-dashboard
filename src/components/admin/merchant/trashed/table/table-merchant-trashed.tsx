@@ -25,6 +25,8 @@ const TableMerchantTrashed = ({
   isLoadingWithDelay,
   loadingGetMerchantTrasheds,
   table,
+  showModalRestoreAll,
+  showModalDeleteAll,
   pagination,
   handlePageChange,
   handlePageSizeChange,
@@ -34,6 +36,11 @@ const TableMerchantTrashed = ({
       <CardHeader className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Table MerchantTrashed</h3>
+
+          <div className="space-x-2">
+            <Button onClick={() => showModalRestoreAll()}>Restore All</Button>
+            <Button onClick={() => showModalDeleteAll()}>Delete All</Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4">

@@ -50,7 +50,10 @@ export const withdrawColumns: ColumnDef<Withdraw>[] = [
     header: "Withdraw Time",
     cell: ({ row }) => {
       const time = row.getValue("withdraw_time") as string;
-      return <div>{new Date(time).toLocaleString()}</div>;
+
+      const fixedTime = time.replace(/ \+0000$/, "");
+
+      return <div>{new Date(fixedTime).toLocaleString()}</div>;
     },
   },
   {

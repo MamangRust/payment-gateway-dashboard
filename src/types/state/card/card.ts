@@ -50,7 +50,7 @@ export interface CardStore {
 
   pagination: {
     currentPage: number;
-    pageSize: number;
+    page_size: number;
     totalItems: number;
     totalPages: number;
   };
@@ -265,11 +265,7 @@ export interface CardStore {
   findByUser: (req: FindByUser) => Promise<void>;
   findByCardNumber: (req: FindByCardNumber) => Promise<void>;
 
-  findByActiveCard: (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => Promise<void>;
+  findByActiveCard: (req: FindAllCard) => Promise<void>;
 
   createCard: (req: CreateCard) => Promise<boolean>;
   updateCard: (req: UpdateCard) => Promise<boolean>;

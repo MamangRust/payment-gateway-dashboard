@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { CardStore } from "@/types/state/card/card";
 import {
@@ -10,6 +9,9 @@ import {
   UpdateCard,
 } from "@/types/domain/request";
 import { getAccessToken } from "../auth";
+import CardService from "@/services/api/card/card";
+import CardCommand from "@/services/ipc/card/card";
+import { isTauri } from "@tauri-apps/api/core";
 import { FindByUser } from "@/types/domain/request/card/user";
 import { handleMessageAction } from "@/helpers/message";
 
@@ -40,7 +42,7 @@ const useCardStore = create<CardStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -190,17 +192,23 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingDashboard: true, errorDashboard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("response", response.data);
 
-      set({
-        dashboard: response.data.data,
-        loadingDashboard: false,
-        errorDashboard: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findDashboard(token);
+        set({
+          dashboard: response.data,
+          loadingDashboard: false,
+          errorDashboard: null,
+        });
+      } else {
+        const response = await CardService.findDashboard(token);
+
+        set({
+          dashboard: response,
+          loadingDashboard: false,
+          errorDashboard: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -215,17 +223,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingDashboardCardNumber: true, errorDashboardCardNumber: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/dashboard/" + card_number, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("response", response.data.data);
 
-      set({
-        dashboardCardNumber: response.data.data,
-        loadingDashboardCardNumber: false,
-        errorDashboardCardNumber: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findDashboardByCardNumber(
+          token,
+          card_number,
+        );
+
+        set({
+          dashboardCardNumber: response.data,
+          loadingDashboardCardNumber: false,
+          errorDashboardCardNumber: null,
+        });
+      } else {
+        const response = await CardService.findDashboardByCardNumber(
+          token,
+          card_number,
+        );
+
+        set({
+          dashboardCardNumber: response,
+          loadingDashboardCardNumber: false,
+          errorDashboardCardNumber: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -240,19 +261,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingMonthBalance: true, errorMonthBalance: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-balance", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("response month:", response.data.data);
+      if (isTauri()) {
+        const response = await CardCommand.findMonthBalance(token, year);
 
-      set({
-        monthBalance: response.data.data,
-        loadingMonthBalance: false,
-        errorMonthBalance: null,
-      });
-      return response.data;
+        set({
+          monthBalance: response.data,
+          loadingMonthBalance: false,
+          errorMonthBalance: null,
+        });
+      } else {
+        const response = await CardService.findMonthBalance(token, year);
+
+        set({
+          monthBalance: response,
+          loadingMonthBalance: false,
+          errorMonthBalance: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -267,18 +293,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingYearBalance: true, errorYearBalance: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-balance", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("response: ", response.data.data);
-      set({
-        yearBalance: response.data.data,
-        loadingYearBalance: false,
-        errorYearBalance: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findYearBalance(token, year);
+
+        set({
+          yearBalance: response.data,
+          loadingYearBalance: false,
+          errorYearBalance: null,
+        });
+      } else {
+        const response = await CardService.findYearBalance(token, year);
+
+        set({
+          yearBalance: response,
+          loadingYearBalance: false,
+          errorYearBalance: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -293,18 +325,27 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingMonthTopupAmount: true, errorMonthTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-topup-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
-      console.log("topup", response.data.data);
 
-      set({
-        monthTopupAmount: response.data.data,
-        loadingMonthTopupAmount: false,
-        errorMonthTopupAmount: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTopupAmountCard(
+          token,
+          year,
+        );
+
+        set({
+          monthTopupAmount: response.data,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      } else {
+        const response = await CardService.findMonthTopupAmount(token, year);
+
+        set({
+          monthTopupAmount: response,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -319,19 +360,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingYearTopupAmount: true, errorYearTopupAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-topup-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("topup", response.data.data);
+      if (isTauri()) {
+        const response = await CardCommand.findYearTopupAmountCard(token, year);
 
-      set({
-        yearTopupAmount: response.data.data,
-        loadingYearTopupAmount: false,
-        errorYearTopupAmount: null,
-      });
-      return response.data;
+        set({
+          yearTopupAmount: response.data,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      } else {
+        const response = await CardService.findYearTopupAmount(token, year);
+
+        set({
+          yearTopupAmount: response,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -346,19 +392,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingMonthWithdrawAmount: true, errorMonthWithdrawAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-withdraw-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("response withdraw:", response.data.data);
+      if (isTauri()) {
+        const response = await CardCommand.findMonthWithdrawAmount(token, year);
 
-      set({
-        monthWithdrawAmount: response.data.data,
-        loadingMonthWithdrawAmount: false,
-        errorMonthWithdrawAmount: null,
-      });
-      return response.data;
+        set({
+          monthWithdrawAmount: response.data,
+          loadingMonthWithdrawAmount: false,
+          errorMonthWithdrawAmount: null,
+        });
+      } else {
+        const response = await CardService.findMonthWithdrawAmount(token, year);
+
+        set({
+          monthWithdrawAmount: response,
+          loadingMonthWithdrawAmount: false,
+          errorMonthWithdrawAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -373,19 +424,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingYearWithdrawAmount: true, errorYearWithdrawAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-withdraw-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("response year withdraw", response.data);
+      if (isTauri()) {
+        const response = await CardCommand.findYearWithdrawAmount(token, year);
 
-      set({
-        yearWithdrawAmount: response.data.data,
-        loadingYearWithdrawAmount: false,
-        errorYearWithdrawAmount: null,
-      });
-      return response.data;
+        set({
+          yearWithdrawAmount: response.data,
+          loadingYearWithdrawAmount: false,
+          errorYearWithdrawAmount: null,
+        });
+      } else {
+        const response = await CardService.findYearWithdrawAmount(token, year);
+
+        set({
+          yearWithdrawAmount: response,
+          loadingYearWithdrawAmount: false,
+          errorYearWithdrawAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -403,16 +459,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-transfer-sender-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
-      set({
-        monthTransferSender: response.data.data,
-        loadingMonthTransferSender: false,
-        errorMonthTransferSender: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTransferSenderAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransferSender: response.data,
+          loadingMonthTransferSender: false,
+          errorMonthTransferSender: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyTransferSenderAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransferSender: response,
+          loadingMonthTransferSender: false,
+          errorMonthTransferSender: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -430,16 +500,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-transfer-sender-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
-      set({
-        yearTransferSender: response.data.data,
-        loadingYearTransferSender: false,
-        errorYearTransferSender: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransferSenderAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransferSender: response.data,
+          loadingYearTransferSender: false,
+          errorYearTransferSender: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTransferSenderAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransferSender: response,
+          loadingYearTransferSender: false,
+          errorYearTransferSender: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -457,19 +541,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/monthly-transfer-receiver-amount",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year },
-        },
-      );
-      set({
-        monthTransferReceiver: response.data.data,
-        loadingMonthTransferReceiver: false,
-        errorMonthTransferReceiver: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTransferReceiverAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransferReceiver: response.data,
+          loadingMonthTransferReceiver: false,
+          errorMonthTransferReceiver: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyTransferReceiverAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransferReceiver: response,
+          loadingMonthTransferReceiver: false,
+          errorMonthTransferReceiver: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -487,19 +582,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/yearly-transfer-receiver-amount",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year },
-        },
-      );
-      set({
-        yearTransferReceiver: response.data.data,
-        loadingYearTransferReceiver: false,
-        errorYearTransferReceiver: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransferReceiverAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransferReceiver: response.data,
+          loadingYearTransferReceiver: false,
+          errorYearTransferReceiver: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTransferReceiverAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransferReceiver: response,
+          loadingYearTransferReceiver: false,
+          errorYearTransferReceiver: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -517,17 +623,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-transaction-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
-      console.log("response transaction:", response.data.data);
-      set({
-        monthTransactionAmount: response.data.data,
-        loadingMonthTransaction: false,
-        errorMonthTransaction: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTransactionAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransactionAmount: response.data,
+          loadingMonthTransaction: false,
+          errorMonthTransaction: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyTransactionAmount(
+          token,
+          year,
+        );
+
+        set({
+          monthTransactionAmount: response,
+          loadingMonthTransaction: false,
+          errorMonthTransaction: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -545,18 +664,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-transaction-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year },
-      });
 
-      console.log("response transaction:", response.data.data);
-      set({
-        yearTransactionAmount: response.data.data,
-        loadingYearTransaction: false,
-        errorYearTransaction: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransactionAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransactionAmount: response.data,
+          loadingYearTransaction: false,
+          errorYearTransaction: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTransactionAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransactionAmount: response,
+          loadingYearTransaction: false,
+          errorYearTransaction: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -575,16 +706,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingMonthBalance: true, errorMonthBalance: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-balance-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year, card_number },
-      });
-      set({
-        monthBalance: response.data.data,
-        loadingMonthBalance: false,
-        errorMonthBalance: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthBalanceByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          monthBalance: response.data,
+          loadingMonthBalance: false,
+          errorMonthBalance: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyBalanceByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthBalance: response,
+          loadingMonthBalance: false,
+          errorMonthBalance: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -603,16 +750,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingYearBalance: true, errorYearBalance: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-balance-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year, card_number },
-      });
-      set({
-        yearBalance: response.data.data,
-        loadingYearBalance: false,
-        errorYearBalance: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearBalanceByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearBalance: response.data,
+          loadingYearBalance: false,
+          errorYearBalance: null,
+        });
+      } else {
+        const response = await CardService.findYearlyBalanceByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearBalance: response,
+          loadingYearBalance: false,
+          errorYearBalance: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -634,18 +797,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/monthly-topup-amount-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year, card_number },
-      });
-      console.log("response", response.data.data);
 
-      set({
-        monthTopupAmount: response.data.data,
-        loadingMonthTopupAmount: false,
-        errorMonthTopupAmount: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTopupAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          monthTopupAmount: response.data,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyTopupAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthTopupAmount: response,
+          loadingMonthTopupAmount: false,
+          errorMonthTopupAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -667,19 +844,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-topup-amount-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year, card_number },
-      });
 
-      console.log("response", response.data.data);
+      if (isTauri()) {
+        const response = await CardCommand.findYearTopupAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
 
-      set({
-        yearTopupAmount: response.data.data,
-        loadingYearTopupAmount: false,
-        errorYearTopupAmount: null,
-      });
-      return response.data;
+        set({
+          yearTopupAmount: response.data,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTopupAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTopupAmount: response,
+          loadingYearTopupAmount: false,
+          errorYearTopupAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -701,19 +891,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/monthly-withdraw-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        monthWithdrawAmount: response.data.data,
-        loadingMonthWithdrawAmount: false,
-        errorMonthWithdrawAmount: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthWithdrawAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          monthWithdrawAmount: response.data,
+          loadingMonthWithdrawAmount: false,
+          errorMonthWithdrawAmount: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyWithdrawAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthWithdrawAmount: response,
+          loadingMonthWithdrawAmount: false,
+          errorMonthWithdrawAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -735,16 +938,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/yearly-withdraw-amount-by-card", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { year, card_number },
-      });
-      set({
-        yearWithdrawAmount: response.data.data,
-        loadingYearWithdrawAmount: false,
-        errorYearWithdrawAmount: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearWithdrawAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearWithdrawAmount: response.data,
+          loadingYearWithdrawAmount: false,
+          errorYearWithdrawAmount: null,
+        });
+      } else {
+        const response = await CardService.findYearlyWithdrawAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearWithdrawAmount: response,
+          loadingYearWithdrawAmount: false,
+          errorYearWithdrawAmount: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -766,19 +985,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/monthly-transaction-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        monthTransactionAmount: response.data.data,
-        loadingMonthTransaction: false,
-        errorMonthTransaction: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTransactionAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          monthTransactionAmount: response.data,
+          loadingMonthTransaction: false,
+          errorMonthTransaction: null,
+        });
+      } else {
+        const response = await CardService.findMonthlyTransactionAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthTransactionAmount: response,
+          loadingMonthTransaction: false,
+          errorMonthTransaction: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -800,19 +1032,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/yearly-transaction-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        yearTransactionAmount: response.data.data,
-        loadingYearTransaction: false,
-        errorYearTransaction: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransactionAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearTransactionAmount: response.data,
+          loadingYearTransaction: false,
+          errorYearTransaction: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTransactionAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTransactionAmount: response,
+          loadingYearTransaction: false,
+          errorYearTransaction: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -834,19 +1079,33 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/monthly-transfer-sender-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        monthTransferSender: response.data.data,
-        loadingMonthTransferSender: false,
-        errorMonthTransferSender: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findMonthTransferSenderAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          monthTransferSender: response.data,
+          loadingMonthTransferSender: false,
+          errorMonthTransferSender: null,
+        });
+      } else {
+        const response =
+          await CardService.findMonthlyTransferSenderAmountByCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransferSender: response,
+          loadingMonthTransferSender: false,
+          errorMonthTransferSender: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -868,21 +1127,32 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/yearly-transfer-sender-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      console.log("response yer", response.data.data);
 
-      set({
-        yearTransferSender: response.data.data,
-        loadingYearTransferSender: false,
-        errorYearTransferSender: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransferSenderAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearTransferSender: response.data,
+          loadingYearTransferSender: false,
+          errorYearTransferSender: null,
+        });
+      } else {
+        const response = await CardService.findYearlyTransferSenderAmountByCard(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTransferSender: response,
+          loadingYearTransferSender: false,
+          errorYearTransferSender: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -904,19 +1174,34 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/monthly-transfer-receiver-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        monthTransferReceiver: response.data.data,
-        loadingMonthTransferReceiver: false,
-        errorMonthTransferReceiver: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response =
+          await CardCommand.findMonthTransferReceiverAmountByCard(
+            token,
+            year,
+            card_number.toString(),
+          );
+
+        set({
+          monthTransferReceiver: response.data,
+          loadingMonthTransferReceiver: false,
+          errorMonthTransferReceiver: null,
+        });
+      } else {
+        const response =
+          await CardService.findMonthlyTransferReceiverAmountByCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransferReceiver: response,
+          loadingMonthTransferReceiver: false,
+          errorMonthTransferReceiver: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -938,19 +1223,33 @@ const useCardStore = create<CardStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(
-        "/card/yearly-transfer-receiver-amount-by-card",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { year, card_number },
-        },
-      );
-      set({
-        yearTransferReceiver: response.data.data,
-        loadingYearTransferReceiver: false,
-        errorYearTransferReceiver: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findYearTransferReceiverAmountByCard(
+          token,
+          year,
+          card_number.toString(),
+        );
+
+        set({
+          yearTransferReceiver: response.data,
+          loadingYearTransferReceiver: false,
+          errorYearTransferReceiver: null,
+        });
+      } else {
+        const response =
+          await CardService.findYearlyTransferReceiverAmountByCard(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          yearTransferReceiver: response,
+          loadingYearTransferReceiver: false,
+          errorYearTransferReceiver: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -965,22 +1264,36 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingGetCards: true, errorGetCards: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        cards: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetCards: false,
-        errorGetCards: null,
-      });
-      return response.data;
+
+      if (isTauri()) {
+        const response = await CardCommand.findAllCard(token, req);
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetCards: false,
+          errorGetCards: null,
+        });
+      } else {
+        const response = await CardService.findAllCards(req, token);
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetCards: false,
+          errorGetCards: null,
+        });
+      }
     } catch (error) {
       handleApiError(
         error,
@@ -995,19 +1308,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingGetCard: true, errorGetCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/card/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      console.log("response ", response.data.data);
+      if (isTauri()) {
+        const response = await CardCommand.findByIdCard(token, req);
 
-      set({
-        card: response.data.data,
-        loadingGetCard: false,
-        errorGetCard: null,
-      });
+        set({
+          card: response.data,
+          loadingGetCard: false,
+          errorGetCard: null,
+        });
+      } else {
+        const response = await CardService.findByIdCard(req, token);
 
-      return response.data;
+        set({
+          card: response,
+          loadingGetCard: false,
+          errorGetCard: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -1022,16 +1340,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingGetCardByUser: true, errorGetCardByUser: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/card/user/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        cards: response.data,
-        loadingGetCardByUser: false,
-        errorGetCardByUser: null,
-      });
 
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.findByUser(token, req);
+
+        set({
+          card: response.data,
+          loadingGetCardByUser: false,
+          errorGetCardByUser: null,
+        });
+      } else {
+        const response = await CardService.findByUser(req, token);
+
+        set({
+          card: response,
+          loadingGetCardByUser: false,
+          errorGetCardByUser: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -1046,16 +1372,24 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingGetCardByCardNumber: true, errorGetCardByCardNumber: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/card/card_number/${req.cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("response card_number", response.data.data);
 
-      set({
-        card: response.data.data,
-        loadingGetCardByCardNumber: false,
-        errorGetCardByCardNumber: null,
-      });
+      if (isTauri()) {
+        const response = await CardCommand.findByCardNumber(token, req);
+
+        set({
+          card: response.data,
+          loadingGetCardByCardNumber: false,
+          errorGetCardByCardNumber: null,
+        });
+      } else {
+        const response = await CardService.findByCardNumber(req, token);
+
+        set({
+          card: response,
+          loadingGetCardByCardNumber: false,
+          errorGetCardByCardNumber: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -1066,25 +1400,40 @@ const useCardStore = create<CardStore>((set, get) => ({
     }
   },
 
-  findByActiveCard: async (search: string, page: number, pageSize: number) => {
+  findByActiveCard: async (req: FindAllCard) => {
     set({ loadingGetActiveCards: true, errorGetActiveCards: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/card/active", {
-        params: { page, pageSize, search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        cards: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetActiveCards: false,
-        errorGetActiveCards: null,
-      });
+
+      if (isTauri()) {
+        const response = await CardCommand.findActiveCard(token, req);
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetActiveCards: false,
+          errorGetActiveCards: null,
+        });
+      } else {
+        const response = await CardService.findByActiveCard(req, token);
+
+        set({
+          cards: response.data,
+          pagination: {
+            currentPage: response.pagination!.current_page,
+            page_size: response.pagination!.page_size,
+            totalItems: response.pagination!.total_records,
+            totalPages: response.pagination!.total_pages,
+          },
+          loadingGetActiveCards: false,
+          errorGetActiveCards: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -1099,27 +1448,28 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingCreateCard: true, errorCreateCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        "/card/create",
-        {
-          user_id: req.user_id,
-          card_type: req.card_type,
-          expire_date: req.expire_date,
-          cvv: req.cvv,
-          card_provider: req.card_provider,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
 
-      handleMessageAction("card", "create");
-      set({
-        card: response.data.data,
-        loadingCreateCard: false,
-        errorCreateCard: null,
-      });
-      return response.data;
+      if (isTauri()) {
+        const response = await CardCommand.createCard(token, req);
+
+        handleMessageAction("card", "create");
+        set({
+          card: response.data,
+          loadingCreateCard: false,
+          errorCreateCard: null,
+        });
+      } else {
+        const response = await CardService.createCard(req, token);
+
+        handleMessageAction("card", "create");
+        set({
+          card: response,
+          loadingCreateCard: false,
+          errorCreateCard: null,
+        });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -1127,6 +1477,8 @@ const useCardStore = create<CardStore>((set, get) => ({
         (message: any) => set({ errorCreateCard: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 
@@ -1134,31 +1486,30 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingUpdateCard: true, errorUpdateCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/card/update/${req.card_id}`,
-        {
-          card_id: req.card_id,
-          user_id: req.user_id,
-          card_type: req.card_type,
-          expire_date: req.expire_date,
-          cvv: req.cvv,
-          card_provider: req.card_provider,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      console.log("req update", req);
-      console.log("response", response.data.data);
 
-      handleMessageAction("card", "update");
+      if (isTauri()) {
+        const response = await CardCommand.updateCard(token, req);
 
-      set({
-        card: response.data,
-        loadingUpdateCard: false,
-        errorUpdateCard: null,
-      });
-      return response.data;
+        handleMessageAction("card", "update");
+
+        set({
+          card: response.data,
+          loadingUpdateCard: false,
+          errorUpdateCard: null,
+        });
+      } else {
+        const response = await CardService.updateCard(req, token);
+
+        handleMessageAction("card", "update");
+
+        set({
+          card: response,
+          loadingUpdateCard: false,
+          errorUpdateCard: null,
+        });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -1166,6 +1517,8 @@ const useCardStore = create<CardStore>((set, get) => ({
         (message: any) => set({ errorUpdateCard: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 
@@ -1173,14 +1526,22 @@ const useCardStore = create<CardStore>((set, get) => ({
     set({ loadingTrashedCard: true, errorTrashedCard: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/card/trashed/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ loadingTrashedCard: false, errorTrashedCard: null });
 
-      handleMessageAction("card", "trashed");
+      if (isTauri()) {
+        await CardCommand.trashedCard(token, req);
 
-      return response.data;
+        set({ loadingTrashedCard: false, errorTrashedCard: null });
+
+        handleMessageAction("card", "trashed");
+      } else {
+        await CardService.trashedCard(req, token);
+
+        set({ loadingTrashedCard: false, errorTrashedCard: null });
+
+        handleMessageAction("card", "trashed");
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -1188,6 +1549,8 @@ const useCardStore = create<CardStore>((set, get) => ({
         (message: any) => set({ errorTrashedCard: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 }));

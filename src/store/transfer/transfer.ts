@@ -1,7 +1,6 @@
 import { TransferStore } from "@/types/state/transfer/transfer";
 import { create } from "zustand";
 import { getAccessToken } from "../auth";
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import {
   CreateTransfer,
@@ -12,7 +11,10 @@ import {
   TrashedTransfer,
   UpdateTransfer,
 } from "@/types/domain/request";
+import TransferCommand from "@/services/ipc/transfer/transfer";
+import TransferService from "@/services/api/transfer/transfer";
 import { handleMessageAction } from "@/helpers/message";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTransferStore = create<TransferStore>((set, get) => ({
   transfers: null,
@@ -35,7 +37,7 @@ const useTransferStore = create<TransferStore>((set, get) => ({
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -164,18 +166,32 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingMonthStatusSuccess: true, errorMonthStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/month-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findMonthStatusSuccessTransfer(
+          token,
           year,
           month,
-        },
-      });
-      set({
-        monthStatusSuccess: response.data.data,
-        loadingMonthStatusSuccess: false,
-        errorMonthStatusSuccess: null,
-      });
+        );
+
+        set({
+          monthStatusSuccess: response.data,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      } else {
+        const response = await TransferService.findMonthStatusSuccess(
+          token,
+          year,
+          month,
+        );
+
+        set({
+          monthStatusSuccess: response,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -186,22 +202,34 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     }
   },
 
-  findYearStatusSuccess: async (toast: any, year: number, month: number) => {
+  findYearStatusSuccess: async (toast: any, year: number) => {
     set({ loadingYearStatusSuccess: true, errorYearStatusSuccess: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/year-success", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findYearStatusSuccessTransfer(
+          token,
           year,
-          month,
-        },
-      });
-      set({
-        yearStatusSuccess: response.data.data,
-        loadingYearStatusSuccess: false,
-        errorYearStatusSuccess: null,
-      });
+        );
+
+        set({
+          yearStatusSuccess: response.data,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      } else {
+        const response = await TransferService.findYearStatusSuccess(
+          token,
+          year,
+        );
+
+        set({
+          yearStatusSuccess: response,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -216,18 +244,32 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingMonthStatusFailed: true, errorMonthStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/month-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findMonthStatusFailedTransfer(
+          token,
           year,
           month,
-        },
-      });
-      set({
-        monthStatusFailed: response.data.data,
-        loadingMonthStatusFailed: false,
-        errorMonthStatusFailed: null,
-      });
+        );
+
+        set({
+          monthStatusFailed: response.data,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      } else {
+        const response = await TransferService.findMonthStatusFailed(
+          token,
+          year,
+          month,
+        );
+
+        set({
+          monthStatusFailed: response,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -238,22 +280,34 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     }
   },
 
-  findYearStatusFailed: async (toast: any, year: number, month: number) => {
+  findYearStatusFailed: async (toast: any, year: number) => {
     set({ loadingYearStatusFailed: true, errorYearStatusFailed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/year-failed", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findYearStatusFailedTransfer(
+          token,
           year,
-          month,
-        },
-      });
-      set({
-        yearStatusFailed: response.data.data,
-        loadingYearStatusFailed: false,
-        errorYearStatusFailed: null,
-      });
+        );
+
+        set({
+          yearStatusFailed: response.data,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      } else {
+        const response = await TransferService.findYearStatusFailed(
+          token,
+          year,
+        );
+
+        set({
+          yearStatusFailed: response,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -268,17 +322,28 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingMonthTransferAmount: true, errorMonthTransferAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/monthly-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findMonthTransferAmountTransfer(
+          token,
           year,
-        },
-      });
-      set({
-        monthTransferAmount: response.data.data,
-        loadingMonthTransferAmount: false,
-        errorMonthTransferAmount: null,
-      });
+        );
+        set({
+          monthTransferAmount: response.data,
+          loadingMonthTransferAmount: false,
+          errorMonthTransferAmount: null,
+        });
+      } else {
+        const response = await TransferService.findMonthTransferAmount(
+          token,
+          year,
+        );
+        set({
+          monthTransferAmount: response,
+          loadingMonthTransferAmount: false,
+          errorMonthTransferAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -293,17 +358,30 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingYearTransferAmount: true, errorYearTransferAmount: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/yearly-amount", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findYearTransferAmountTransfer(
+          token,
           year,
-        },
-      });
-      set({
-        yearTransferAmount: response.data.data,
-        loadingYearTransferAmount: false,
-        errorYearTransferAmount: null,
-      });
+        );
+
+        set({
+          yearTransferAmount: response.data,
+          loadingYearTransferAmount: false,
+          errorYearTransferAmount: null,
+        });
+      } else {
+        const response = await TransferService.findYearTransferAmount(
+          token,
+          year,
+        );
+
+        set({
+          yearTransferAmount: response,
+          loadingYearTransferAmount: false,
+          errorYearTransferAmount: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -325,18 +403,32 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/monthly-by-sender", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findMonthTransferAmountBySender(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        monthTransferAmountSender: response.data.data,
-        loadingMonthTransferAmountSender: false,
-        errorMonthTransferAmountSender: null,
-      });
+        );
+
+        set({
+          monthTransferAmountSender: response.data,
+          loadingMonthTransferAmountSender: false,
+          errorMonthTransferAmountSender: null,
+        });
+      } else {
+        const response = await TransferService.findMonthTransferAmountBySender(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          monthTransferAmountSender: response,
+          loadingMonthTransferAmountSender: false,
+          errorMonthTransferAmountSender: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -358,18 +450,32 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/yearly-by-sender", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findYearTransferAmountBySender(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTransferAmountSender: response.data.data,
-        loadingYearTransferAmountSender: false,
-        errorYearTransferAmountSender: null,
-      });
+        );
+
+        set({
+          yearTransferAmountSender: response.data,
+          loadingYearTransferAmountSender: false,
+          errorYearTransferAmountSender: null,
+        });
+      } else {
+        const response = await TransferService.findYearTransferAmountBySender(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTransferAmountSender: response,
+          loadingYearTransferAmountSender: false,
+          errorYearTransferAmountSender: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -391,18 +497,34 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/monthly-by-receiver", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          year,
-          card_number,
-        },
-      });
-      set({
-        monthTransferAmountReceiver: response.data.data,
-        loadingMonthTransferAmountReceiver: false,
-        errorMonthTransferAmountReceiver: null,
-      });
+
+      if (isTauri()) {
+        const response =
+          await TransferCommand.findMonthTransferAmountByReceiver(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransferAmountReceiver: response.data,
+          loadingMonthTransferAmountReceiver: false,
+          errorMonthTransferAmountReceiver: null,
+        });
+      } else {
+        const response =
+          await TransferService.findMonthTransferAmountByReceiver(
+            token,
+            year,
+            card_number,
+          );
+
+        set({
+          monthTransferAmountReceiver: response,
+          loadingMonthTransferAmountReceiver: false,
+          errorMonthTransferAmountReceiver: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -424,18 +546,32 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/yearly-by-receiver", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+
+      if (isTauri()) {
+        const response = await TransferCommand.findYearTransferAmountByReceiver(
+          token,
           year,
           card_number,
-        },
-      });
-      set({
-        yearTransferAmountReceiver: response.data.data,
-        loadingYearTransferAmountReceiver: false,
-        errorYearTransferAmountReceiver: null,
-      });
+        );
+
+        set({
+          yearTransferAmountReceiver: response.data,
+          loadingYearTransferAmountReceiver: false,
+          errorYearTransferAmountReceiver: null,
+        });
+      } else {
+        const response = await TransferService.findYearTransferAmountByReceiver(
+          token,
+          year,
+          card_number,
+        );
+
+        set({
+          yearTransferAmountReceiver: response,
+          loadingYearTransferAmountReceiver: false,
+          errorYearTransferAmountReceiver: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -450,21 +586,34 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingGetTransfers: true, errorGetTransfers: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTransfers: false,
-        errorGetTransfers: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransferCommand.findAllTransfers(token, req);
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransfers: false,
+          errorGetTransfers: null,
+        });
+      } else {
+        const response = await TransferService.findAllTransfers(token, req);
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransfers: false,
+          errorGetTransfers: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -479,14 +628,24 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingGetTransfer: true, errorGetTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfer: response.data.data,
-        loadingGetTransfer: false,
-        errorGetTransfer: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransferCommand.findByIdTransfer(token, req);
+
+        set({
+          transfer: response.data,
+          loadingGetTransfer: false,
+          errorGetTransfer: null,
+        });
+      } else {
+        const response = await TransferService.findByIdTransfer(token, req);
+
+        set({
+          transfer: response.data,
+          loadingGetTransfer: false,
+          errorGetTransfer: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -501,14 +660,24 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingGetTransferFrom: true, errorGetTransferFrom: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/from/${req.cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.data,
-        loadingGetTransferFrom: false,
-        errorGetTransferFrom: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransferCommand.findByTransferFrom(token, req);
+
+        set({
+          transfers: response.data,
+          loadingGetTransferFrom: false,
+          errorGetTransferFrom: null,
+        });
+      } else {
+        const response = await TransferService.findByTransferFrom(token, req);
+
+        set({
+          transfers: response,
+          loadingGetTransferFrom: false,
+          errorGetTransferFrom: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -523,14 +692,24 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingGetTransferTo: true, errorGetTransferTo: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get(`/transfers/to/${req.cardNumber}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.data,
-        loadingGetTransferTo: false,
-        errorGetTransferTo: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransferCommand.findByTransferTo(token, req);
+
+        set({
+          transfers: response.data,
+          loadingGetTransferTo: false,
+          errorGetTransferTo: null,
+        });
+      } else {
+        const response = await TransferService.findByTransferTo(token, req);
+
+        set({
+          transfers: response,
+          loadingGetTransferTo: false,
+          errorGetTransferTo: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -541,29 +720,40 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     }
   },
 
-  findByActiveTransfer: async (
-    search: string,
-    page: number,
-    pageSize: number,
-  ) => {
+  findByActiveTransfer: async (req: FindAllTransfer) => {
     set({ loadingGetActiveTransfer: true, errorGetActiveTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/active", {
-        params: { search, page, pageSize },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.items,
-        pagination: {
-          currentPage: response.data.currentPage,
-          pageSize: response.data.pageSize,
-          totalItems: response.data.totalItems,
-          totalPages: response.data.totalPages,
-        },
-        loadingGetActiveTransfer: false,
-        errorGetActiveTransfer: null,
-      });
+
+      if (isTauri()) {
+        const response = await TransferCommand.findByActiveTransfer(token, req);
+
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTransfer: false,
+          errorGetActiveTransfer: null,
+        });
+      } else {
+        const response = await TransferService.findByActiveTransfer(token, req);
+
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetActiveTransfer: false,
+          errorGetActiveTransfer: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -578,21 +768,22 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingCreateTransfer: true, errorCreateTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        "/transfers/create",
-        {
-          transfer_from: req.transfer_from,
-          transfer_to: req.transfer_to,
-          transfer_amount: req.transfer_amount,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("transfer", "create");
 
-      set({ loadingCreateTransfer: false, errorCreateTransfer: null });
-      return response.data;
+      if (isTauri()) {
+        await TransferCommand.createTransfer(token, req);
+
+        handleMessageAction("transfer", "create");
+
+        set({ loadingCreateTransfer: false, errorCreateTransfer: null });
+      } else {
+        await TransferService.createTransfer(token, req);
+
+        handleMessageAction("transfer", "create");
+
+        set({ loadingCreateTransfer: false, errorCreateTransfer: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -600,6 +791,7 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         (message: any) => set({ errorCreateTransfer: message }),
         req.toast,
       );
+      return false;
     }
   },
 
@@ -607,22 +799,22 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingUpdateTransfer: true, errorUpdateTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(
-        `/transfers/update/${req.id}`,
-        {
-          transfer_id: req.id,
-          transfer_from: req.transfer_from,
-          transfer_to: req.transfer_to,
-          transfer_amount: req.transfer_amount,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      handleMessageAction("transfer", "update");
 
-      set({ loadingUpdateTransfer: false, errorUpdateTransfer: null });
-      return response.data;
+      if (isTauri()) {
+        await TransferCommand.updateTransfer(token, req);
+
+        handleMessageAction("transfer", "update");
+
+        set({ loadingUpdateTransfer: false, errorUpdateTransfer: null });
+      } else {
+        await TransferService.updateTransfer(token, req);
+
+        handleMessageAction("transfer", "update");
+
+        set({ loadingUpdateTransfer: false, errorUpdateTransfer: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -630,6 +822,7 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         (message: any) => set({ errorUpdateTransfer: message }),
         req.toast,
       );
+      return false;
     }
   },
 
@@ -637,13 +830,22 @@ const useTransferStore = create<TransferStore>((set, get) => ({
     set({ loadingTrashedTransfer: true, errorTrashedTransfer: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.post(`/transfers/trashed/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      handleMessageAction("transfer", "trashed");
 
-      set({ loadingTrashedTransfer: false, errorTrashedTransfer: null });
-      return response.data;
+      if (isTauri()) {
+        await TransferCommand.trashedTransfer(token, req);
+
+        handleMessageAction("transfer", "trashed");
+
+        set({ loadingTrashedTransfer: false, errorTrashedTransfer: null });
+      } else {
+        await TransferService.trashedTransfer(token, req);
+
+        handleMessageAction("transfer", "trashed");
+
+        set({ loadingTrashedTransfer: false, errorTrashedTransfer: null });
+      }
+
+      return true;
     } catch (err) {
       handleApiError(
         err,
@@ -651,6 +853,8 @@ const useTransferStore = create<TransferStore>((set, get) => ({
         (message: any) => set({ errorTrashedTransfer: message }),
         req.toast,
       );
+
+      return false;
     }
   },
 }));

@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -7,15 +6,18 @@ import {
   FindAllTransferTrashed,
   RestoreTransferTrashed,
 } from "@/types/domain/request";
+import TransferTrashedService from "@/services/api/transfer/transfer_trashed";
+import TransferTrashedCommand from "@/services/ipc/transfer/transfer_trashed";
 import { TransferTrashedStore } from "@/types/state";
 import { create } from "zustand";
+import { isTauri } from "@tauri-apps/api/core";
 
 const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
   transfers: null,
 
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    page_size: 10,
     totalItems: 0,
     totalPages: 0,
   },
@@ -58,23 +60,42 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     set({ loadingGetTransfersTrashed: true, errorGetTransfersTrashed: null });
     try {
       const token = getAccessToken();
-      const response = await myApi.get("/transfers/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        transfers: response.data.data,
-        pagination: {
-          currentPage: response.data.pagination.current_page,
-          pageSize: response.data.pagination.page_size,
-          totalItems: response.data.pagination.total_records,
-          totalPages: response.data.pagination.total_pages,
-        },
-        loadingGetTransfersTrashed: false,
-        errorGetTransfersTrashed: null,
-      });
 
-      return response.data;
+      if (isTauri()) {
+        const response = await TransferTrashedCommand.findAllTransfersTrashed(
+          token,
+          req,
+        );
+
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransfersTrashed: false,
+          errorGetTransfersTrashed: null,
+        });
+      } else {
+        const response = await TransferTrashedService.findAllTransferssTrashed(
+          req,
+          token,
+        );
+
+        set({
+          transfers: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransfersTrashed: false,
+          errorGetTransfersTrashed: null,
+        });
+      }
     } catch (err) {
       handleApiError(
         err,
@@ -92,14 +113,22 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.post(`/transfers/restore/${req.id}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingRestoreTransferTrashed: false,
-        errorRestoreTransferTrashed: null,
-      });
-      handleMessageAction("transfer", "restore");
+
+      if (isTauri()) {
+        await TransferTrashedCommand.restoreTransferTrashed(token, req);
+        set({
+          loadingRestoreTransferTrashed: false,
+          errorRestoreTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "restore");
+      } else {
+        await TransferTrashedService.restoreTransfersTrashed(req, token);
+        set({
+          loadingRestoreTransferTrashed: false,
+          errorRestoreTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "restore");
+      }
 
       return true;
     } catch (err) {
@@ -120,14 +149,22 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
     try {
       const token = getAccessToken();
-      await myApi.delete(`/transfers/permanent/${req.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({
-        loadingDeletePermanentTransferTrashed: false,
-        errorDeletePermanentTransferTrashed: null,
-      });
-      handleMessageAction("transfer", "deletePermanent");
+
+      if (isTauri()) {
+        await TransferTrashedCommand.deletePermanentTransfer(token, req);
+        set({
+          loadingDeletePermanentTransferTrashed: false,
+          errorDeletePermanentTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "deletePermanent");
+      } else {
+        await TransferTrashedService.deletePermanentTransfer(req, token);
+        set({
+          loadingDeletePermanentTransferTrashed: false,
+          errorDeletePermanentTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "deletePermanent");
+      }
 
       return true;
     } catch (err) {
@@ -148,12 +185,25 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/transfers/restore/all");
-      set({
-        loadingRestoreAllTransferTrashed: false,
-        errorRestoreAllTransferTrashed: null,
-      });
-      handleMessageAction("transfer", "restoreAll");
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        await TransferTrashedCommand.restoreTransferAllTrashed(token);
+
+        set({
+          loadingRestoreAllTransferTrashed: false,
+          errorRestoreAllTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "restoreAll");
+      } else {
+        await TransferTrashedService.restoreTransfersAllTrashed(token);
+
+        set({
+          loadingRestoreAllTransferTrashed: false,
+          errorRestoreAllTransferTrashed: null,
+        });
+        handleMessageAction("transfer", "restoreAll");
+      }
 
       return true;
     } catch (err) {
@@ -175,13 +225,27 @@ const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
     });
 
     try {
-      await myApi.post("/transfers/permanent/all");
-      set({
-        loadingDeletePermanentTransferTrashed: false,
-        errorDeletePermanentTransferTrashed: null,
-      });
+      const token = getAccessToken();
 
-      handleMessageAction("transfer", "deleteAllPermanent");
+      if (isTauri()) {
+        await TransferTrashedCommand.deletePermanentAllTransfer(token);
+
+        set({
+          loadingDeletePermanentTransferTrashed: false,
+          errorDeletePermanentTransferTrashed: null,
+        });
+
+        handleMessageAction("transfer", "deleteAllPermanent");
+      } else {
+        await TransferTrashedService.deletePermanentAllTransfers(token);
+
+        set({
+          loadingDeletePermanentTransferTrashed: false,
+          errorDeletePermanentTransferTrashed: null,
+        });
+
+        handleMessageAction("transfer", "deleteAllPermanent");
+      }
 
       return true;
     } catch (err) {

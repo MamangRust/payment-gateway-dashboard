@@ -45,7 +45,7 @@ export interface TopupMonthStatusFailed {
 
 export interface TopupYearStatusFailed {
   year: string;
-  totalAmount: number;
+  total_amount: number;
   total_failed: number;
 }
 
@@ -137,14 +137,14 @@ export interface ApiResponsePaginationTopup {
   status: string;
   message: string;
   data: Topup[];
-  pagination?: PaginationMeta;
+  pagination: PaginationMeta;
 }
 
 export interface ApiResponsePaginationTopupDeleteAt {
   status: string;
   message: string;
   data: TopupTrashed[];
-  pagination?: PaginationMeta;
+  pagination: PaginationMeta;
 }
 
 export interface ApiResponseTopupDelete {
