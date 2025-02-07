@@ -60,7 +60,6 @@ export function Navbar() {
             </Link>
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden text-gray-700 dark:text-gray-300"
             onClick={toggleMenu}

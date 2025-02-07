@@ -1,5 +1,5 @@
 [package]
-name = "frontend-desktop"
+name = "frontend-dashboard"
 version = "0.1.0"
 description = "A Tauri App"
 authors = ["you"]
@@ -14,7 +14,7 @@ edition = "2021"
 name = "frontend_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[build-dependencies]
+[build-dependencies] 
 tauri-build = { version = "2", features = [] }
 
 [dependencies]

@@ -3,10 +3,6 @@ import ErrorPage from "@/pages/error";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import AuthLayout from "@/layouts/auth";
 import LoginPage from "@/pages/auth/login";
-import PointOfSalePage from "@/pages/admin/point-of-sale";
-import TablePayment from "@/pages/admin/table";
-import TermsOfServicePage from "@/pages/TermOfService";
-import CompanyProfile from "@/pages/Home";
 import CardDashboard from "@/pages/admin/dashboard/card/dashboard-card";
 import DashboardSaldo from "@/pages/admin/dashboard/dashboard-saldo";
 import DashboardMerchant from "@/pages/admin/dashboard/merchant/dashboard-merchant";
@@ -226,34 +222,8 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/point-of-sale",
-    element: <LayoutAdmin />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <PointOfSalePage />,
-      },
-    ],
-  },
-  {
-    path: "/term",
-    element: <TermsOfServicePage />,
-  },
-  {
     path: "/",
-    element: <CompanyProfile />,
-  },
-  {
-    path: "/table",
-    element: <LayoutAdmin />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <TablePayment />,
-      },
-    ],
+    element: <Navigate to={"/auth/login"} />,
   },
   {
     path: "/auth",
