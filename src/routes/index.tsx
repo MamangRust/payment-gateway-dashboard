@@ -29,6 +29,8 @@ import TransferTrashedPage from "@/pages/admin/transfer/tansferTrashed";
 import UserTrashedPage from "@/pages/admin/user/userTrashed";
 import WithdrawTrashedPage from "@/pages/admin/withdraw/withdrawTrashed";
 import DashboardCardByCardNumber from "@/pages/admin/dashboard/card/dashboard-card-bycardnumber";
+import RolePage from "@/pages/admin/role/role";
+import RoleTrashedPage from "@/pages/admin/role/roleTrashed";
 
 const router = createBrowserRouter([
   {
@@ -188,6 +190,27 @@ const router = createBrowserRouter([
       {
         path: "trashed",
         element: <UserTrashedPage />,
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,
+      },
+    ],
+  },
+
+  {
+    path: "/roles",
+    element: <LayoutAdmin />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <RolePage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "trashed",
+        element: <RoleTrashedPage />,
       },
       {
         path: "*",

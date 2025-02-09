@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 
+pub mod role;
+pub mod user;
 pub mod card;
 pub mod merchant;
-pub mod role;
 pub mod saldo;
 pub mod topup;
 pub mod transaction;
 pub mod transfer;
-pub mod user;
 pub mod withdraw;
 
 #[derive(Serialize, Deserialize, Debug)]

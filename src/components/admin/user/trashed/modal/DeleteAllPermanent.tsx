@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useDeletePermanentUser from "@/hooks/admin/user/trashed/Delete";
 import useDeletePermanentAllUser from "@/hooks/admin/user/trashed/DeleteAll";
 
 export function DeletePermanetAllUserTrashed() {

@@ -12,6 +12,8 @@ import TransferModal from "./transfer/modal";
 import TransferTrashedModal from "./transfer/trashed/modal";
 import UserModal from "./user/modal";
 import UserTrashedModal from "./user/trashed/modal";
+import RoleModal from "./role/modal";
+import RoleTrashedModal from "./role/trashed/modal";
 import WithdrawModal from "./withdraw/modal";
 import WithdrawTrashedModal from "./withdraw/trashed/modal";
 
@@ -20,6 +22,8 @@ export default function ModalAdmin() {
     <>
       <UserModal />
       <UserTrashedModal />
+      <RoleModal />
+      <RoleTrashedModal />
       <CardModal />
       <CardTrashedModal />
       <MerchantModal />

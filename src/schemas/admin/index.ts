@@ -1,4 +1,5 @@
 export * from "./user";
+export * from "./role"
 export * from "./card";
 export * from "./merchant";
 export * from "./saldo";

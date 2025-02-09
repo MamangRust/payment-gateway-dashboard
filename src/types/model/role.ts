@@ -1,13 +1,13 @@
 import { PaginationMeta } from "./card";
 
-export interface RoleResponse {
+export interface Role {
   id: number;
   name: string;
   created_at: string;
   updated_at: string;
 }
 
-export interface RoleResponseDeleteAt extends RoleResponse {
+export interface RoleTrashed extends Role {
   deleted_at: string;
 }
 
@@ -24,25 +24,25 @@ export interface ApiResponseRoleDelete {
 export interface ApiResponseRole {
   status: string;
   message: string;
-  data?: RoleResponse;
+  data?: Role;
 }
 
 export interface ApiResponsesRole {
   status: string;
   message: string;
-  data: RoleResponse[];
+  data: Role[];
 }
 
 export interface ApiResponsePaginationRole {
   status: string;
   message: string;
-  data: RoleResponse[];
+  data: Role[];
   pagination: PaginationMeta;
 }
 
 export interface ApiResponsePaginationRoleDeleteAt {
   status: string;
   message: string;
-  data: RoleResponseDeleteAt[];
+  data: RoleTrashed[];
   pagination: PaginationMeta;
 }

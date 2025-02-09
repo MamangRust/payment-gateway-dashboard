@@ -1092,7 +1092,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "frontend-desktop"
+name = "frontend-dashboard"
 version = "0.1.0"
 dependencies = [
  "chrono",

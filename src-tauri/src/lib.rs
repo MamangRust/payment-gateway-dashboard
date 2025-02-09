@@ -1,4 +1,25 @@
 use command::auth_command::{get_me, login, myrefresh_token, register};
+use command::user::user_command::{
+    create_user, find_all_users, find_by_active, find_by_id_user, trashed_user, update_user,
+};
+
+
+use command::user::user_trashed_command::{
+    delete_permanent_all_user, delete_permanent_user, find_all_users_trashed,
+    restore_user_all_trashed, restore_user_trashed,
+};
+
+use command::role::role_command::{
+    create_role, find_all_roles, find_by_active_role, find_by_id_role, trashed_role, update_role,
+};
+
+
+use command::role::role_trashed_command::{
+    delete_permanent_all_role, delete_permanent_role, find_all_roles_trashed,
+    restore_role_all_trashed, restore_role_trashed,
+};
+
+
 
 use command::card::card_command::{
     create_card, find_active_card, find_all_card, find_by_card_number, find_by_id_card,
@@ -92,14 +113,7 @@ use command::transfer::transfer_trashed_command::{
     restore_transfer_all_trashed, restore_transfer_trashed,
 };
 
-use command::user::user_command::{
-    create_user, find_all_users, find_by_active, find_by_id_user, trashed_user, update_user,
-};
 
-use command::user::user_trashed_command::{
-    delete_permanent_all_user, delete_permanent_user, find_all_users_trashed,
-    restore_user_all_trashed, restore_user_trashed,
-};
 
 use command::withdraw::withdraw_command::{
     create_withdraw, find_all_withdraws, find_by_active_withdraw, find_by_card_number_withdraw,
@@ -139,6 +153,28 @@ pub fn run() {
             register,
             get_me,
             myrefresh_token,
+            create_user,
+            find_all_users,
+            find_by_active,
+            find_by_id_user,
+            trashed_user,
+            update_user,
+            delete_permanent_all_user,
+            delete_permanent_user,
+            find_all_users_trashed,
+            restore_user_all_trashed,
+            restore_user_trashed,
+            create_role,
+            find_all_roles,
+            find_by_active,
+            find_by_id_role,
+            trashed_role,
+            update_role,
+            delete_permanent_all_role,
+            delete_permanent_role,
+            find_all_roles_trashed,
+            restore_role_all_trashed,
+            restore_role_trashed,
             find_dashboard,
             find_dashboard_by_card_number,
             find_month_balance_by_card_card,
@@ -293,17 +329,7 @@ pub fn run() {
             find_all_transfers_trashed,
             restore_transfer_all_trashed,
             restore_transfer_trashed,
-            create_user,
-            find_all_users,
-            find_by_active,
-            find_by_id_user,
-            trashed_user,
-            update_user,
-            delete_permanent_all_user,
-            delete_permanent_user,
-            find_all_users_trashed,
-            restore_user_all_trashed,
-            restore_user_trashed,
+           
             create_withdraw,
             find_all_withdraws,
             find_by_active_withdraw,

@@ -5,4 +5,5 @@ export * from "./topup";
 export * from "./transaction";
 export * from "./transfer";
 export * from "./user";
+export * from "./role"
 export * from "./withdraw";

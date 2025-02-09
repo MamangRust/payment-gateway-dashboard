@@ -207,6 +207,24 @@ const data = {
       ],
     },
     {
+      title: 'Roles',
+      url: '/roles',
+      isActive: true,
+      icon: User,
+      items: [
+        {
+          title: 'Roles',
+          url: '/roles',
+          icon: User,
+        },
+        {
+          title: 'Trashed Roles',
+          url: '/roles/trashed',
+          icon: Trash,
+        },
+      ],
+    },
+    {
       title: 'Withdraws',
       url: '/withdraws',
       isActive: true,
@@ -280,7 +298,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 {subItem.icon && (
                                   <subItem.icon className="w-4 h-4" />
                                 )}{' '}
-                                {/* Ikon ditambahkan */}
+                              
                                 <span>{subItem.title}</span>
                               </Link>
                             </SidebarMenuSubButton>
