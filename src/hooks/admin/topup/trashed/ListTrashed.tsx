@@ -12,7 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import useModalTopupTrashed from "@/store/topup/trashed/modal";
 import useTopupTrashedStore from "@/store/topup/trashed/trashed";
-import { topupColumns } from "@/components/admin/topup";
+import { topupColumns, topupTrashedColumns } from "@/components/admin/topup";
 import { FindAllTopupTrashed } from "@/types/domain/request/topup";
 
 export default function useListTopupTrashed() {
@@ -40,7 +40,7 @@ export default function useListTopupTrashed() {
 
   const table = useReactTable({
     data: topups || [],
-    columns: topupColumns,
+    columns: topupTrashedColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

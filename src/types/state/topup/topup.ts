@@ -132,6 +132,30 @@ export interface TopupStore {
   ) => Promise<void>;
   findYearStatusFailed: (toast: any, year: number) => Promise<void>;
 
+  findMonthStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+
+  findMonthStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+
   findMonthTopupMethod: (toast: any, year: number) => Promise<void>;
   findYearTopupMethod: (toast: any, year: number) => Promise<void>;
   findMonthTopupAmount: (toast: any, year: number) => Promise<void>;

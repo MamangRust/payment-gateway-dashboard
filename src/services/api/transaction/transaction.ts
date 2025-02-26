@@ -112,17 +112,119 @@ class TransactionService {
     }
   }
 
+  async findMonthStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionMonthStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get(
+        "/transactions/monthly-success-by-card",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+            month,
+            card_number: cardNumber,
+          },
+        },
+      );
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionYearStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/transactions/yearly-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findMonthStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionMonthStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/transactions/monthly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionYearStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/transactions/yearly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
   async findMonthTransactionMethod(
     access_token: string,
     year: number,
   ): Promise<ApiResponseTransactionMonthMethod["data"]> {
     try {
-      const response = await myApi.get("/transactions/monthly-methods", {
-        headers: { Authorization: `Bearer ${access_token}` },
-        params: {
-          year,
+      const response = await myApi.get(
+        "/transactions/monthly-payment-methods-by-card",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+          },
         },
-      });
+      );
 
       if (response.status == 200) {
         return response.data.data;
@@ -337,7 +439,7 @@ class TransactionService {
   async findByCardNumberTransaction(
     access_token: string,
     req: FindyByCardNumberTransaction,
-  ): Promise<ApiResponseTransactions["data"]> {
+  ): Promise<ApiResponsePaginationTransaction> {
     try {
       const response = await myApi.get(
         `/transactions/card-number/${req.cardNumber}`,
@@ -347,7 +449,7 @@ class TransactionService {
       );
 
       if (response.status == 200) {
-        return response.data.data;
+        return response.data;
       }
       throw new Error(response.data.message || "Login failed.");
     } catch (error: any) {

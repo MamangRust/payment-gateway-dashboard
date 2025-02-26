@@ -4,9 +4,13 @@ use serde_json::json;
 use crate::{
     domain::{
         requests::merchant::{
-            create::CreateMerchant, findbyapikey::FindByApiKeyMerchant, findbyid::FindByIdMerchant,
-            findmerchantuser::FindMerchantUser, list::FindAllMerchant,
-            trashedmerchant::FindTrashedMerchant, update::UpdateMerchant,
+            create::CreateMerchant,
+            findbyapikey::FindByApiKeyMerchant,
+            findbyid::FindByIdMerchant,
+            findmerchantuser::FindMerchantUser,
+            list::{FindAllMerchant, FindAllMerchantTransaction, FindAllMerchantTransactionApiKey},
+            trashedmerchant::FindTrashedMerchant,
+            update::UpdateMerchant,
         },
         response::merchant::{
             ApiResponseMerchant, ApiResponseMerchantMonthlyAmount,
@@ -315,6 +319,56 @@ impl MerchantService {
         let response = self
             .client
             .get(format!("{}/merchants/transactions", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[
+                ("page", req.page.to_string()),
+                ("page_size", req.page_size.to_string()),
+            ])
+            .query(&[("search", req.search)])
+            .send()
+            .await?
+            .json::<ApiResponsePaginationMerchantTransaction>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_all_transactions_by_merchant(
+        &self,
+        access_token: &str,
+        req: FindAllMerchantTransaction,
+    ) -> Result<ApiResponsePaginationMerchantTransaction, Error> {
+        let response = self
+            .client
+            .get(format!(
+                "{}/merchants/transactions/{}/",
+                self.base_url, req.merchant_id
+            ))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[
+                ("page", req.page.to_string()),
+                ("page_size", req.page_size.to_string()),
+            ])
+            .query(&[("search", req.search)])
+            .send()
+            .await?
+            .json::<ApiResponsePaginationMerchantTransaction>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_all_transactions_by_api_key(
+        &self,
+        access_token: &str,
+        req: FindAllMerchantTransactionApiKey,
+    ) -> Result<ApiResponsePaginationMerchantTransaction, Error> {
+        let response = self
+            .client
+            .get(format!(
+                "{}/merchants/transactions/api-key/{}/",
+                self.base_url, req.api_key
+            ))
             .header("Authorization", format!("Bearer {}", access_token))
             .query(&[
                 ("page", req.page.to_string()),

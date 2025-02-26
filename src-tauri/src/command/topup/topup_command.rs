@@ -72,6 +72,64 @@ pub async fn find_year_status_failed(
 }
 
 #[command]
+pub async fn find_month_status_success_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseTopupMonthStatusSuccess, String> {
+    let service = TopupService::new("http://localhost:5000/api".to_string());
+
+    service
+        .find_month_status_success_by_card(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_success_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseTopupYearStatusSuccess, String> {
+    let service = TopupService::new("http://localhost:5000/api".to_string());
+
+    service
+        .find_year_status_success_by_card(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_month_status_failed_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseTopupMonthStatusFailed, String> {
+    let service = TopupService::new("http://localhost:5000/api".to_string());
+
+    service
+        .find_month_status_failed_by_card(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_failed_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseTopupYearStatusFailed, String> {
+    let service = TopupService::new("http://localhost:5000/api".to_string());
+
+    service
+        .find_year_status_failed_by_card(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
 pub async fn find_month_topup_method(
     access_token: String,
     year: u32,

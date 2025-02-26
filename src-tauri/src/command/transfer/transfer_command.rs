@@ -69,6 +69,60 @@ pub async fn find_year_status_failed_transfer(
 }
 
 #[command]
+pub async fn find_month_status_success_transfer_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseTransferMonthStatusSuccess, String> {
+    let service = TransferService::new("http://localhost:5000/api".to_string());
+    service
+        .find_month_status_success_by_card_number(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_success_transfer_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseTransferYearStatusSuccess, String> {
+    let service = TransferService::new("http://localhost:5000/api".to_string());
+    service
+        .find_year_status_success_by_card_number(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_month_status_failed_transfer_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseTransferMonthStatusFailed, String> {
+    let service = TransferService::new("http://localhost:5000/api".to_string());
+    service
+        .find_month_status_failed_by_card_number(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_failed_transfer_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseTransferYearStatusFailed, String> {
+    let service = TransferService::new("http://localhost:5000/api".to_string());
+    service
+        .find_year_status_failed_by_card_number(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
 pub async fn find_month_transfer_amount_transfer(
     access_token: String,
     year: u32,

@@ -152,6 +152,29 @@ export interface TransferStore {
   ) => Promise<void>;
   findYearStatusFailed: (toast: any, year: number) => Promise<void>;
 
+  findMonthStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+  findMonthStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+
   findMonthTransferAmount: (toast: any, year: number) => Promise<void>;
   findYearTransferAmount: (toast: any, year: number) => Promise<void>;
 

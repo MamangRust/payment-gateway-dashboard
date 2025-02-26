@@ -135,6 +135,30 @@ export interface TransactionStore {
     month: number,
   ) => Promise<void>;
   findYearStatusFailed: (toast: any, year: number) => Promise<void>;
+
+  findMonthStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+  findMonthStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+
   findMonthTransactionMethod: (toast: any, year: number) => Promise<void>;
   findYearTransactionMethod: (toast: any, year: number) => Promise<void>;
 

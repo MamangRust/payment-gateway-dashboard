@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import TableActionTransaction from "./table-action";
 import { Transaction } from "@/types/model";
+import { Link } from "react-router-dom";
 
 export const transactionColumns: ColumnDef<Transaction>[] = [
   {
@@ -27,10 +28,20 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "card_number",
     header: "Card Number",
     cell: ({ row }) => (
-      <div className="font-mono">{row.getValue("card_number")}</div>
+      <Link
+        to={`/transactions/detail/${row.getValue("card_number")}`}
+        className="font-mono text-blue-500 underline"
+      >
+        {row.getValue("card_number")}
+      </Link>
     ),
   },
   {

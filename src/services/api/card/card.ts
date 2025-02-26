@@ -544,6 +544,7 @@ class CardService {
           params: { year, card_number },
         },
       );
+      console.log(response.data.data);
       if (response.status == 200) {
         return response.data.data;
       }

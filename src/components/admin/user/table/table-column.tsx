@@ -27,6 +27,11 @@ export const userColumns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "firstname",
     header: "First Name",
     cell: ({ row }) => <div>{row.getValue("firstname")}</div>,

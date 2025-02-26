@@ -70,6 +70,60 @@ pub async fn find_year_status_failed_withdraw(
 }
 
 #[command]
+pub async fn find_month_status_success_withdraw_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseWithdrawMonthStatusSuccess, String> {
+    let service = WithdrawService::new("http://localhost:5000/api".to_string());
+    service
+        .find_month_status_success_by_card_number(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_success_withdraw_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseWithdrawYearStatusSuccess, String> {
+    let service = WithdrawService::new("http://localhost:5000/api".to_string());
+    service
+        .find_year_status_success_by_card_number(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_month_status_failed_withdraw_by_card_number(
+    access_token: String,
+    year: u32,
+    month: u32,
+    card_number: String,
+) -> Result<ApiResponseWithdrawMonthStatusFailed, String> {
+    let service = WithdrawService::new("http://localhost:5000/api".to_string());
+    service
+        .find_month_status_failed_by_card_number(&access_token, year, month, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_year_status_failed_withdraw_by_card_number(
+    access_token: String,
+    year: u32,
+    card_number: String,
+) -> Result<ApiResponseWithdrawYearStatusFailed, String> {
+    let service = WithdrawService::new("http://localhost:5000/api".to_string());
+    service
+        .find_year_status_failed_by_card_number(&access_token, year, &card_number)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
 pub async fn find_month_withdraw_amount_withdraw(
     access_token: String,
     year: u32,

@@ -3,6 +3,7 @@ import {
   CreateMerchant,
   FindAllMerchant,
   FindAllMerchantTransaction,
+  FindAllTransactionByApiKey,
   findByApiKeyMerchant,
   FindByIdMerchant,
   FindMerchantUser,
@@ -298,6 +299,153 @@ class MerchantService {
     }
   }
 
+  async findMonthPaymentMethodByApiKey(
+    access_token: string,
+    year: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantMonthlyPaymentMethod["data"]> {
+    try {
+      const response = await myApi.get(
+        "/merchants/monthly-payment-methods-by-apikey",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+            api_key,
+          },
+        },
+      );
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
+  async findYearPaymentMethodByApiKey(
+    access_token: string,
+    year: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantYearlyPaymentMethod["data"]> {
+    try {
+      const response = await myApi.get(
+        "/merchants/yearly-payment-methods-by-apikey",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+            api_key,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
+  async findMonthAmountByApiKey(
+    access_token: string,
+    year: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantMonthlyAmount["data"]> {
+    try {
+      const response = await myApi.get("/merchants/monthly-amount-by-apikey", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          api_key,
+        },
+      });
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
+  async findYearAmountByApiKey(
+    access_token: string,
+    year: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantYearlyAmount["data"]> {
+    try {
+      const response = await myApi.get("/merchants/yearly-amount-by-apikey", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          api_key,
+        },
+      });
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
+  async findMonthTotalAmountByApiKey(
+    access_token: string,
+    year: number,
+    month: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantMonthlyTotalAmount["data"]> {
+    try {
+      const response = await myApi.get(
+        "/merchants/monthly-totalamount-by-apikey",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+            month,
+            api_key,
+          },
+        },
+      );
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
+  async findYearTotalAmountByApiKey(
+    access_token: string,
+    year: number,
+    api_key: string,
+  ): Promise<ApiResponseMerchantYearlyTotalAmount["data"]> {
+    try {
+      const response = await myApi.get(
+        "/merchants/yearly-totalamount-by-apikey",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+          params: {
+            year,
+            api_key,
+          },
+        },
+      );
+      if (response.status === 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Request failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Request failed.");
+    }
+  }
+
   async findAllMerchants(
     req: FindAllMerchant,
     access_token: string,
@@ -356,6 +504,32 @@ class MerchantService {
         },
         headers: { Authorization: `Bearer ${access_token}` },
       });
+
+      if (response.status == 200) {
+        return response.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findAllTransactionByApiKey(
+    req: FindAllTransactionByApiKey,
+    access_token: string,
+  ): Promise<ApiResponsePaginationMerchantTransaction> {
+    try {
+      const response = await myApi.get(
+        "/merchants/transactions/api-key/" + req.api_key,
+        {
+          params: {
+            page: req.page,
+            page_size: req.page_size,
+            search: req.search,
+          },
+          headers: { Authorization: `Bearer ${access_token}` },
+        },
+      );
 
       if (response.status == 200) {
         return response.data;

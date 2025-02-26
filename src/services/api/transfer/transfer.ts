@@ -107,6 +107,99 @@ class TranferService {
     }
   }
 
+  async findMonthStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferMonthStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/transfers/month-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+  async findYearStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferYearStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/transfers/year-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+  async findMonthStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferMonthStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/transfers/month-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+  async findYearStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferYearStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/transfers/year-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
   async findMonthTransferAmount(
     access_token: string,
     year: number,

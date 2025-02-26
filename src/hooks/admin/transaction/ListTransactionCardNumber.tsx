@@ -9,14 +9,16 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { cardColumns } from "@/components/admin/card/table";
-import { FindAllTrashedCard } from "@/types/domain/request";
 import { useToast } from "@/hooks/use-toast";
-import useCardTrashedStore from "@/store/card/trashed/trashed";
-import useModalCardTrashed from "@/store/card/trashed/modal";
-import { cardTrashedColumns } from "@/components/admin/card";
+import useTransactionStore from "@/store/transaction/transaction";
+import { transactionColumns } from "@/components/admin/transaction";
+import { FindyByCardNumberTransaction } from "@/types/domain/request";
 
-export default function useListCardTrashed() {
+export default function useListTransactionCardNumber({
+  card_number,
+}: {
+  card_number: string;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -26,22 +28,19 @@ export default function useListCardTrashed() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { toast } = useToast();
-  const { showModalRestoreAll, showModalDeletePermanentAll } =
-    useModalCardTrashed();
-
   const {
-    cards,
+    transactions,
     pagination,
-    loadingGetCardsTrashed,
-    setErrorGetCardsTrashed,
-    setLoadingGetCardsTrashed,
-    findAllCardsTrashed,
-  } = useCardTrashedStore();
+    loadingGetCardNumberTransaction,
+    setLoadingGetCardNumberTransaction,
+    findByCardNumberTransaction,
+  } = useTransactionStore();
+
+  const { toast } = useToast();
 
   const table = useReactTable({
-    data: cards || [],
-    columns: cardTrashedColumns,
+    data: transactions || [],
+    columns: transactionColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -72,29 +71,30 @@ export default function useListCardTrashed() {
     }, 2000);
 
     return () => clearTimeout(delayTimer);
-  }, [loadingGetCardsTrashed]);
+  }, [loadingGetCardNumberTransaction]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchTransactions = async () => {
       try {
-        setLoadingGetCardsTrashed(true);
+        setLoadingGetCardNumberTransaction(true);
 
-        const searchReq: FindAllTrashedCard = {
+        const searchReq: FindyByCardNumberTransaction = {
+          cardNumber: card_number,
           search: search,
           page: currentPage,
           page_size: pageSize,
           toast: toast,
         };
 
-        await findAllCardsTrashed(searchReq);
-      } catch (error: any) {
-        setErrorGetCardsTrashed(error);
+        await findByCardNumberTransaction(searchReq);
+      } catch (error) {
+        console.error("Error fetching users:", error);
       } finally {
-        setLoadingGetCardsTrashed(false);
+        setLoadingGetCardNumberTransaction(false);
       }
     };
 
-    fetchUsers();
+    fetchTransactions();
   }, [search, currentPage, pageSize]);
 
   const handlePageChange = (newPage: number) => {
@@ -102,6 +102,7 @@ export default function useListCardTrashed() {
   };
 
   const handlePageSizeChange = (newSize: number) => {
+    console.log("Changing page size to:", newSize);
     setPageSize(newSize);
     setCurrentPage(1);
   };
@@ -110,14 +111,12 @@ export default function useListCardTrashed() {
     table,
     search,
     setSearch,
-    loadingGetCardsTrashed,
+    loadingGetCardNumberTransaction,
     currentPage,
     pageSize,
     pagination,
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModalRestoreAll,
-    showModalDeletePermanentAll,
   };
 }

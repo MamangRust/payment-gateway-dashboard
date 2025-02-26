@@ -2,6 +2,7 @@ import {
   CreateMerchant,
   FindAllMerchant,
   FindAllMerchantTransaction,
+  FindAllTransactionByApiKey,
   findByApiKeyMerchant,
   FindByIdMerchant,
   FindMerchantUser,
@@ -176,10 +177,49 @@ export interface MerchantStore {
     merchant_id: number,
   ) => Promise<void>;
 
+  findMonthPaymentMethodByApiKey: (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => Promise<void>;
+
+  findYearPaymentMethodByApiKey: (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => Promise<void>;
+  findMonthAmountByApiKey: (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => Promise<void>;
+
+  findYearAmountByApiKey: (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => Promise<void>;
+
+  findMonthTotalAmountByApiKey: (
+    toast: any,
+    year: number,
+    month: number,
+    api_key: string,
+  ) => Promise<void>;
+
+  findYearTotalAmountByApiKey: (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => Promise<void>;
+
   findAllMerchants: (req: FindAllMerchant) => Promise<void>;
   findAllTransaction: (req: FindAllMerchant) => Promise<void>;
   findAllTransactionByMerchant: (
     req: FindAllMerchantTransaction,
+  ) => Promise<void>;
+  findAllTransactionByApiKey: (
+    req: FindAllTransactionByApiKey,
   ) => Promise<void>;
 
   findById: (req: FindByIdMerchant) => Promise<void>;

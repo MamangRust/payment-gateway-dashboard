@@ -27,6 +27,11 @@ export const transferTrashedColumns: ColumnDef<TransferTrashed>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "transfer_from",
     header: "Transfer From",
     cell: ({ row }) => <div>{row.getValue("transfer_from")}</div>,

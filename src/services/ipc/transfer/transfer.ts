@@ -18,17 +18,14 @@ import {
   ApiResponseTransferMonthStatusFailed,
   ApiResponseTransferYearStatusFailed,
   ApiResponseTransferYearAmount,
-
 } from "@/types/model";
 import { invoke } from "@tauri-apps/api/core";
 
-
 class TransferCommand {
-
   async findMonthStatusSuccessTransfer(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseTransferMonthStatusSuccess> {
     try {
       return await invoke("find_month_status_success_transfer", {
@@ -44,7 +41,7 @@ class TransferCommand {
 
   async findYearStatusSuccessTransfer(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransferYearStatusSuccess> {
     try {
       return await invoke("find_year_status_success_transfer", {
@@ -60,7 +57,7 @@ class TransferCommand {
   async findMonthStatusFailedTransfer(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseTransferMonthStatusFailed> {
     try {
       return await invoke("find_month_status_failed_transfer", {
@@ -76,7 +73,7 @@ class TransferCommand {
 
   async findYearStatusFailedTransfer(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransferYearStatusFailed> {
     try {
       return await invoke("find_year_status_failed_transfer", {
@@ -89,10 +86,81 @@ class TransferCommand {
     }
   }
 
+  async findMonthStatusSuccessTransferByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferMonthStatusSuccess> {
+    try {
+      return await invoke("find_month_status_success_transfer_by_card_number", {
+        accessToken,
+        year,
+        month,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findMonthStatusSuccessTransfer:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusSuccessTransferByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferYearStatusSuccess> {
+    try {
+      return await invoke("find_year_status_success_transfer_by_card_number", {
+        accessToken,
+        year,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findYearStatusSuccessTransfer:", error);
+      throw error;
+    }
+  }
+
+  async findMonthStatusFailedTransferByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferMonthStatusFailed> {
+    try {
+      return await invoke("find_month_status_failed_transfer_by_card_number", {
+        accessToken,
+        year,
+        month,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findMonthStatusFailedTransfer:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusFailedTransferByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransferYearStatusFailed> {
+    try {
+      return await invoke("find_year_status_failed_transfer_by_card_number", {
+        accessToken,
+        year,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findYearStatusFailedTransfer:", error);
+      throw error;
+    }
+  }
 
   async findMonthTransferAmountTransfer(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransferMonthAmount> {
     try {
       return await invoke("find_month_transfer_amount_transfer", {
@@ -107,7 +175,7 @@ class TransferCommand {
 
   async findYearTransferAmountTransfer(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransferYearAmount> {
     try {
       return await invoke("find_year_transfer_amount_transfer", {
@@ -123,7 +191,7 @@ class TransferCommand {
   async findMonthTransferAmountBySender(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransferMonthAmount> {
     try {
       return await invoke("find_month_transfer_amount_by_sender", {
@@ -140,7 +208,7 @@ class TransferCommand {
   async findYearTransferAmountBySender(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransferYearAmount> {
     try {
       return await invoke("find_year_transfer_amount_by_sender", {
@@ -157,7 +225,7 @@ class TransferCommand {
   async findMonthTransferAmountByReceiver(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransferMonthAmount> {
     try {
       return await invoke("find_month_transfer_amount_by_receiver", {
@@ -174,7 +242,7 @@ class TransferCommand {
   async findYearTransferAmountByReceiver(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransferYearAmount> {
     try {
       return await invoke("find_year_transfer_amount_by_receiver", {
@@ -188,10 +256,9 @@ class TransferCommand {
     }
   }
 
-
   async findAllTransfers(
     accessToken: string,
-    req: FindAllTransfer
+    req: FindAllTransfer,
   ): Promise<ApiResponsePaginationTransfer> {
     try {
       return await invoke("find_all_transfers", {
@@ -206,7 +273,7 @@ class TransferCommand {
 
   async findByIdTransfer(
     accessToken: string,
-    req: FindByIdTransfer
+    req: FindByIdTransfer,
   ): Promise<ApiResponseTransfer> {
     try {
       return await invoke("find_by_id_transfer", {
@@ -221,7 +288,7 @@ class TransferCommand {
 
   async findByTransferFrom(
     accessToken: string,
-    req: TransferFrom
+    req: TransferFrom,
   ): Promise<ApiResponseTransfers> {
     try {
       return await invoke("find_by_transfer_from", {
@@ -236,7 +303,7 @@ class TransferCommand {
 
   async findByTransferTo(
     accessToken: string,
-    req: TransferTo
+    req: TransferTo,
   ): Promise<ApiResponseTransfers> {
     try {
       return await invoke("find_by_transfer_to", {
@@ -251,7 +318,7 @@ class TransferCommand {
 
   async findByActiveTransfer(
     accessToken: string,
-    req: FindAllTransfer
+    req: FindAllTransfer,
   ): Promise<ApiResponsePaginationTransferDeleteAt> {
     try {
       return await invoke("find_by_active_transfer", {
@@ -266,7 +333,7 @@ class TransferCommand {
 
   async createTransfer(
     accessToken: string,
-    req: CreateTransfer
+    req: CreateTransfer,
   ): Promise<ApiResponseTransfer> {
     try {
       return await invoke("create_transfer", {
@@ -281,7 +348,7 @@ class TransferCommand {
 
   async updateTransfer(
     accessToken: string,
-    req: UpdateTransfer
+    req: UpdateTransfer,
   ): Promise<ApiResponseTransfer> {
     try {
       return await invoke("update_transfer", {
@@ -296,7 +363,7 @@ class TransferCommand {
 
   async trashedTransfer(
     accessToken: string,
-    req: TrashedTransfer
+    req: TrashedTransfer,
   ): Promise<ApiResponseTransfer> {
     try {
       return await invoke("trashed_transfer", {

@@ -9,14 +9,17 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { cardColumns } from "@/components/admin/card/table";
-import { FindAllTrashedCard } from "@/types/domain/request";
+import { transferColumns } from "@/components/admin/transfer/table";
+import useTransferStore from "@/store/transfer/transfer";
+import useModalTransfer from "@/store/transfer/modal";
+import { FindAllTransfer } from "@/types/domain/request";
 import { useToast } from "@/hooks/use-toast";
-import useCardTrashedStore from "@/store/card/trashed/trashed";
-import useModalCardTrashed from "@/store/card/trashed/modal";
-import { cardTrashedColumns } from "@/components/admin/card";
 
-export default function useListCardTrashed() {
+export default function useListTransfer({
+  card_number,
+}: {
+  card_number: string;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -25,23 +28,20 @@ export default function useListCardTrashed() {
   const [isLoadingWithDelay, setIsLoadingWithDelay] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-
-  const { toast } = useToast();
-  const { showModalRestoreAll, showModalDeletePermanentAll } =
-    useModalCardTrashed();
+  const { showModal } = useModalTransfer();
 
   const {
-    cards,
+    transfers,
     pagination,
-    loadingGetCardsTrashed,
-    setErrorGetCardsTrashed,
-    setLoadingGetCardsTrashed,
-    findAllCardsTrashed,
-  } = useCardTrashedStore();
+    loadingGetTransfers,
+    setLoadingGetTransfers,
+    findAllTransfers,
+  } = useTransferStore();
+  const { toast } = useToast();
 
   const table = useReactTable({
-    data: cards || [],
-    columns: cardTrashedColumns,
+    data: transfers || [],
+    columns: transferColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -72,30 +72,30 @@ export default function useListCardTrashed() {
     }, 2000);
 
     return () => clearTimeout(delayTimer);
-  }, [loadingGetCardsTrashed]);
+  }, [loadingGetTransfers]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchTransfers = async () => {
       try {
-        setLoadingGetCardsTrashed(true);
+        setLoadingGetTransfers(true);
 
-        const searchReq: FindAllTrashedCard = {
-          search: search,
+        const searchReq: FindAllTransfer = {
+          search: card_number ? card_number : search, // Prioritaskan card_number jika ada
           page: currentPage,
           page_size: pageSize,
           toast: toast,
         };
 
-        await findAllCardsTrashed(searchReq);
-      } catch (error: any) {
-        setErrorGetCardsTrashed(error);
+        await findAllTransfers(searchReq);
+      } catch (error) {
+        console.error("Error fetching transfers:", error);
       } finally {
-        setLoadingGetCardsTrashed(false);
+        setLoadingGetTransfers(false);
       }
     };
 
-    fetchUsers();
-  }, [search, currentPage, pageSize]);
+    fetchTransfers();
+  }, [search, currentPage, pageSize, card_number]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -110,14 +110,13 @@ export default function useListCardTrashed() {
     table,
     search,
     setSearch,
-    loadingGetCardsTrashed,
+    loadingGetTransfers,
     currentPage,
     pageSize,
     pagination,
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModalRestoreAll,
-    showModalDeletePermanentAll,
+    showModal,
   };
 }

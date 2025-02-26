@@ -1,6 +1,8 @@
 import {
   CreateMerchant,
   FindAllMerchant,
+  FindAllMerchantTransaction,
+  FindAllTransactionByApiKey,
   findByApiKeyMerchant,
   FindByIdMerchant,
   FindMerchantUser,
@@ -25,7 +27,7 @@ import { invoke } from "@tauri-apps/api/core";
 class MerchantCommandService {
   async findMonthPaymentMethod(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMerchantMonthlyPaymentMethod> {
     try {
       return await invoke("find_month_payment_method", {
@@ -40,7 +42,7 @@ class MerchantCommandService {
 
   async findYearPaymentMethod(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMerchantYearlyPaymentMethod> {
     try {
       return await invoke("find_year_payment_method", {
@@ -55,7 +57,7 @@ class MerchantCommandService {
 
   async findMonthAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMerchantMonthlyAmount> {
     try {
       return await invoke("find_month_amount", {
@@ -70,7 +72,7 @@ class MerchantCommandService {
 
   async findYearAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMerchantYearlyAmount> {
     try {
       return await invoke("find_year_amount", {
@@ -86,7 +88,7 @@ class MerchantCommandService {
   async findMonthTotalAmount(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseMerchantMonthlyTotalAmount> {
     try {
       return await invoke("find_month_total_amount", {
@@ -102,7 +104,7 @@ class MerchantCommandService {
 
   async findYearTotalAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMerchantYearlyTotalAmount> {
     try {
       return await invoke("find_year_total_amount", {
@@ -115,11 +117,10 @@ class MerchantCommandService {
     }
   }
 
-
   async findMonthPaymentMethodByMerchant(
     accessToken: string,
     year: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantMonthlyPaymentMethod> {
     try {
       return await invoke("find_month_payment_method_by_merchant", {
@@ -136,7 +137,7 @@ class MerchantCommandService {
   async findYearPaymentMethodByMerchant(
     accessToken: string,
     year: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantYearlyPaymentMethod> {
     try {
       return await invoke("find_year_payment_method_by_merchant", {
@@ -153,7 +154,7 @@ class MerchantCommandService {
   async findMonthAmountByMerchant(
     accessToken: string,
     year: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantMonthlyAmount> {
     try {
       return await invoke("find_month_amount_by_merchant", {
@@ -170,7 +171,7 @@ class MerchantCommandService {
   async findYearAmountByMerchant(
     accessToken: string,
     year: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantYearlyAmount> {
     try {
       return await invoke("find_year_amount_by_merchant", {
@@ -188,7 +189,7 @@ class MerchantCommandService {
     accessToken: string,
     year: number,
     month: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantMonthlyTotalAmount> {
     try {
       return await invoke("find_month_total_amount_by_merchant", {
@@ -206,7 +207,7 @@ class MerchantCommandService {
   async findYearTotalAmountByMerchant(
     accessToken: string,
     year: number,
-    merchantId: number
+    merchantId: number,
   ): Promise<ApiResponseMerchantYearlyTotalAmount> {
     try {
       return await invoke("find_year_total_amount_by_merchant", {
@@ -220,9 +221,113 @@ class MerchantCommandService {
     }
   }
 
+  async findMonthPaymentMethodByApiKey(
+    accessToken: string,
+    year: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantMonthlyPaymentMethod> {
+    try {
+      return await invoke("find_month_payment_method_by_api_key", {
+        accessToken,
+        year,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findMonthPaymentMethodByApiKey:", error);
+      throw error;
+    }
+  }
+
+  async findYearPaymentMethodByApiKey(
+    accessToken: string,
+    year: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantYearlyPaymentMethod> {
+    try {
+      return await invoke("find_year_payment_method_by_api_key", {
+        accessToken,
+        year,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findYearPaymentMethodByApiKey:", error);
+      throw error;
+    }
+  }
+
+  async findMonthAmountByApiKey(
+    accessToken: string,
+    year: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantMonthlyAmount> {
+    try {
+      return await invoke("find_month_amount_by_api_key", {
+        accessToken,
+        year,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findMonthAmountByApiKey:", error);
+      throw error;
+    }
+  }
+
+  async findYearAmountByApiKey(
+    accessToken: string,
+    year: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantYearlyAmount> {
+    try {
+      return await invoke("find_year_amount_by_api_key", {
+        accessToken,
+        year,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findYearAmountByApiKey:", error);
+      throw error;
+    }
+  }
+
+  async findMonthTotalAmountByApiKey(
+    accessToken: string,
+    year: number,
+    month: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantMonthlyTotalAmount> {
+    try {
+      return await invoke("find_month_total_amount_by_api_key", {
+        accessToken,
+        year,
+        month,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findMonthTotalAmountByApiKey:", error);
+      throw error;
+    }
+  }
+
+  async findYearTotalAmountByApiKey(
+    accessToken: string,
+    year: number,
+    apiKey: string,
+  ): Promise<ApiResponseMerchantYearlyTotalAmount> {
+    try {
+      return await invoke("find_year_total_amount_by_api_key", {
+        accessToken,
+        year,
+        apiKey,
+      });
+    } catch (error) {
+      console.error("Error in findYearTotalAmountByApiKey:", error);
+      throw error;
+    }
+  }
+
   async findAllMerchants(
     accessToken: string,
-    req: FindAllMerchant
+    req: FindAllMerchant,
   ): Promise<ApiResponsePaginationMerchant> {
     try {
       return await invoke("find_all_merchants", {
@@ -237,7 +342,7 @@ class MerchantCommandService {
 
   async findAllTransactions(
     accessToken: string,
-    req: FindAllMerchant
+    req: FindAllMerchant,
   ): Promise<ApiResponsePaginationMerchantTransaction> {
     try {
       return await invoke("find_all_transactions", {
@@ -250,9 +355,38 @@ class MerchantCommandService {
     }
   }
 
+  async findAllTransactionByMerchant(
+    accessToken: string,
+    req: FindAllMerchantTransaction,
+  ): Promise<ApiResponsePaginationMerchantTransaction> {
+    try {
+      return await invoke("find_all_transactions_by_merchant", {
+        accessToken,
+        req,
+      });
+    } catch (error) {
+      console.error("Error in findAllTransactions:", error);
+      throw error;
+    }
+  }
+  async findAllTransactionByApiKey(
+    accessToken: string,
+    req: FindAllTransactionByApiKey,
+  ): Promise<ApiResponsePaginationMerchantTransaction> {
+    try {
+      return await invoke("find_all_transactions_by_api_key", {
+        accessToken,
+        req,
+      });
+    } catch (error) {
+      console.error("Error in findAllTransactions:", error);
+      throw error;
+    }
+  }
+
   async findMerchantById(
     accessToken: string,
-    req: FindByIdMerchant
+    req: FindByIdMerchant,
   ): Promise<ApiResponseMerchant> {
     try {
       return await invoke("find_by_id", {
@@ -267,7 +401,7 @@ class MerchantCommandService {
 
   async findMerchantByApiKey(
     accessToken: string,
-    req: findByApiKeyMerchant
+    req: findByApiKeyMerchant,
   ): Promise<ApiResponseMerchant> {
     try {
       return await invoke("find_by_api_key", {
@@ -282,7 +416,7 @@ class MerchantCommandService {
 
   async findMerchantByUser(
     accessToken: string,
-    req: FindMerchantUser
+    req: FindMerchantUser,
   ): Promise<ApiResponsesMerchant> {
     try {
       return await invoke("find_by_merchant_user", {
@@ -297,7 +431,7 @@ class MerchantCommandService {
 
   async findActiveMerchant(
     accessToken: string,
-    req: FindAllMerchant
+    req: FindAllMerchant,
   ): Promise<ApiResponsePaginationMerchantDeleteAt> {
     try {
       return await invoke("find_by_active_merchant", {
@@ -312,7 +446,7 @@ class MerchantCommandService {
 
   async createMerchant(
     accessToken: string,
-    req: CreateMerchant
+    req: CreateMerchant,
   ): Promise<ApiResponseMerchant> {
     try {
       return await invoke("create_merchant", {
@@ -327,7 +461,7 @@ class MerchantCommandService {
 
   async updateMerchant(
     accessToken: string,
-    req: UpdateMerchant
+    req: UpdateMerchant,
   ): Promise<ApiResponseMerchant> {
     try {
       return await invoke("update_merchant", {
@@ -342,7 +476,7 @@ class MerchantCommandService {
 
   async trashedMerchant(
     accessToken: string,
-    req: FindTrashedMerchant
+    req: FindTrashedMerchant,
   ): Promise<ApiResponseMerchant> {
     try {
       return await invoke("trashed_merchant", {
@@ -357,4 +491,3 @@ class MerchantCommandService {
 }
 
 export default new MerchantCommandService();
-

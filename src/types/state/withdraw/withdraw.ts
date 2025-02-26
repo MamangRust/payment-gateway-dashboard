@@ -118,6 +118,30 @@ export interface WithdrawStore {
     month: number,
   ) => Promise<void>;
   findYearStatusFailed: (toast: any, year: number) => Promise<void>;
+
+  findMonthStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusSuccessByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+  findMonthStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    month: number,
+    card_number: string,
+  ) => Promise<void>;
+  findYearStatusFailedByCardNumber: (
+    toast: any,
+    year: number,
+    card_number: string,
+  ) => Promise<void>;
+
   findMonthWithdrawAmount: (toast: any, year: number) => Promise<void>;
   findYearWithdrawAmount: (toast: any, year: number) => Promise<void>;
 

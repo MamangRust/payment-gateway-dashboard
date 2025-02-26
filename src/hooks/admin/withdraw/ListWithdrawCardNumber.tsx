@@ -9,14 +9,17 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { cardColumns } from "@/components/admin/card/table";
-import { FindAllTrashedCard } from "@/types/domain/request";
+import { withdrawColumns } from "@/components/admin/withdraw/table";
+import useWithdrawStore from "@/store/withdraw/withdraw";
+import useModalWithdraw from "@/store/withdraw/modal";
 import { useToast } from "@/hooks/use-toast";
-import useCardTrashedStore from "@/store/card/trashed/trashed";
-import useModalCardTrashed from "@/store/card/trashed/modal";
-import { cardTrashedColumns } from "@/components/admin/card";
+import { FindByCardNumberWithdraw } from "@/types/domain/request";
 
-export default function useListCardTrashed() {
+export default function useListWithdrawCardNumber({
+  card_number,
+}: {
+  card_number: string;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -26,22 +29,19 @@ export default function useListCardTrashed() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { toast } = useToast();
-  const { showModalRestoreAll, showModalDeletePermanentAll } =
-    useModalCardTrashed();
-
   const {
-    cards,
+    withdraws,
     pagination,
-    loadingGetCardsTrashed,
-    setErrorGetCardsTrashed,
-    setLoadingGetCardsTrashed,
-    findAllCardsTrashed,
-  } = useCardTrashedStore();
+    loadingGetCardNumberWithdraw,
+    setLoadingGetCardNumberWithdraw,
+    findByCardNumberWithdraw,
+  } = useWithdrawStore();
+  const { showModal } = useModalWithdraw();
+  const { toast } = useToast();
 
   const table = useReactTable({
-    data: cards || [],
-    columns: cardTrashedColumns,
+    data: withdraws || [],
+    columns: withdrawColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -72,29 +72,30 @@ export default function useListCardTrashed() {
     }, 2000);
 
     return () => clearTimeout(delayTimer);
-  }, [loadingGetCardsTrashed]);
+  }, [loadingGetCardNumberWithdraw]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchWithdraws = async () => {
       try {
-        setLoadingGetCardsTrashed(true);
+        setLoadingGetCardNumberWithdraw(true);
 
-        const searchReq: FindAllTrashedCard = {
+        const searchReq: FindByCardNumberWithdraw = {
+          cardNumber: card_number,
           search: search,
           page: currentPage,
           page_size: pageSize,
           toast: toast,
         };
 
-        await findAllCardsTrashed(searchReq);
-      } catch (error: any) {
-        setErrorGetCardsTrashed(error);
+        await findByCardNumberWithdraw(searchReq);
+      } catch (error) {
+        console.error("Error fetching users:", error);
       } finally {
-        setLoadingGetCardsTrashed(false);
+        setLoadingGetCardNumberWithdraw(false);
       }
     };
 
-    fetchUsers();
+    fetchWithdraws();
   }, [search, currentPage, pageSize]);
 
   const handlePageChange = (newPage: number) => {
@@ -110,14 +111,13 @@ export default function useListCardTrashed() {
     table,
     search,
     setSearch,
-    loadingGetCardsTrashed,
+    loadingGetCardNumberWithdraw,
     currentPage,
     pageSize,
     pagination,
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModalRestoreAll,
-    showModalDeletePermanentAll,
+    showModal,
   };
 }

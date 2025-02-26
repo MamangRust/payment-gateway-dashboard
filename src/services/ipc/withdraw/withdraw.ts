@@ -83,6 +83,78 @@ class WithdrawCommand {
     }
   }
 
+  async findMonthStatusSuccessWithdrawByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawMonthStatusSuccess> {
+    try {
+      return await invoke("find_month_status_success_withdraw_by_card_number", {
+        accessToken,
+        year,
+        month,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findMonthStatusSuccessWithdraw:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusSuccessWithdrawByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawYearStatusSuccess> {
+    try {
+      return await invoke("find_year_status_success_withdraw_by_card_number", {
+        accessToken,
+        year,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findYearStatusSuccessWithdraw:", error);
+      throw error;
+    }
+  }
+
+  async findMonthStatusFailedWithdrawByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawMonthStatusFailed> {
+    try {
+      return await invoke("find_month_status_failed_withdraw_by_card_number", {
+        accessToken,
+        year,
+        month,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findMonthStatusFailedWithdraw:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusFailedWithdrawByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawYearStatusFailed> {
+    try {
+      return await invoke("find_year_status_failed_withdraw_by_card_number", {
+        accessToken,
+        year,
+        cardNumber,
+      });
+    } catch (error) {
+      console.error("Error in findYearStatusFailedWithdraw:", error);
+      throw error;
+    }
+  }
+
   async findMonthWithdrawAmountWithdraw(
     accessToken: string,
     year: number,
@@ -186,7 +258,7 @@ class WithdrawCommand {
   async findByCardNumberWithdraw(
     accessToken: string,
     cardNumber: string,
-  ): Promise<ApiResponseWithdraw> {
+  ): Promise<ApiResponsePaginationWithdraw> {
     try {
       return await invoke("find_by_card_number_withdraw", {
         accessToken,

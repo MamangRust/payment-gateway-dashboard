@@ -41,6 +41,8 @@ export default function DashboardWithdraws() {
     handlePageSizeChange,
     isLoadingWithDelay,
     showModal,
+    errorGetWithdraw,
+    setErrorGetWithdraw,
   } = useListWithdraw();
 
   const {
@@ -81,6 +83,7 @@ export default function DashboardWithdraws() {
 
     findYearWithdrawAmount,
     yearWithdrawAmount,
+    errorYearWithdrawAmount,
     loadingYearWithdrawAmount,
     setLoadingYearWithdrawAmount,
     setErrorYearWithdrawAmount,

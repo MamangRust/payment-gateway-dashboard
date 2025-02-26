@@ -3,7 +3,6 @@ use command::user::user_command::{
     create_user, find_all_users, find_by_active, find_by_id_user, trashed_user, update_user,
 };
 
-
 use command::user::user_trashed_command::{
     delete_permanent_all_user, delete_permanent_user, find_all_users_trashed,
     restore_user_all_trashed, restore_user_trashed,
@@ -13,13 +12,10 @@ use command::role::role_command::{
     create_role, find_all_roles, find_by_active_role, find_by_id_role, trashed_role, update_role,
 };
 
-
 use command::role::role_trashed_command::{
     delete_permanent_all_role, delete_permanent_role, find_all_roles_trashed,
     restore_role_all_trashed, restore_role_trashed,
 };
-
-
 
 use command::card::card_command::{
     create_card, find_active_card, find_all_card, find_by_card_number, find_by_id_card,
@@ -42,10 +38,10 @@ use command::card::card_trashed_command::{
 };
 
 use command::merchant::merchant_command::{
-    create_merchant, find_all_merchants, find_all_transactions, find_by_active_merchant,
-    find_by_api_key, find_by_id, find_by_merchant_user, find_month_amount,
-    find_month_amount_by_merchant, find_month_payment_method,
-    find_month_payment_method_by_merchant, find_month_total_amount,
+    create_merchant, find_all_merchants, find_all_transactions, find_all_transactions_by_api_key,
+    find_all_transactions_by_merchant, find_by_active_merchant, find_by_api_key, find_by_id,
+    find_by_merchant_user, find_month_amount, find_month_amount_by_merchant,
+    find_month_payment_method, find_month_payment_method_by_merchant, find_month_total_amount,
     find_month_total_amount_by_merchant, find_year_amount, find_year_amount_by_merchant,
     find_year_payment_method, find_year_payment_method_by_merchant, find_year_total_amount,
     find_year_total_amount_by_merchant, trashed_merchant, update_merchant,
@@ -69,9 +65,11 @@ use command::saldo::saldo_trashed_command::{
 
 use command::topup::topup_command::{
     create_topup, find_all_topups, find_by_active_topup, find_by_card_number_topup,
-    find_by_id_topup, find_month_status_failed, find_month_status_success, find_month_topup_amount,
+    find_by_id_topup, find_month_status_failed, find_month_status_failed_by_card_number,
+    find_month_status_success, find_month_status_success_by_card_number, find_month_topup_amount,
     find_month_topup_amount_by_card, find_month_topup_method, find_month_topup_method_by_card,
-    find_year_status_failed, find_year_status_success, find_year_topup_amount,
+    find_year_status_failed, find_year_status_failed_by_card_number, find_year_status_success,
+    find_year_status_success_by_card_number, find_year_topup_amount,
     find_year_topup_amount_by_card, find_year_topup_method, find_year_topup_method_by_card,
     trashed_topup, update_topup,
 };
@@ -84,10 +82,12 @@ use command::topup::topup_trashed_command::{
 use command::transaction::transaction_command::{
     create_transaction, find_all_transactions_transaction, find_by_active_transaction,
     find_by_card_number_transaction, find_by_id_transaction, find_by_merchant_transaction,
-    find_month_status_failed_transaction, find_month_status_success_transaction,
+    find_month_status_failed_transaction, find_month_status_failed_transaction_by_card_number,
+    find_month_status_success_transaction, find_month_status_success_transaction_by_card_number,
     find_month_transaction_amount, find_month_transaction_amount_by_card,
     find_month_transaction_method, find_month_transaction_method_by_card,
-    find_year_status_failed_transaction, find_year_status_success_transaction,
+    find_year_status_failed_transaction, find_year_status_failed_transaction_by_card_number,
+    find_year_status_success_transaction, find_year_status_success_transaction_by_card_number,
     find_year_transaction_amount, find_year_transaction_amount_by_card,
     find_year_transaction_method, find_year_transaction_method_by_card, trashed_transaction,
     update_transaction,
@@ -101,9 +101,11 @@ use command::transaction::transaction_trashed_command::{
 use command::transfer::transfer_command::{
     create_transfer, find_all_transfers, find_by_active_transfer, find_by_id_transfer,
     find_by_transfer_from, find_by_transfer_to, find_month_status_failed_transfer,
-    find_month_status_success_transfer, find_month_transfer_amount_by_receiver,
+    find_month_status_failed_transfer_by_card_number, find_month_status_success_transfer,
+    find_month_status_success_transfer_by_card_number, find_month_transfer_amount_by_receiver,
     find_month_transfer_amount_by_sender, find_month_transfer_amount_transfer,
-    find_year_status_failed_transfer, find_year_status_success_transfer,
+    find_year_status_failed_transfer, find_year_status_failed_transfer_by_card_number,
+    find_year_status_success_transfer, find_year_status_success_transfer_by_card_number,
     find_year_transfer_amount_by_receiver, find_year_transfer_amount_by_sender,
     find_year_transfer_amount_transfer, trashed_transfer, update_transfer,
 };
@@ -113,13 +115,14 @@ use command::transfer::transfer_trashed_command::{
     restore_transfer_all_trashed, restore_transfer_trashed,
 };
 
-
-
 use command::withdraw::withdraw_command::{
     create_withdraw, find_all_withdraws, find_by_active_withdraw, find_by_card_number_withdraw,
-    find_by_id_withdraw, find_month_status_failed_withdraw, find_month_status_success_withdraw,
-    find_month_withdraw_amount_by_card_withdraw, find_month_withdraw_amount_withdraw,
-    find_year_status_failed_withdraw, find_year_status_success_withdraw, find_year_withdraw_amount,
+    find_by_id_withdraw, find_month_status_failed_withdraw,
+    find_month_status_failed_withdraw_by_card_number, find_month_status_success_withdraw,
+    find_month_status_success_withdraw_by_card_number, find_month_withdraw_amount_by_card_withdraw,
+    find_month_withdraw_amount_withdraw, find_year_status_failed_withdraw,
+    find_year_status_failed_withdraw_by_card_number, find_year_status_success_withdraw,
+    find_year_status_success_withdraw_by_card_number, find_year_withdraw_amount,
     find_year_withdraw_amount_by_card, trashed_withdraw, update_withdraw,
 };
 
@@ -166,7 +169,7 @@ pub fn run() {
             restore_user_trashed,
             create_role,
             find_all_roles,
-            find_by_active,
+            find_by_active_role,
             find_by_id_role,
             trashed_role,
             update_role,
@@ -215,7 +218,25 @@ pub fn run() {
             restore_all_cards_trashed,
             restore_card_trashed,
             find_month_amount,
+            find_all_transactions_by_merchant,
+            find_all_transactions_by_api_key,
             find_month_amount_by_merchant,
+            find_month_status_success_withdraw_by_card_number,
+            find_year_status_success_withdraw_by_card_number,
+            find_month_status_failed_withdraw_by_card_number,
+            find_year_status_failed_withdraw_by_card_number,
+            find_month_status_success_transfer_by_card_number,
+            find_year_status_success_transfer_by_card_number,
+            find_month_status_failed_transfer_by_card_number,
+            find_year_status_failed_transfer_by_card_number,
+            find_month_status_success_transaction_by_card_number,
+            find_year_status_success_transaction_by_card_number,
+            find_month_status_failed_transaction_by_card_number,
+            find_year_status_failed_transaction_by_card_number,
+            find_month_status_success_by_card_number,
+            find_year_status_success_by_card_number,
+            find_month_status_failed_by_card_number,
+            find_year_status_failed_by_card_number,
             find_month_payment_method,
             find_month_payment_method_by_merchant,
             find_month_total_amount,
@@ -329,7 +350,6 @@ pub fn run() {
             find_all_transfers_trashed,
             restore_transfer_all_trashed,
             restore_transfer_trashed,
-           
             create_withdraw,
             find_all_withdraws,
             find_by_active_withdraw,

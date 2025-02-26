@@ -108,6 +108,102 @@ class WithdrawService {
     }
   }
 
+  async findMonthStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawMonthStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/withdraws/monthly-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawYearStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/withdraws/yearly-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findMonthStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawMonthStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/withdraws/monthly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseWithdrawYearStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/withdraws/yearly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
   async findMonthWithdrawAmount(
     access_token: string,
     year: number,
@@ -156,7 +252,7 @@ class WithdrawService {
     card_number: string,
   ): Promise<ApiResponseWithdrawMonthAmount["data"]> {
     try {
-      const response = await myApi.get("/withdraws/monthly-by-card", {
+      const response = await myApi.get("/withdraws/monthly-amount-card", {
         headers: { Authorization: `Bearer ${access_token}` },
         params: {
           year,
@@ -179,7 +275,7 @@ class WithdrawService {
     card_number: string,
   ): Promise<ApiResponseWithdrawYearAmount["data"]> {
     try {
-      const response = await myApi.get("/withdraws/yearly-by-card", {
+      const response = await myApi.get("/withdraws/yearly-amount-card", {
         headers: { Authorization: `Bearer ${access_token}` },
         params: {
           year,
@@ -236,10 +332,10 @@ class WithdrawService {
     }
   }
 
-  async findByCardNumberWithdraw(
+  async findAllByCardNumberWithdraw(
     access_token: string,
     req: FindByCardNumberWithdraw,
-  ): Promise<ApiResponseWithdraw["data"]> {
+  ): Promise<ApiResponsePaginationWithdraw> {
     try {
       const response = await myApi.get(
         `/withdraws/card-number/${req.cardNumber}`,
@@ -249,7 +345,7 @@ class WithdrawService {
       );
 
       if (response.status == 200) {
-        return response.data.data;
+        return response.data;
       }
       throw new Error(response.data.message || "Login failed.");
     } catch (error: any) {

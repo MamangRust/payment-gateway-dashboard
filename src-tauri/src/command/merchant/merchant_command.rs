@@ -3,9 +3,13 @@ use tauri::command;
 use crate::{
     domain::{
         requests::merchant::{
-            create::CreateMerchant, findbyapikey::FindByApiKeyMerchant, findbyid::FindByIdMerchant,
-            findmerchantuser::FindMerchantUser, list::FindAllMerchant,
-            trashedmerchant::FindTrashedMerchant, update::UpdateMerchant,
+            create::CreateMerchant,
+            findbyapikey::FindByApiKeyMerchant,
+            findbyid::FindByIdMerchant,
+            findmerchantuser::FindMerchantUser,
+            list::{FindAllMerchant, FindAllMerchantTransaction, FindAllMerchantTransactionApiKey},
+            trashedmerchant::FindTrashedMerchant,
+            update::UpdateMerchant,
         },
         response::merchant::{
             ApiResponseMerchant, ApiResponseMerchantMonthlyAmount,
@@ -201,6 +205,30 @@ pub async fn find_all_transactions(
     let service = MerchantService::new("http://localhost:5000/api".to_string());
     service
         .find_all_transactions(&access_token, req)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_all_transactions_by_merchant(
+    access_token: String,
+    req: FindAllMerchantTransaction,
+) -> Result<ApiResponsePaginationMerchantTransaction, String> {
+    let service = MerchantService::new("http://localhost:5000/api".to_string());
+    service
+        .find_all_transactions_by_merchant(&access_token, req)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn find_all_transactions_by_api_key(
+    access_token: String,
+    req: FindAllMerchantTransactionApiKey,
+) -> Result<ApiResponsePaginationMerchantTransaction, String> {
+    let service = MerchantService::new("http://localhost:5000/api".to_string());
+    service
+        .find_all_transactions_by_api_key(&access_token, req)
         .await
         .map_err(|e| e.to_string())
 }

@@ -27,6 +27,11 @@ export const merchantTrashedColumns: ColumnDef<MerchantTrashed>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "name",
     header: "Merchant Name",
     cell: ({ row }) => <div>{row.getValue("name")}</div>,

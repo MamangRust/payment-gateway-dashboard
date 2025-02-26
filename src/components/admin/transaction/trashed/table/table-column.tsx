@@ -27,6 +27,11 @@ export const transactionTrashedColumns: ColumnDef<TransactionTrashed>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "card_number",
     header: "Card Number",
     cell: ({ row }) => (

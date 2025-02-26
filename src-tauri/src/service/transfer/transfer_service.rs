@@ -106,6 +106,94 @@ impl TransferService {
         Ok(response)
     }
 
+    pub async fn find_month_status_success_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTransferMonthStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!(
+                "{}/transfers/monthly-success-by-card",
+                self.base_url
+            ))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTransferMonthStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_success_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTransferYearStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!(
+                "{}/transfers/yearly-success-by-card",
+                self.base_url
+            ))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTransferYearStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_month_status_failed_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTransferMonthStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/tranfers/monthly-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTransferMonthStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_failed_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTransferYearStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/transfers/yearly-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTransferYearStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
     pub async fn find_month_transfer_amount(
         &self,
         access_token: &str,

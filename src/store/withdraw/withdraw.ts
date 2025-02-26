@@ -277,6 +277,195 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
     }
   },
 
+  findMonthStatusSuccessByCardNumber: async (
+    toast: any,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ) => {
+    set({ loadingMonthStatusSuccess: true, errorMonthStatusSuccess: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response =
+          await WithdrawCommand.findMonthStatusSuccessWithdrawByCardNumber(
+            token,
+            year,
+            month,
+            cardNumber,
+          );
+
+        set({
+          monthStatusSuccess: response.data,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      } else {
+        const response =
+          await WithdrawService.findMonthStatusSuccessByCardNumber(
+            token,
+            year,
+            month,
+            cardNumber,
+          );
+
+        set({
+          monthStatusSuccess: response,
+          loadingMonthStatusSuccess: false,
+          errorMonthStatusSuccess: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthStatusSuccess: false }),
+        (message: any) => set({ errorMonthStatusSuccess: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearStatusSuccessByCardNumber: async (
+    toast: any,
+    year: number,
+    cardNumber: string,
+  ) => {
+    set({ loadingYearStatusSuccess: true, errorYearStatusSuccess: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response =
+          await WithdrawCommand.findYearStatusSuccessWithdrawByCardNumber(
+            token,
+            year,
+            cardNumber,
+          );
+
+        set({
+          yearStatusSuccess: response.data,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      } else {
+        const response =
+          await WithdrawService.findYearStatusSuccessByCardNumber(
+            token,
+            year,
+            cardNumber,
+          );
+
+        set({
+          yearStatusSuccess: response,
+          loadingYearStatusSuccess: false,
+          errorYearStatusSuccess: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearStatusSuccess: false }),
+        (message: any) => set({ errorYearStatusSuccess: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthStatusFailedByCardNumber: async (
+    toast: any,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ) => {
+    set({ loadingMonthStatusFailed: true, errorMonthStatusFailed: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response =
+          await WithdrawCommand.findMonthStatusFailedWithdrawByCardNumber(
+            token,
+            year,
+            month,
+            cardNumber,
+          );
+
+        set({
+          monthStatusFailed: response.data,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      } else {
+        const response =
+          await WithdrawService.findMonthStatusFailedByCardNumber(
+            token,
+            year,
+            month,
+            cardNumber,
+          );
+
+        set({
+          monthStatusFailed: response,
+          loadingMonthStatusFailed: false,
+          errorMonthStatusFailed: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthStatusFailed: false }),
+        (message: any) => set({ errorMonthStatusFailed: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearStatusFailedByCardNumber: async (
+    toast: any,
+    year: number,
+    cardNumber: string,
+  ) => {
+    set({ loadingYearStatusFailed: true, errorYearStatusFailed: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response =
+          await WithdrawCommand.findYearStatusFailedWithdrawByCardNumber(
+            token,
+            year,
+            cardNumber,
+          );
+
+        set({
+          yearStatusFailed: response.data,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      } else {
+        const response = await WithdrawService.findYearStatusFailedByCardNumber(
+          token,
+          year,
+          cardNumber,
+        );
+
+        set({
+          yearStatusFailed: response,
+          loadingYearStatusFailed: false,
+          errorYearStatusFailed: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearStatusFailed: false }),
+        (message: any) => set({ errorYearStatusFailed: message }),
+        toast,
+      );
+    }
+  },
+
   findMonthWithdrawAmount: async (toast: any, year: number) => {
     set({ loadingMonthWithdrawAmount: true, errorMonthWithdrawAmount: null });
     try {
@@ -531,18 +720,30 @@ const useWithdrawStore = create<WithdrawStore>((set, get) => ({
         );
 
         set({
-          withdraw: response.data,
+          withdraws: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
           loadingGetCardNumberWithdraw: false,
           errorGetCardNumberWithdraw: null,
         });
       } else {
-        const response = await WithdrawService.findByCardNumberWithdraw(
+        const response = await WithdrawService.findAllByCardNumberWithdraw(
           token,
           req,
         );
 
         set({
-          withdraw: response,
+          withdraws: response.data,
+          pagination: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
           loadingGetCardNumberWithdraw: false,
           errorGetCardNumberWithdraw: null,
         });

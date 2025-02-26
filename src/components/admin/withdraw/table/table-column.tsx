@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import TableActionWithdraw from "./table-action";
 import { Withdraw } from "@/types/model";
+import { Link } from "react-router-dom";
 
 export const withdrawColumns: ColumnDef<Withdraw>[] = [
   {
@@ -27,10 +28,20 @@ export const withdrawColumns: ColumnDef<Withdraw>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "card_number",
     header: "Card Number",
     cell: ({ row }) => (
-      <div className="font-mono">{row.getValue("card_number")}</div>
+      <Link
+        to={`/withdraws/detail/${row.getValue("card_number")}`}
+        className="font-mono text-blue-500 underline"
+      >
+        {row.getValue("card_number")}
+      </Link>
     ),
   },
   {

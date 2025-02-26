@@ -1243,6 +1243,7 @@ const useCardStore = create<CardStore>((set, get) => ({
             year,
             card_number,
           );
+        console.log("hello", response);
 
         set({
           yearTransferReceiver: response,

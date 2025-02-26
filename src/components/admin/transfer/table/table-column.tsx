@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import TableActionTransfer from "./table-action";
 import { Transfer } from "@/types/model";
+import { Link } from "react-router-dom";
 
 export const transferColumns: ColumnDef<Transfer>[] = [
   {
@@ -27,14 +28,33 @@ export const transferColumns: ColumnDef<Transfer>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className="font-mono">{row.getValue("id")}</div>,
+  },
+  {
     accessorKey: "transfer_from",
     header: "Transfer From",
-    cell: ({ row }) => <div>{row.getValue("transfer_from")}</div>,
+    cell: ({ row }) => (
+      <Link
+        to={`/transfers/detail/${row.getValue("transfer_from")}`}
+        className="font-mono text-blue-500 underline"
+      >
+        {row.getValue("transfer_from")}
+      </Link>
+    ),
   },
   {
     accessorKey: "transfer_to",
     header: "Transfer To",
-    cell: ({ row }) => <div>{row.getValue("transfer_to")}</div>,
+    cell: ({ row }) => (
+      <Link
+        to={`/transfers/detail/${row.getValue("transfer_to")}`}
+        className="font-mono text-blue-500 underline"
+      >
+        {row.getValue("transfer_to")}
+      </Link>
+    ),
   },
   {
     accessorKey: "transfer_amount",
@@ -52,8 +72,9 @@ export const transferColumns: ColumnDef<Transfer>[] = [
     accessorKey: "transfer_time",
     header: "Transfer Time",
     cell: ({ row }) => {
-      const time = row.getValue("transfer_time") as string;
-      return <div>{new Date(time).toLocaleString()}</div>;
+      const rawTime = row.getValue("transfer_time") as string;
+      const parsedTime = new Date(rawTime.replace(" +0000 +0000", "Z"));
+      return <div>{parsedTime.toLocaleString()}</div>;
     },
   },
   {

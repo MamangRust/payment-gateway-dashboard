@@ -5,6 +5,7 @@ import {
   CreateMerchant,
   FindAllMerchant,
   FindAllMerchantTransaction,
+  FindAllTransactionByApiKey,
   findByApiKeyMerchant,
   FindByIdMerchant,
   FindMerchantUser,
@@ -608,6 +609,269 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
     }
   },
 
+  findMonthPaymentMethodByApiKey: async (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => {
+    set({ loadingMonthPaymentMethod: true, errorMonthPaymentMethod: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthPaymentMethodByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          monthPaymentMethod: response.data,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthPaymentMethodByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          monthPaymentMethod: response,
+          loadingMonthPaymentMethod: false,
+          errorMonthPaymentMethod: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthPaymentMethod: false }),
+        (message: any) => set({ errorMonthPaymentMethod: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearPaymentMethodByApiKey: async (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => {
+    set({ loadingYearPaymentMethod: true, errorYearPaymentMethod: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearPaymentMethodByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearPaymentMethod: response.data,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      } else {
+        const response = await MerchantService.findYearPaymentMethodByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearPaymentMethod: response,
+          loadingYearPaymentMethod: false,
+          errorYearPaymentMethod: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearPaymentMethod: false }),
+        (message: any) => set({ errorYearPaymentMethod: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthAmountByApiKey: async (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => {
+    set({ loadingMonthAmount: true, errorMonthAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          monthAmount: response.data,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          monthAmount: response,
+          loadingMonthAmount: false,
+          errorMonthAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthAmount: false }),
+        (message: any) => set({ errorMonthAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearAmountByApiKey: async (toast: any, year: number, api_key: string) => {
+    set({ loadingYearAmount: true, errorYearAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearAmount: response.data,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearAmount: response,
+          loadingYearAmount: false,
+          errorYearAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearAmount: false }),
+        (message: any) => set({ errorYearAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findMonthTotalAmountByApiKey: async (
+    toast: any,
+    year: number,
+    month: number,
+    api_key: string,
+  ) => {
+    set({ loadingMonthTotalAmount: true, errorMonthTotalAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findMonthTotalAmountByApiKey(
+          token,
+          year,
+          month,
+          api_key,
+        );
+
+        set({
+          monthTotalAmount: response.data,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findMonthTotalAmountByApiKey(
+          token,
+          year,
+          month,
+          api_key,
+        );
+
+        set({
+          monthTotalAmount: response,
+          loadingMonthTotalAmount: false,
+          errorMonthTotalAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingMonthTotalAmount: false }),
+        (message: any) => set({ errorMonthTotalAmount: message }),
+        toast,
+      );
+    }
+  },
+
+  findYearTotalAmountByApiKey: async (
+    toast: any,
+    year: number,
+    api_key: string,
+  ) => {
+    set({ loadingYearTotalAmount: true, errorYearTotalAmount: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findYearTotalAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearTotalAmount: response.data,
+          loadingYearTotalAmount: false,
+          errorYearTotalAmount: null,
+        });
+      } else {
+        const response = await MerchantService.findYearTotalAmountByApiKey(
+          token,
+          year,
+          api_key,
+        );
+
+        set({
+          yearTotalAmount: response,
+          loadingYearTotalAmount: false,
+          errorYearTotalAmount: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingYearTotalAmount: false }),
+        (message: any) => set({ errorYearTotalAmount: message }),
+        toast,
+      );
+    }
+  },
+
   findAllMerchants: async (req: FindAllMerchant) => {
     set({ loadingGetMerchants: true, errorGetMerchants: null });
     try {
@@ -702,8 +966,74 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
       const token = getAccessToken();
 
       if (isTauri()) {
+        const response = await MerchantCommand.findAllTransactionByMerchant(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
       } else {
         const response = await MerchantService.findAllTransactionByMerchant(
+          req,
+          token,
+        );
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        () => set({ loadingGetTransactions: false }),
+        (message: any) => set({ errorGetTransactions: message }),
+        req.toast,
+      );
+    }
+  },
+
+  findAllTransactionByApiKey: async (req: FindAllTransactionByApiKey) => {
+    set({ loadingGetTransactions: true, errorGetTransactions: null });
+    try {
+      const token = getAccessToken();
+
+      if (isTauri()) {
+        const response = await MerchantCommand.findAllTransactionByApiKey(
+          token,
+          req,
+        );
+
+        set({
+          transactions: response.data,
+          paginationTransaction: {
+            currentPage: response.pagination.current_page,
+            page_size: response.pagination.page_size,
+            totalItems: response.pagination.total_records,
+            totalPages: response.pagination.total_pages,
+          },
+          loadingGetTransactions: false,
+          errorGetTransactions: null,
+        });
+      } else {
+        const response = await MerchantService.findAllTransactionByApiKey(
           req,
           token,
         );

@@ -1,4 +1,7 @@
 export interface FindByCardNumberWithdraw {
-  cardNumber: any;
+  cardNumber: string;
+  search: string;
+  page: number;
+  page_size: number;
   toast: any;
 }

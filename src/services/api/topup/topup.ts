@@ -108,6 +108,100 @@ class TopupService {
     }
   }
 
+  async findMonthStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTopupMonthStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/topups/monthly-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusSuccessByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTopupYearStatusSuccess["data"]> {
+    try {
+      const response = await myApi.get("/topups/yearly-success-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+  async findMonthStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTopupMonthStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/topups/monthly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          month,
+          card_number: cardNumber,
+        },
+      });
+
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
+  async findYearStatusFailedByCardNumber(
+    access_token: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTopupYearStatusFailed["data"]> {
+    try {
+      const response = await myApi.get("/topups/yearly-failed-by-card", {
+        headers: { Authorization: `Bearer ${access_token}` },
+        params: {
+          year,
+          card_number: cardNumber,
+        },
+      });
+      if (response.status == 200) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || "Login failed.");
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed.");
+    }
+  }
+
   async findMonthTopupMethod(
     access_token: string,
     year: number,
@@ -346,17 +440,22 @@ class TopupService {
   async findByCardNumberTopup(
     access_token: string,
     req: FindByCardNumberTopup,
-  ): Promise<ApiResponseTopup["data"]> {
+  ): Promise<ApiResponsePaginationTopup> {
     try {
       const response = await myApi.get(
         `/topups/card-number/${req.cardNumber}`,
         {
+          params: {
+            page: req.page,
+            page_size: req.page_size,
+            search: req.search,
+          },
           headers: { Authorization: `Bearer ${access_token}` },
         },
       );
 
       if (response.status == 200) {
-        return response.data.data;
+        return response.data;
       }
       throw new Error(response.data.message || "Login failed.");
     } catch (error: any) {

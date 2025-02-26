@@ -30,6 +30,8 @@ export default function useListWithdraw() {
     pagination,
     loadingGetWithdraws,
     setLoadingGetWithdraws,
+    errorGetWithdraw,
+    setErrorGetWithdraw,
     findAllWithdraws,
   } = useWithdrawStore();
   const { showModal } = useModalWithdraw();
@@ -114,5 +116,7 @@ export default function useListWithdraw() {
     handlePageSizeChange,
     isLoadingWithDelay,
     showModal,
+    errorGetWithdraw,
+    setErrorGetWithdraw,
   };
 }

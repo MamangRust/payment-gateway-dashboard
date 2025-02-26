@@ -18,7 +18,11 @@ class CardTrashedService {
   ): Promise<ApiResponsePaginationCardDeleteAt> {
     try {
       const response = await myApi.get("/card/trashed", {
-        params: { page: req.page, page_size: req.pageSize, search: req.search },
+        params: {
+          page: req.page,
+          page_size: req.page_size,
+          search: req.search,
+        },
         headers: { Authorization: `Bearer ${access_token}` },
       });
 

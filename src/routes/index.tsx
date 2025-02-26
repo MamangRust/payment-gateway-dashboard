@@ -4,12 +4,12 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import AuthLayout from "@/layouts/auth";
 import LoginPage from "@/pages/auth/login";
 import CardDashboard from "@/pages/admin/dashboard/card/dashboard-card";
-import DashboardSaldo from "@/pages/admin/dashboard/dashboard-saldo";
+import DashboardSaldo from "@/pages/admin/dashboard/saldo/dashboard-saldo";
 import DashboardMerchant from "@/pages/admin/dashboard/merchant/dashboard-merchant";
 import DashboardTopups from "@/pages/admin/dashboard/topup/dashboard-topup";
 import DashboardTransactions from "@/pages/admin/dashboard/transaction/dashboard-transaction";
-import DashboardTransfers from "@/pages/admin/dashboard/dashboard-transfer";
-import DashboardWithdraws from "@/pages/admin/dashboard/dashboard-withdraw";
+import DashboardTransfers from "@/pages/admin/dashboard/transfer/dashboard-transfer";
+import DashboardWithdraws from "@/pages/admin/dashboard/withdraw/dashboard-withdraw";
 import ProfilePage from "@/pages/admin/user-profile";
 import SaldoPage from "@/pages/admin/saldo/saldo";
 import CardPage from "@/pages/admin/card/card";
@@ -31,6 +31,13 @@ import WithdrawTrashedPage from "@/pages/admin/withdraw/withdrawTrashed";
 import DashboardCardByCardNumber from "@/pages/admin/dashboard/card/dashboard-card-bycardnumber";
 import RolePage from "@/pages/admin/role/role";
 import RoleTrashedPage from "@/pages/admin/role/roleTrashed";
+import CardDetail from "@/pages/admin/card/cardDetail";
+import MerchantDetail from "@/pages/admin/merchant/merchantDetail";
+import MerchantDetailApiKey from "@/pages/admin/merchant/merchantApiKey";
+import TopupDetail from "@/pages/admin/topup/topupDetail";
+import TransactionDetail from "@/pages/admin/transaction/transactionDetail";
+import TransferDetail from "@/pages/admin/transfer/transferDetail";
+import WithdrawDetail from "@/pages/admin/withdraw/withdrawDetail";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +104,10 @@ const router = createBrowserRouter([
         element: <CardPage />,
       },
       {
+        path: "detail/:card_number",
+        element: <CardDetail />,
+      },
+      {
         path: "trashed",
         element: <CardTrashedPage />,
       },
@@ -110,6 +121,14 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <MerchantPage />,
+      },
+      {
+        path: "detail/:merchant_id",
+        element: <MerchantDetail />,
+      },
+      {
+        path: "detail-key/:api_key",
+        element: <MerchantDetailApiKey />,
       },
       {
         path: "trashed",
@@ -142,6 +161,10 @@ const router = createBrowserRouter([
         element: <TopupPage />,
       },
       {
+        path: "detail/:card_number",
+        element: <TopupDetail />,
+      },
+      {
         path: "trashed",
         element: <TopupTrashedPage />,
       },
@@ -157,6 +180,10 @@ const router = createBrowserRouter([
         element: <TransactionPage />,
       },
       {
+        path: "detail/:card_number",
+        element: <TransactionDetail />,
+      },
+      {
         path: "trashed",
         element: <TransactionTrashedPage />,
       },
@@ -170,6 +197,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <TransferPage />,
+      },
+      {
+        path: "detail/:card_number",
+        element: <TransferDetail />,
       },
       {
         path: "trashed",
@@ -226,6 +257,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <WithdrawPage />,
+      },
+      {
+        path: "detail/:card_number",
+        element: <WithdrawDetail />,
       },
       {
         path: "trashed",

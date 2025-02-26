@@ -24,11 +24,10 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 
 class TransactionCommand {
-
   async findMonthStatusSuccessTransaction(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseTransactionMonthStatusSuccess> {
     try {
       return await invoke("find_month_status_success_transaction", {
@@ -44,7 +43,7 @@ class TransactionCommand {
 
   async findYearStatusSuccessTransaction(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionYearStatusSuccess> {
     try {
       return await invoke("find_year_status_success_transaction", {
@@ -60,7 +59,7 @@ class TransactionCommand {
   async findMonthStatusFailedTransaction(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseTransactionMonthStatusFailed> {
     try {
       return await invoke("find_month_status_failed_transaction", {
@@ -76,7 +75,7 @@ class TransactionCommand {
 
   async findYearStatusFailedTransaction(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionYearStatusFailed> {
     try {
       return await invoke("find_year_status_failed_transaction", {
@@ -89,10 +88,93 @@ class TransactionCommand {
     }
   }
 
+  async findMonthStatusSuccessTransactionByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionMonthStatusSuccess> {
+    try {
+      return await invoke(
+        "find_month_status_success_transaction_by_card_number",
+        {
+          accessToken,
+          year,
+          month,
+          cardNumber,
+        },
+      );
+    } catch (error) {
+      console.error("Error in findMonthStatusSuccessTransaction:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusSuccessTransactionByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionYearStatusSuccess> {
+    try {
+      return await invoke(
+        "find_year_status_success_transaction_by_card_number",
+        {
+          accessToken,
+          year,
+          cardNumber,
+        },
+      );
+    } catch (error) {
+      console.error("Error in findYearStatusSuccessTransaction:", error);
+      throw error;
+    }
+  }
+
+  async findMonthStatusFailedTransactionByCardNumber(
+    accessToken: string,
+    year: number,
+    month: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionMonthStatusFailed> {
+    try {
+      return await invoke(
+        "find_month_status_failed_transaction_by_card_number",
+        {
+          accessToken,
+          year,
+          month,
+          cardNumber,
+        },
+      );
+    } catch (error) {
+      console.error("Error in findMonthStatusFailedTransaction:", error);
+      throw error;
+    }
+  }
+
+  async findYearStatusFailedTransactionByCardNumber(
+    accessToken: string,
+    year: number,
+    cardNumber: string,
+  ): Promise<ApiResponseTransactionYearStatusFailed> {
+    try {
+      return await invoke(
+        "find_year_status_failed_transaction_by_card_number",
+        {
+          accessToken,
+          year,
+          cardNumber,
+        },
+      );
+    } catch (error) {
+      console.error("Error in findYearStatusFailedTransaction:", error);
+      throw error;
+    }
+  }
 
   async findMonthTransactionMethod(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionMonthMethod> {
     try {
       return await invoke("find_month_transaction_method", {
@@ -107,7 +189,7 @@ class TransactionCommand {
 
   async findYearTransactionMethod(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionYearMethod> {
     try {
       return await invoke("find_year_transaction_method", {
@@ -122,7 +204,7 @@ class TransactionCommand {
 
   async findMonthTransactionAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionMonthAmount> {
     try {
       return await invoke("find_month_transaction_amount", {
@@ -137,7 +219,7 @@ class TransactionCommand {
 
   async findYearTransactionAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseTransactionYearAmount> {
     try {
       return await invoke("find_year_transaction_amount", {
@@ -153,7 +235,7 @@ class TransactionCommand {
   async findMonthTransactionMethodByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransactionMonthMethod> {
     try {
       return await invoke("find_month_transaction_method_by_card", {
@@ -170,7 +252,7 @@ class TransactionCommand {
   async findYearTransactionMethodByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransactionYearMethod> {
     try {
       return await invoke("find_year_transaction_method_by_card", {
@@ -187,7 +269,7 @@ class TransactionCommand {
   async findMonthTransactionAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransactionMonthAmount> {
     try {
       return await invoke("find_month_transaction_amount_by_card", {
@@ -204,7 +286,7 @@ class TransactionCommand {
   async findYearTransactionAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseTransactionYearAmount> {
     try {
       return await invoke("find_year_transaction_amount_by_card", {
@@ -220,7 +302,7 @@ class TransactionCommand {
 
   async findAllTransactions(
     accessToken: string,
-    req: FindAllTransaction
+    req: FindAllTransaction,
   ): Promise<ApiResponsePaginationTransaction> {
     try {
       return await invoke("find_all_transactions_transaction", {
@@ -235,7 +317,7 @@ class TransactionCommand {
 
   async findByIdTransaction(
     accessToken: string,
-    req: FindyByIdTransaction
+    req: FindyByIdTransaction,
   ): Promise<ApiResponseTransaction> {
     try {
       return await invoke("find_by_id_transaction", {
@@ -250,8 +332,8 @@ class TransactionCommand {
 
   async findByCardNumberTransaction(
     accessToken: string,
-    req: FindyByCardNumberTransaction
-  ): Promise<ApiResponseTransactions> {
+    req: FindyByCardNumberTransaction,
+  ): Promise<ApiResponsePaginationTransaction> {
     try {
       return await invoke("find_by_card_number_transaction", {
         accessToken,
@@ -265,7 +347,7 @@ class TransactionCommand {
 
   async findByMerchantTransaction(
     accessToken: string,
-    req: FindyByMerchantTransaction
+    req: FindyByMerchantTransaction,
   ): Promise<ApiResponseTransactions> {
     try {
       return await invoke("find_by_merchant_transaction", {
@@ -280,7 +362,7 @@ class TransactionCommand {
 
   async findByActiveTransaction(
     accessToken: string,
-    req: FindAllTransaction
+    req: FindAllTransaction,
   ): Promise<ApiResponsePaginationTransactionDeleteAt> {
     try {
       return await invoke("find_by_active_transaction", {
@@ -295,7 +377,7 @@ class TransactionCommand {
 
   async createTransaction(
     accessToken: string,
-    req: CreateTransaction
+    req: CreateTransaction,
   ): Promise<ApiResponseTransaction> {
     try {
       return await invoke("create_transaction", {
@@ -310,7 +392,7 @@ class TransactionCommand {
 
   async updateTransaction(
     accessToken: string,
-    req: UpdateTransaction
+    req: UpdateTransaction,
   ): Promise<ApiResponseTransaction> {
     try {
       return await invoke("update_transaction", {
@@ -325,7 +407,7 @@ class TransactionCommand {
 
   async trashedTransaction(
     accessToken: string,
-    req: TrashedTransaction
+    req: TrashedTransaction,
   ): Promise<ApiResponseTransaction> {
     try {
       return await invoke("trashed_transaction", {

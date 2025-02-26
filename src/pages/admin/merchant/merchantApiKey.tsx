@@ -1,37 +1,83 @@
-import { Store } from "lucide-react";
+import { TrendingDown, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { YearPicker } from "@/components/ui/yearpicker";
-import useListMerchant from "@/hooks/admin/merchant/ListMerchant";
-import { TableMerchant } from "@/components/admin/merchant";
 import useMerchantStore from "@/store/merchant/merchant";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { formatRupiah } from "@/helpers/formatRupiah";
+import { months, MonthPicker } from "@/components/ui/monthpicker";
 import { debounce } from "@/helpers/debounce";
 import ChartSkeleton from "@/components/ui/chartSkeleton";
 import ThemeChart from "@/components/ui/chart";
-import { formatRupiah } from "@/helpers/formatRupiah";
-import useListTransactionMerchant from "@/hooks/admin/merchant/ListTransactionMerchant";
+import { useParams } from "react-router-dom";
 import TableMerchantTransaction from "@/components/admin/merchant/table/transaction/table-merchant-transaction";
+import useListTransactionByApiKey from "@/hooks/admin/merchant/ListTransactionByApikey";
 
-export default function DashboardMerchant() {
+export default function MerchantDetailApiKey() {
   const initialYear = useMemo(() => {
     const currentDate = new Date();
     return currentDate.getFullYear();
   }, []);
+  const params = useParams();
+
+  const currentMonthIndex = new Date().getMonth();
+  const currentMonth = months[currentMonthIndex];
+
+  const [selectedMonth, setSelectedMonth] = useState<{
+    name: string;
+    number: number;
+  }>({
+    name: currentMonth.value,
+    number: currentMonth.number,
+  });
 
   const [selectedYear, setSelectedYear] = useState<number>(initialYear);
 
+  const api_key = params.api_key;
+
   const {
-    table: merchantTable,
-    search: merchantSearch,
-    setSearch: setMerchantSearch,
-    loadingGetMerchants,
-    pagination: merchantPagination,
-    handlePageChange: handleMerchantPageChange,
-    handlePageSizeChange: handleMerchantPageSizeChange,
-    isLoadingWithDelay: isMerchantLoadingWithDelay,
-    showModal: showMerchantModal,
-  } = useListMerchant();
+    findMonthTotalAmountByApiKey,
+    monthTotalAmount,
+    loadingMonthTotalAmount,
+    errorMonthTotalAmount,
+    setLoadingMonthTotalAmount,
+    setErrorMonthTotalAmount,
+
+    findYearTotalAmountByApiKey,
+    yearTotalAmount,
+    loadingYearTotalAmount,
+    errorYearTotalAmount,
+    setLoadingYearTotalAmount,
+    setErrorYearTotalAmount,
+
+    findMonthPaymentMethodByApiKey,
+    monthPaymentMethod,
+    loadingMonthPaymentMethod,
+    errorMonthPaymentMethod,
+    setLoadingMonthPaymentMethod,
+    setErrorMonthPaymentMethod,
+
+    findYearPaymentMethodByApiKey,
+    yearPaymentMethod,
+    loadingYearPaymentMethod,
+    errorYearPaymentMethod,
+    setLoadingYearPaymentMethod,
+    setErrorYearPaymentMethod,
+
+    findMonthAmountByApiKey,
+    monthAmount,
+    loadingMonthAmount,
+    errorMonthAmount,
+    setLoadingMonthAmount,
+    setErrorMonthAmount,
+
+    findYearAmountByApiKey,
+    yearAmount,
+    loadingYearAmount,
+    errorYearAmount,
+    setLoadingYearAmount,
+    setErrorYearAmount,
+  } = useMerchantStore();
 
   const {
     table: transactionTable,
@@ -42,39 +88,96 @@ export default function DashboardMerchant() {
     handlePageChange: handleTransactionPageChange,
     handlePageSizeChange: handleTransactionPageSizeChange,
     isLoadingWithDelay: isTransactionLoadingWithDelay,
-  } = useListTransactionMerchant();
-
-  const {
-    findMonthPaymentMethod,
-    monthPaymentMethod,
-    loadingMonthPaymentMethod,
-    errorMonthPaymentMethod,
-    setLoadingMonthPaymentMethod,
-    setErrorMonthPaymentMethod,
-
-    findYearPaymentMethod,
-    yearPaymentMethod,
-    loadingYearPaymentMethod,
-    errorYearPaymentMethod,
-    setLoadingYearPaymentMethod,
-    setErrorYearPaymentMethod,
-
-    findMonthAmount,
-    monthAmount,
-    loadingMonthAmount,
-    errorMonthAmount,
-    setLoadingMonthAmount,
-    setErrorMonthAmount,
-
-    findYearAmount,
-    yearAmount,
-    loadingYearAmount,
-    errorYearAmount,
-    setLoadingYearAmount,
-    setErrorYearAmount,
-  } = useMerchantStore();
+  } = useListTransactionByApiKey({ api_key: api_key! });
 
   const { toast } = useToast();
+
+  const handleYearChange = (newYear: number) => {
+    setSelectedYear(newYear);
+  };
+  const handleMonthChange = (month: { name: string; number: number }) => {
+    setSelectedMonth(month);
+  };
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonths = currentDate.getMonth();
+
+  const previousMonth = currentMonths === 0 ? 11 : currentMonths - 1;
+  const previousYear = currentMonths === 0 ? currentYear - 1 : currentYear;
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const calculatePercentageChange = (
+    current: number,
+    previous: number,
+  ): number => {
+    if (previous === 0) return 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const currentMonthData =
+    monthTotalAmount && Array.isArray(monthTotalAmount)
+      ? monthTotalAmount.find(
+          (balance) =>
+            balance.month === monthNames[currentMonths] &&
+            balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousMonthData =
+    monthTotalAmount && Array.isArray(monthTotalAmount)
+      ? monthTotalAmount.find(
+          (balance) =>
+            balance.month === monthNames[previousMonth] &&
+            balance.year === previousYear.toString(),
+        )
+      : null;
+
+  const currentMonthBalance = currentMonthData?.total_amount || 0;
+  const previousMonthBalance = previousMonthData?.total_amount || 0;
+
+  const monthPercentageChange = calculatePercentageChange(
+    currentMonthBalance,
+    previousMonthBalance,
+  );
+
+  const currentYearData =
+    yearTotalAmount && Array.isArray(yearTotalAmount)
+      ? yearTotalAmount.find(
+          (balance) => balance.year === currentYear.toString(),
+        )
+      : null;
+
+  const previousYearData =
+    yearTotalAmount && Array.isArray(yearTotalAmount)
+      ? yearTotalAmount.find(
+          (balance) => balance.year === (currentYear - 1).toString(),
+        )
+      : null;
+
+  const currentYearBalance = currentYearData?.total_amount || 0;
+  const previousYearBalance = previousYearData?.total_amount || 0;
+
+  console.log("example month", monthTotalAmount);
+
+  const yearPercentageChange = calculatePercentageChange(
+    currentYearBalance,
+    previousYearBalance,
+  );
 
   const monthlyPaymentMethod = useMemo(() => {
     if (!monthPaymentMethod || !Array.isArray(monthPaymentMethod)) {
@@ -162,13 +265,53 @@ export default function DashboardMerchant() {
     return years.map((year) => balanceMap.get(year) || 0);
   }, [yearAmount]);
 
+  const fetchMonthlyTotalbalance = useCallback(
+    async (year: number, month: number, api_key: string) => {
+      try {
+        setLoadingMonthTotalAmount(true);
+        setErrorMonthTotalAmount(null);
+
+        await findMonthTotalAmountByApiKey(toast, year, month, api_key);
+      } catch (error) {
+        setErrorMonthTotalAmount("Failed to fetch monthly balance");
+      } finally {
+        setLoadingMonthTotalAmount(false);
+      }
+    },
+    [
+      findMonthTotalAmountByApiKey,
+      setLoadingMonthTotalAmount,
+      setErrorMonthTotalAmount,
+    ],
+  );
+
+  const fetchYearlyTotalBalance = useCallback(
+    async (year: number, api_key: string) => {
+      try {
+        setLoadingYearTotalAmount(true);
+        setErrorYearTotalAmount(null);
+
+        await findYearTotalAmountByApiKey(toast, year, api_key);
+      } catch (error) {
+        setErrorYearTotalAmount("Failed to fetch yearly balance");
+      } finally {
+        setLoadingYearTotalAmount(false);
+      }
+    },
+    [
+      findYearTotalAmountByApiKey,
+      setLoadingYearTotalAmount,
+      setErrorYearTotalAmount,
+    ],
+  );
+
   const fetchMonthlyPaymentMethod = useCallback(
-    async (year: number) => {
+    async (year: number, api_key: string) => {
       try {
         setLoadingMonthPaymentMethod(true);
         setErrorMonthPaymentMethod(null);
 
-        await findMonthPaymentMethod(toast, year);
+        await findMonthPaymentMethodByApiKey(toast, year, api_key);
       } catch (error) {
         console.error("Failed to fetch monthly payment method:", error);
         setErrorMonthPaymentMethod("Failed to fetch monthly payment method");
@@ -177,19 +320,19 @@ export default function DashboardMerchant() {
       }
     },
     [
-      findMonthPaymentMethod,
+      findMonthPaymentMethodByApiKey,
       setLoadingMonthPaymentMethod,
       setErrorMonthPaymentMethod,
     ],
   );
 
   const fetchYearlyPaymentMethod = useCallback(
-    async (year: number) => {
+    async (year: number, api_key: string) => {
       try {
         setLoadingYearPaymentMethod(true);
         setErrorYearPaymentMethod(null);
 
-        await findYearPaymentMethod(toast, year);
+        await findYearPaymentMethodByApiKey(toast, year, api_key);
       } catch (error) {
         setErrorYearPaymentMethod("Failed to fetch yearly balance");
       } finally {
@@ -197,19 +340,19 @@ export default function DashboardMerchant() {
       }
     },
     [
-      findYearPaymentMethod,
+      findYearPaymentMethodByApiKey,
       setLoadingYearPaymentMethod,
       setErrorYearPaymentMethod,
     ],
   );
 
   const fetchMonthlyAmount = useCallback(
-    async (year: number) => {
+    async (year: number, api_key: string) => {
       try {
         setLoadingMonthAmount(true);
         setErrorMonthAmount(null);
 
-        await findMonthAmount(toast, year);
+        await findMonthAmountByApiKey(toast, year, api_key);
       } catch (error) {
         console.error("Failed to fetch monthly payment method:", error);
         setErrorMonthAmount("Failed to fetch monthly payment method");
@@ -217,28 +360,33 @@ export default function DashboardMerchant() {
         setLoadingMonthAmount(false);
       }
     },
-    [findMonthAmount, setLoadingMonthAmount, setErrorMonthAmount],
+    [findMonthAmountByApiKey, setLoadingMonthAmount, setErrorMonthAmount],
   );
 
   const fetchYearlyAmount = useCallback(
-    async (year: number) => {
+    async (year: number, api_key: string) => {
       try {
         setLoadingYearAmount(true);
         setErrorYearAmount(null);
 
-        await findYearAmount(toast, year);
+        await findYearAmountByApiKey(toast, year, api_key);
       } catch (error) {
         setErrorYearAmount("Failed to fetch yearly balance");
       } finally {
         setLoadingYearAmount(false);
       }
     },
-    [findYearAmount, setLoadingYearAmount, setErrorYearAmount],
+    [findYearAmountByApiKey, setLoadingYearAmount, setErrorYearAmount],
   );
 
-  const handleYearChange = (newYear: number) => {
-    setSelectedYear(newYear);
-  };
+  const debouncedFetchMonthlyTotalBalance = debounce(
+    fetchMonthlyTotalbalance,
+    300,
+  );
+  const debouncedFetchYearlyTotalBalance = debounce(
+    fetchYearlyTotalBalance,
+    300,
+  );
 
   const debouncedFetchMonthlyPaymentMethod = debounce(
     fetchMonthlyPaymentMethod,
@@ -255,10 +403,16 @@ export default function DashboardMerchant() {
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([
-        debouncedFetchMonthlyPaymentMethod(selectedYear),
-        debouncedFetchYearlyPaymentMethod(selectedYear),
-        debouncedFetchMonthlyAmount(selectedYear),
-        debouncedFetchYearlyAmount(selectedYear),
+        debouncedFetchMonthlyPaymentMethod(selectedYear, api_key),
+        debouncedFetchYearlyPaymentMethod(selectedYear, api_key),
+        debouncedFetchMonthlyAmount(selectedYear, api_key),
+        debouncedFetchYearlyAmount(selectedYear, api_key),
+        debouncedFetchMonthlyTotalBalance(
+          selectedYear,
+          selectedMonth.number,
+          api_key,
+        ),
+        debouncedFetchYearlyTotalBalance(selectedYear, api_key),
       ]);
     };
 
@@ -269,50 +423,67 @@ export default function DashboardMerchant() {
       debouncedFetchYearlyPaymentMethod.cancel();
       debouncedFetchMonthlyAmount.cancel();
       debouncedFetchYearlyAmount.cancel();
+      debouncedFetchMonthlyTotalBalance.cancel();
+      debouncedFetchYearlyTotalBalance.cancel();
     };
-  }, [selectedYear]);
+  }, [selectedYear, selectedMonth]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-10">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-10">
         <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Merchants
+              Total Amount Month
             </CardTitle>
-            <Store className="h-6 w-6 text-gray-500" />
+            <Wallet className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45</div>
+            <div className="text-2xl font-bold">
+              {currentMonthData
+                ? formatRupiah(currentMonthBalance)
+                : "Data tidak tersedia"}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {previousMonthData
+                ? `${monthPercentageChange >= 0 ? "↑" : "↓"} ${Math.abs(monthPercentageChange).toFixed(2)}% dari bulan sebelumnya`
+                : "Tidak ada data bulan sebelumnya"}
+            </p>
           </CardContent>
         </Card>
-
         <Card className="w-full shadow-lg rounded-md border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Merchants
+              Total Amount Year
             </CardTitle>
-            <Store className="h-6 w-6 text-green-500" />
+            <TrendingDown className="h-6 w-6 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">30</div>
-          </CardContent>
-        </Card>
-
-        <Card className="w-full shadow-lg rounded-md border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Suspended Merchants
-            </CardTitle>
-            <Store className="h-6 w-6 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">
+              {currentYearData
+                ? formatRupiah(currentYearBalance)
+                : "Data tidak tersedia"}
+            </div>
+            {currentYearData && previousYearData ? (
+              <p className="text-sm text-muted-foreground">
+                {yearPercentageChange >= 0 ? "↑" : "↓"}{" "}
+                {Math.abs(yearPercentageChange).toFixed(2)}% dari tahun
+                sebelumnya
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Tidak ada data tahun sebelumnya
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
       <div className="flex-1 flex flex-col min-h-0 space-y-8 mt-4">
         <div className="flex justify-between">
+          <div>
+            <MonthPicker onMonthChange={handleMonthChange} />
+          </div>
+
           <div>
             <YearPicker
               selectedYear={selectedYear}
@@ -363,7 +534,7 @@ export default function DashboardMerchant() {
                         formatter: (value) => formatRupiah(value),
                       },
                     },
-                    colors: ["#6366F1", "#10B981", "#F59E0B"], // Warna untuk tiap metode pembayaran
+                    colors: ["#6366F1", "#10B981", "#F59E0B"],
                   }}
                   series={monthlyPaymentMethod}
                   type="line"
@@ -502,18 +673,6 @@ export default function DashboardMerchant() {
           )}
         </div>
       </div>
-
-      <TableMerchant
-        search={merchantSearch}
-        setSearch={setMerchantSearch}
-        isLoadingWithDelay={isMerchantLoadingWithDelay}
-        loadingGetMerchants={loadingGetMerchants}
-        table={merchantTable}
-        pagination={merchantPagination}
-        handlePageChange={handleMerchantPageChange}
-        handlePageSizeChange={handleMerchantPageSizeChange}
-      />
-
       <TableMerchantTransaction
         search={transactionSearch}
         setSearch={setTransactionSearch}

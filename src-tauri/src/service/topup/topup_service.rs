@@ -102,6 +102,88 @@ impl TopupService {
         Ok(response)
     }
 
+    pub async fn find_month_status_success_by_card(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTopupMonthStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!("{}/topups/monthly-success", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTopupMonthStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_success_by_card(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTopupYearStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!("{}/topups/yearly-success-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTopupYearStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_month_status_failed_by_card(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTopupMonthStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/topups/monthly-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTopupMonthStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_failed_by_card(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseTopupYearStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/topups/yearly-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseTopupYearStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
     pub async fn find_month_topup_method(
         &self,
         access_token: &str,

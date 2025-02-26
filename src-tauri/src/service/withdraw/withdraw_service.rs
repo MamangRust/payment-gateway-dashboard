@@ -107,6 +107,88 @@ impl WithdrawService {
         Ok(response)
     }
 
+    pub async fn find_month_status_success_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseWithdrawMonthStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!("{}/withdraws/month-success-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseWithdrawMonthStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_success_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseWithdrawYearStatusSuccess, Error> {
+        let response = self
+            .client
+            .get(format!("{}/withdraws/year-success-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseWithdrawYearStatusSuccess>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_month_status_failed_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        month: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseWithdrawMonthStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/withdraws/month-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year), ("month", month)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseWithdrawMonthStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn find_year_status_failed_by_card_number(
+        &self,
+        access_token: &str,
+        year: u32,
+        card_number: &str,
+    ) -> Result<ApiResponseWithdrawYearStatusFailed, Error> {
+        let response = self
+            .client
+            .get(format!("{}/withdraws/year-failed-by-card", self.base_url))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .query(&[("year", year)])
+            .query(&[("card_number", card_number)])
+            .send()
+            .await?
+            .json::<ApiResponseWithdrawYearStatusFailed>()
+            .await?;
+
+        Ok(response)
+    }
+
     pub async fn find_month_withdraw_amount(
         &self,
         access_token: &str,

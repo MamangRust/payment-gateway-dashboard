@@ -35,7 +35,6 @@ export default function DashboardCard() {
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModal,
   } = useListCard();
 
   const { toast } = useToast();

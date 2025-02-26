@@ -12,3 +12,11 @@ export interface FindAllMerchantTransaction {
   page_size: number;
   toast: any;
 }
+
+export interface FindAllTransactionByApiKey {
+  api_key: string;
+  search: string;
+  page: number;
+  page_size: number;
+  toast: any;
+}

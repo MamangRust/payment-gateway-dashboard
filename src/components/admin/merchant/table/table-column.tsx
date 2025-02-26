@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import TableActionMerchant from "./table-action";
 import { Merchant } from "@/types/model";
+import { Link } from "react-router-dom";
 
 export const merchantColumns: ColumnDef<Merchant>[] = [
   {
@@ -27,6 +28,19 @@ export const merchantColumns: ColumnDef<Merchant>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => (
+      <Link
+        to={`/merchants/detail/${row.getValue("id")}`}
+        className="font-mono text-blue-500 underline"
+        title={row.getValue("id")}
+      >
+        {row.getValue("id")}
+      </Link>
+    ),
+  },
+  {
     accessorKey: "name",
     header: "Merchant Name",
     cell: ({ row }) => <div>{row.getValue("name")}</div>,
@@ -35,9 +49,13 @@ export const merchantColumns: ColumnDef<Merchant>[] = [
     accessorKey: "api_key",
     header: "API Key",
     cell: ({ row }) => (
-      <div className="font-mono truncate" title={row.getValue("api_key")}>
+      <Link
+        to={`/merchants/detail-key/${row.getValue("api_key")}`}
+        className="font-mono text-blue-500 underline"
+        title={row.getValue("api_key")}
+      >
         {row.getValue("api_key")}
-      </div>
+      </Link>
     ),
   },
   {

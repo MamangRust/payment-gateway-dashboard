@@ -15,7 +15,11 @@ import useModalTransfer from "@/store/transfer/modal";
 import { FindAllTransfer } from "@/types/domain/request";
 import { useToast } from "@/hooks/use-toast";
 
-export default function useListTransfer() {
+export default function useListTransfer({
+  card_number = "",
+}: {
+  card_number?: string;
+} = {}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -76,7 +80,7 @@ export default function useListTransfer() {
         setLoadingGetTransfers(true);
 
         const searchReq: FindAllTransfer = {
-          search: search,
+          search: card_number ? card_number : search,
           page: currentPage,
           page_size: pageSize,
           toast: toast,
@@ -84,14 +88,14 @@ export default function useListTransfer() {
 
         await findAllTransfers(searchReq);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching transfers:", error);
       } finally {
         setLoadingGetTransfers(false);
       }
     };
 
     fetchTransfers();
-  }, [search, currentPage, pageSize]);
+  }, [search, currentPage, pageSize, card_number]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
