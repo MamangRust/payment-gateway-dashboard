@@ -6,7 +6,7 @@ import {
   ApiResponseRole,
   ApiResponseRoleAll,
   ApiResponseRoleDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class RoleTrashedService {
   async findAllRolesTrashed(

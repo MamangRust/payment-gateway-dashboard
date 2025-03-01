@@ -6,7 +6,7 @@ import {
   ApiResponseUser,
   ApiResponseUserAll,
   ApiResponseUserDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class UserTrashedService {
   async findAllUsersTrashed(

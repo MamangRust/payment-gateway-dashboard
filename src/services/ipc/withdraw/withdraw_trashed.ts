@@ -8,13 +8,13 @@ import {
   ApiResponseWithdrawAll,
   ApiResponseWithdrawDelete,
   ApiResponsePaginationWithdrawDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class WithdrawTrashedCommand {
   async findAllWithdrawsTrashed(
     accessToken: string,
-    req: FindAllWithdraw
+    req: FindAllWithdraw,
   ): Promise<ApiResponsePaginationWithdrawDeleteAt> {
     try {
       return await invoke("find_all_withdraws_trashed", { accessToken, req });
@@ -26,7 +26,7 @@ class WithdrawTrashedCommand {
 
   async restoreWithdrawTrashed(
     accessToken: string,
-    req: RestoreWithdrawTrashed
+    req: RestoreWithdrawTrashed,
   ): Promise<ApiResponseWithdraw> {
     try {
       return await invoke("restore_withdraw_trashed", { accessToken, req });
@@ -38,7 +38,7 @@ class WithdrawTrashedCommand {
 
   async deletePermanentWithdraw(
     accessToken: string,
-    req: DeletePermanentWithdraw
+    req: DeletePermanentWithdraw,
   ): Promise<ApiResponseWithdrawDelete> {
     try {
       return await invoke("delete_permanent_withdraw", { accessToken, req });
@@ -49,7 +49,7 @@ class WithdrawTrashedCommand {
   }
 
   async restoreWithdrawAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseWithdrawAll> {
     try {
       return await invoke("restore_withdraw_all_trashed", { accessToken });
@@ -60,7 +60,7 @@ class WithdrawTrashedCommand {
   }
 
   async deletePermanentAllWithdraw(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseWithdrawAll> {
     try {
       return await invoke("delete_permanent_all_withdraw", { accessToken });

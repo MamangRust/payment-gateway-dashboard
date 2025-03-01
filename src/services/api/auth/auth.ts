@@ -5,7 +5,7 @@ import {
   ApiResponseRegister,
   ApiResponseGetMe,
   ApiResponseRefreshToken,
-} from "@/types/model/auth";
+} from "@/types/domain/response";
 
 class AuthService {
   /**

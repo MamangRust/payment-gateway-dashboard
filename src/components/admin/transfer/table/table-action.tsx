@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { TableActionTransferProps } from "@/types/table";
 import useModalTransfer from "@/store/transfer/modal";
 
@@ -25,12 +25,6 @@ const TableActionTransfer = ({ transfer }: TableActionTransferProps) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onSelect={() => console.log("Viewing details for:", transfer.id)}
-        >
-          <Eye className="mr-2 h-4 w-4 text-gray-500" />
-          View Details
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => showModalEdit(transfer.id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit

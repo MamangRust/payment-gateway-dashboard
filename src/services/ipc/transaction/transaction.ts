@@ -20,7 +20,7 @@ import {
   ApiResponseTransactionYearMethod,
   ApiResponseTransactionYearStatusFailed,
   ApiResponseTransactionYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class TransactionCommand {

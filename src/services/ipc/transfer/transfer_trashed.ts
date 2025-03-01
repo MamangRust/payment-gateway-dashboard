@@ -8,13 +8,13 @@ import {
   ApiResponseTransferAll,
   ApiResponseTransferDelete,
   ApiResponsePaginationTransferDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class TransferTrashedCommand {
   async findAllTransfersTrashed(
     accessToken: string,
-    req: FindAllTransfer
+    req: FindAllTransfer,
   ): Promise<ApiResponsePaginationTransferDeleteAt> {
     try {
       return await invoke("find_all_transfers_trashed", { accessToken, req });
@@ -26,7 +26,7 @@ class TransferTrashedCommand {
 
   async restoreTransferTrashed(
     accessToken: string,
-    req: RestoreTransferTrashed
+    req: RestoreTransferTrashed,
   ): Promise<ApiResponseTransfer> {
     try {
       return await invoke("restore_transfer_trashed", { accessToken, req });
@@ -38,7 +38,7 @@ class TransferTrashedCommand {
 
   async deletePermanentTransfer(
     accessToken: string,
-    req: DeletePermanentTransfer
+    req: DeletePermanentTransfer,
   ): Promise<ApiResponseTransferDelete> {
     try {
       return await invoke("delete_permanent_transfer", { accessToken, req });
@@ -49,7 +49,7 @@ class TransferTrashedCommand {
   }
 
   async restoreTransferAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseTransferAll> {
     try {
       return await invoke("restore_transfer_all_trashed", { accessToken });
@@ -60,7 +60,7 @@ class TransferTrashedCommand {
   }
 
   async deletePermanentAllTransfer(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseTransferAll> {
     try {
       return await invoke("delete_permanent_all_transfer", { accessToken });

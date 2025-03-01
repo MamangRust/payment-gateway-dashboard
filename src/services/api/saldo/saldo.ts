@@ -15,7 +15,7 @@ import {
   ApiResponseSaldo,
   ApiResponseYearSaldoBalances,
   ApiResponseYearTotalSaldo,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class SaldoService {
   async findMonthTotalBalance(

@@ -11,7 +11,7 @@ import {
   ApiResponsePaginationRole,
   ApiResponsePaginationRoleDeleteAt,
   ApiResponseRole,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class RoleService {
   async findAllRoles(
@@ -91,7 +91,7 @@ class RoleService {
       const response = await myApi.post(
         `/role/create`,
         {
-          name: req.name
+          name: req.name,
         },
         {
           headers: {
@@ -117,7 +117,7 @@ class RoleService {
         `/role/update/${req.role_id}`,
         {
           role: req.role_id,
-          name:req.name,
+          name: req.name,
         },
         {
           headers: {

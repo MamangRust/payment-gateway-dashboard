@@ -17,7 +17,7 @@ import {
   ApiResponseWithdrawYearAmount,
   ApiResponseWithdrawYearStatusFailed,
   ApiResponseWithdrawYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class WithdrawService {
   async findMonthStatusSuccess(

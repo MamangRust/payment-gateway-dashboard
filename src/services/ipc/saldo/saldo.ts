@@ -12,15 +12,14 @@ import {
   ApiResponseSaldo,
   ApiResponseYearSaldoBalances,
   ApiResponseYearTotalSaldo,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class SaldoCommand {
-
   async findMonthTotalBalance(
     accessToken: string,
     year: number,
-    month: number
+    month: number,
   ): Promise<ApiResponseMonthTotalSaldo> {
     try {
       return await invoke("find_month_total_balance", {
@@ -36,7 +35,7 @@ class SaldoCommand {
 
   async findYearTotalBalance(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearTotalSaldo> {
     try {
       return await invoke("find_year_total_balance", {
@@ -51,7 +50,7 @@ class SaldoCommand {
 
   async findMonthBalance(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthSaldoBalances> {
     try {
       return await invoke("find_month_balance", {
@@ -66,7 +65,7 @@ class SaldoCommand {
 
   async findYearBalance(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearSaldoBalances> {
     try {
       return await invoke("find_year_balance", {
@@ -81,17 +80,20 @@ class SaldoCommand {
 
   async findAllSaldos(
     accessToken: string,
-    req: FindAllSaldo
+    req: FindAllSaldo,
   ): Promise<ApiResponsePaginationSaldo> {
     try {
-      const response = await invoke<ApiResponsePaginationSaldo>("find_all_saldos", {
-        accessToken,
-        req,
-      });
+      const response = await invoke<ApiResponsePaginationSaldo>(
+        "find_all_saldos",
+        {
+          accessToken,
+          req,
+        },
+      );
 
-      console.log("response", response)
+      console.log("response", response);
 
-      return response
+      return response;
     } catch (error) {
       console.error("Error in findAllSaldos:", error);
       throw error;
@@ -100,7 +102,7 @@ class SaldoCommand {
 
   async findByIdSaldo(
     accessToken: string,
-    req: FindByIdSaldo
+    req: FindByIdSaldo,
   ): Promise<ApiResponseSaldo> {
     try {
       return await invoke("find_by_id_saldo", {
@@ -115,7 +117,7 @@ class SaldoCommand {
 
   async findByActiveSaldo(
     accessToken: string,
-    req: FindAllSaldo
+    req: FindAllSaldo,
   ): Promise<ApiResponsePaginationSaldoDeleteAt> {
     try {
       return await invoke("find_by_active_saldo", {
@@ -130,7 +132,7 @@ class SaldoCommand {
 
   async createSaldo(
     accessToken: string,
-    req: CreateSaldo
+    req: CreateSaldo,
   ): Promise<ApiResponseSaldo> {
     try {
       return await invoke("create_saldo", {
@@ -145,7 +147,7 @@ class SaldoCommand {
 
   async updateSaldo(
     accessToken: string,
-    req: UpdateSaldo
+    req: UpdateSaldo,
   ): Promise<ApiResponseSaldo> {
     try {
       return await invoke("update_saldo", {
@@ -160,7 +162,7 @@ class SaldoCommand {
 
   async trashedSaldo(
     accessToken: string,
-    req: FindByIdSaldo
+    req: FindByIdSaldo,
   ): Promise<ApiResponseSaldo> {
     try {
       return await invoke("trashed_saldo", {

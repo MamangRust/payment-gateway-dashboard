@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { TableActionWithdrawProps } from "@/types/table";
 import useModalWithdraw from "@/store/withdraw/modal";
 
@@ -25,14 +25,6 @@ const TableActionWithdraw = ({ withdraw }: TableActionWithdrawProps) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onSelect={() =>
-            console.log("Viewing details for:", withdraw.withdraw_id)
-          }
-        >
-          <Eye className="mr-2 h-4 w-4 text-gray-500" />
-          View Details
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => showModalEdit(withdraw.withdraw_id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit

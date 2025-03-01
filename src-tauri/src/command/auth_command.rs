@@ -20,18 +20,18 @@ pub async fn register(req: RegisterRequest) -> Result<ApiResponseRegister, Strin
 }
 
 #[tauri::command]
-pub async fn get_me(access_token: String) -> Result<ApiResponseGetMe, String> {
+pub async fn get_me(access_token: &str) -> Result<ApiResponseGetMe, String> {
     let auth_service = AuthService::new();
     auth_service
-        .get_me(&access_token)
+        .get_me(access_token)
         .await
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub async fn myrefresh_token(
-    access_token: String,
-    refresh_token: String,
+    access_token: &str,
+    refresh_token: &str,
 ) -> Result<ApiResponseRefreshToken, String> {
     let auth_service = AuthService::new();
     auth_service

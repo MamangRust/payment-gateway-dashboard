@@ -15,7 +15,7 @@ import {
   ApiResponseWithdrawYearAmount,
   ApiResponseWithdrawYearStatusFailed,
   ApiResponseWithdrawYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class WithdrawCommand {

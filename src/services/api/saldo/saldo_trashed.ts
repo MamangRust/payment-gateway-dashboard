@@ -9,7 +9,7 @@ import {
   ApiResponseSaldo,
   ApiResponseSaldoAll,
   ApiResponseSaldoDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class SaldoTrashedService {
   async findAllSaldosTrashed(

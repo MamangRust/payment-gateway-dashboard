@@ -13,7 +13,7 @@ import {
   ApiResponseWithdraw,
   ApiResponseWithdrawAll,
   ApiResponseWithdrawDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class WithdrawTrashedService {
   async findAllWithdrawsTrashed(

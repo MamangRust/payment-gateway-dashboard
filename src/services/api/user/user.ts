@@ -11,7 +11,7 @@ import {
   ApiResponsePaginationUser,
   ApiResponsePaginationUserDeleteAt,
   ApiResponseUser,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class UserService {
   async findAllUsers(

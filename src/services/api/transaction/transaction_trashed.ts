@@ -8,7 +8,7 @@ import {
   ApiResponsePaginationTransactionDeleteAt,
   ApiResponseTransaction,
   ApiResponseTransactionAll,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TransactionTrashedService {
   async findAllTransactionsTrashed(

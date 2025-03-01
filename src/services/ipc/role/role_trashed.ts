@@ -8,13 +8,13 @@ import {
   ApiResponseRoleAll,
   ApiResponseRoleDelete,
   ApiResponsePaginationRoleDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class RoleTrashedCommand {
   async findAllRolesTrashed(
     accessToken: string,
-    req: FindAllRole
+    req: FindAllRole,
   ): Promise<ApiResponsePaginationRoleDeleteAt> {
     try {
       return await invoke("find_all_roles_trashed", { accessToken, req });
@@ -26,7 +26,7 @@ class RoleTrashedCommand {
 
   async restoreRoleTrashed(
     accessToken: string,
-    req: RestoreRoleTrashed
+    req: RestoreRoleTrashed,
   ): Promise<ApiResponseRole> {
     try {
       return await invoke("restore_role_trashed", { accessToken, req });
@@ -38,7 +38,7 @@ class RoleTrashedCommand {
 
   async deletePermanentRole(
     accessToken: string,
-    req: DeletePermanentRole
+    req: DeletePermanentRole,
   ): Promise<ApiResponseRoleDelete> {
     try {
       return await invoke("delete_permanent_role", { accessToken, req });
@@ -49,7 +49,7 @@ class RoleTrashedCommand {
   }
 
   async restoreRoleAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseRoleAll> {
     try {
       return await invoke("restore_role_all_trashed", { accessToken });
@@ -60,7 +60,7 @@ class RoleTrashedCommand {
   }
 
   async deletePermanentAllRole(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseRoleAll> {
     try {
       return await invoke("delete_permanent_all_role", { accessToken });

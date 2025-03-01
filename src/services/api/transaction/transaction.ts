@@ -21,7 +21,7 @@ import {
   ApiResponseTransactionYearMethod,
   ApiResponseTransactionYearStatusFailed,
   ApiResponseTransactionYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TransactionService {
   async findMonthStatusSuccess(

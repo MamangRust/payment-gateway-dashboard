@@ -19,7 +19,7 @@ import {
   ApiResponseTransferMonthStatusFailed,
   ApiResponseTransferYearStatusFailed,
   ApiResponseTransferYearAmount,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TranferService {
   async findMonthStatusSuccess(

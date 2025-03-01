@@ -11,7 +11,7 @@ import {
   ApiResponseTopup,
   ApiResponseTopupAll,
   ApiResponseTopupDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TopupTrashedService {
   async findAllTopupsTrashed(

@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { TableActionSaldoProps } from "@/types/table";
 import useModalSaldo from "@/store/saldo/modal";
 
@@ -25,18 +25,12 @@ const TableActionSaldo = ({ saldo }: TableActionSaldoProps) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onSelect={() => console.log("Viewing details for:", saldo.id)}
-        >
-          <Eye className="mr-2 h-4 w-4 text-gray-500" />
-          View Details
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => showModalEdit(saldo.saldo_id)}>
+        <DropdownMenuItem onSelect={() => showModalEdit(saldo.id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem
-          onSelect={() => showModalDelete(saldo.saldo_id)}
+          onSelect={() => showModalDelete(saldo.id)}
           className="text-red-600"
         >
           <Trash className="mr-2 h-4 w-4 text-red-500" />

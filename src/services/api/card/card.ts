@@ -23,7 +23,7 @@ import {
   ApiResponseYearlyTransactionAmount,
   ApiResponseYearlyTransferAmount,
   ApiResponseYearlyWithdrawAmount,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class CardService {
   async findDashboard(

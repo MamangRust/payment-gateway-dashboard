@@ -9,7 +9,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { cardColumns } from "@/components/admin/card/table";
 import { FindAllTrashedCard } from "@/types/domain/request";
 import { useToast } from "@/hooks/use-toast";
 import useCardTrashedStore from "@/store/card/trashed/trashed";

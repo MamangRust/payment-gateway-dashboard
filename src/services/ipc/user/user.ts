@@ -10,15 +10,13 @@ import {
   ApiResponsePaginationUser,
   ApiResponsePaginationUserDeleteAt,
   ApiResponseUser,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
-
 class UserCommand {
-
   async findAllUsers(
     accessToken: string,
-    req: FindAllUser
+    req: FindAllUser,
   ): Promise<ApiResponsePaginationUser> {
     try {
       return await invoke("find_all_users", {
@@ -33,7 +31,7 @@ class UserCommand {
 
   async findByIdUser(
     accessToken: string,
-    req: FindByIdUser
+    req: FindByIdUser,
   ): Promise<ApiResponseUser> {
     try {
       return await invoke("find_by_id_user", {
@@ -48,7 +46,7 @@ class UserCommand {
 
   async findByActive(
     accessToken: string,
-    req: FindAllUserTrashed
+    req: FindAllUserTrashed,
   ): Promise<ApiResponsePaginationUserDeleteAt> {
     try {
       return await invoke("find_by_active", {
@@ -63,7 +61,7 @@ class UserCommand {
 
   async createUser(
     accessToken: string,
-    req: CreateUser
+    req: CreateUser,
   ): Promise<ApiResponseUser> {
     try {
       return await invoke("create_user", {
@@ -78,7 +76,7 @@ class UserCommand {
 
   async updateUser(
     accessToken: string,
-    req: UpdateUser
+    req: UpdateUser,
   ): Promise<ApiResponseUser> {
     try {
       return await invoke("update_user", {
@@ -93,7 +91,7 @@ class UserCommand {
 
   async trashedUser(
     accessToken: string,
-    req: TrashedUser
+    req: TrashedUser,
   ): Promise<ApiResponseUser> {
     try {
       return await invoke("trashed_user", {

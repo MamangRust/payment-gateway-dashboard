@@ -15,16 +15,22 @@ import {
   ApiResponseYearlyTransactionAmount,
   ApiResponseYearlyTransferAmount,
   ApiResponseYearlyWithdrawAmount,
-} from "@/types/model";
-import { CreateCard, FindAllCard, FindByCardNumber, FindByIdCard, UpdateCard } from "@/types/domain/request";
+} from "@/types/domain/response";
+import {
+  CreateCard,
+  FindAllCard,
+  FindByCardNumber,
+  FindByIdCard,
+  UpdateCard,
+} from "@/types/domain/request";
 import { FindByUser } from "@/types/domain/request/card/user";
 
 class CardCommand {
-  async findDashboard(
-    accessToken: string
-  ): Promise<ApiResponseDashboardCard> {
+  async findDashboard(accessToken: string): Promise<ApiResponseDashboardCard> {
     try {
-      return await invoke<ApiResponseDashboardCard>("find_dashboard", { accessToken });
+      return await invoke<ApiResponseDashboardCard>("find_dashboard", {
+        accessToken,
+      });
     } catch (error) {
       console.error("Error in findDashboard:", error);
       throw error;
@@ -33,7 +39,7 @@ class CardCommand {
 
   async findDashboardByCardNumber(
     accessToken: string,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseDashboardCardNumber> {
     try {
       return await invoke("find_dashboard_by_card_number", {
@@ -48,7 +54,7 @@ class CardCommand {
 
   async findMonthBalance(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyBalance> {
     try {
       return await invoke("find_month_balance_card", { accessToken, year });
@@ -60,7 +66,7 @@ class CardCommand {
 
   async findYearBalance(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyBalance> {
     try {
       return await invoke("find_year_balance_card", { accessToken, year });
@@ -72,10 +78,13 @@ class CardCommand {
 
   async findMonthTopupAmountCard(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyTopupAmount> {
     try {
-      return await invoke("find_month_topup_amount_card", { accessToken, year });
+      return await invoke("find_month_topup_amount_card", {
+        accessToken,
+        year,
+      });
     } catch (error) {
       console.error("Error in findMonthTopupAmountCard:", error);
       throw error;
@@ -84,7 +93,7 @@ class CardCommand {
 
   async findYearTopupAmountCard(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyTopupAmount> {
     try {
       return await invoke("findyear_topup_amount_card", { accessToken, year });
@@ -96,7 +105,7 @@ class CardCommand {
 
   async findMonthWithdrawAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyWithdrawAmount> {
     try {
       return await invoke("find_month_withdraw_amount_card", {
@@ -111,10 +120,13 @@ class CardCommand {
 
   async findYearWithdrawAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyWithdrawAmount> {
     try {
-      return await invoke("findyear_withdraw_amount_card", { accessToken, year });
+      return await invoke("findyear_withdraw_amount_card", {
+        accessToken,
+        year,
+      });
     } catch (error) {
       console.error("Error in findYearWithdrawAmountCard:", error);
       throw error;
@@ -123,7 +135,7 @@ class CardCommand {
 
   async findMonthTransferSenderAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyTransferAmount> {
     try {
       return await invoke("find_month_transfer_sender_amount_card", {
@@ -138,7 +150,7 @@ class CardCommand {
 
   async findYearTransferSenderAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyTransferAmount> {
     try {
       return await invoke("findyear_transfer_sender_amount_card", {
@@ -153,7 +165,7 @@ class CardCommand {
 
   async findMonthTransferReceiverAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyTransferAmount> {
     try {
       return await invoke("find_month_transfer_receiver_amount_card", {
@@ -168,7 +180,7 @@ class CardCommand {
 
   async findYearTransferReceiverAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyTransferAmount> {
     try {
       return await invoke("findyear_transfer_receiver_amount_card", {
@@ -183,7 +195,7 @@ class CardCommand {
 
   async findMonthTransactionAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseMonthlyTransactionAmount> {
     try {
       return await invoke("find_month_transaction_amount_card", {
@@ -198,7 +210,7 @@ class CardCommand {
 
   async findYearTransactionAmount(
     accessToken: string,
-    year: number
+    year: number,
   ): Promise<ApiResponseYearlyTransactionAmount> {
     try {
       return await invoke("findyear_transaction_amount_card", {
@@ -211,11 +223,10 @@ class CardCommand {
     }
   }
 
-
   async findMonthBalanceByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyBalance> {
     try {
       return await invoke("find_month_balance_by_card_card", {
@@ -232,7 +243,7 @@ class CardCommand {
   async findYearBalanceByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyBalance> {
     try {
       return await invoke("find_year_balance_by_card_card", {
@@ -249,7 +260,7 @@ class CardCommand {
   async findMonthTopupAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyTopupAmount> {
     try {
       return await invoke("find_month_topup_amount_by_card_card", {
@@ -266,7 +277,7 @@ class CardCommand {
   async findYearTopupAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyTopupAmount> {
     try {
       return await invoke("find_year_topup_amount_by_card_card", {
@@ -283,7 +294,7 @@ class CardCommand {
   async findMonthWithdrawAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyWithdrawAmount> {
     try {
       return await invoke("find_month_withdraw_amount_by_card_card", {
@@ -300,7 +311,7 @@ class CardCommand {
   async findYearWithdrawAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyWithdrawAmount> {
     try {
       return await invoke("findyear_withdraw_amount_by_card_card", {
@@ -317,7 +328,7 @@ class CardCommand {
   async findMonthTransferSenderAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyTransferAmount> {
     try {
       return await invoke("find_month_transfer_sender_amount_by_card_card", {
@@ -334,7 +345,7 @@ class CardCommand {
   async findYearTransferSenderAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyTransferAmount> {
     try {
       return await invoke("find_year_transfer_sender_amount_by_card_card", {
@@ -351,7 +362,7 @@ class CardCommand {
   async findMonthTransferReceiverAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyTransferAmount> {
     try {
       return await invoke("find_month_transfer_receiver_amount_by_card_card", {
@@ -368,7 +379,7 @@ class CardCommand {
   async findYearTransferReceiverAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyTransferAmount> {
     try {
       return await invoke("find_year_transfer_receiver_amount_by_card_card", {
@@ -385,7 +396,7 @@ class CardCommand {
   async findMonthTransactionAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseMonthlyTransactionAmount> {
     try {
       return await invoke("find_month_transaction_amount_by_card_card", {
@@ -402,7 +413,7 @@ class CardCommand {
   async findYearTransactionAmountByCard(
     accessToken: string,
     year: number,
-    cardNumber: string
+    cardNumber: string,
   ): Promise<ApiResponseYearlyTransactionAmount> {
     try {
       return await invoke("findyear_transaction_amount_by_card_card", {
@@ -418,7 +429,7 @@ class CardCommand {
 
   async findAllCard(
     accessToken: string,
-    req: FindAllCard
+    req: FindAllCard,
   ): Promise<ApiResponsePaginationCard> {
     try {
       return await invoke("find_all_card", { accessToken, req });
@@ -430,7 +441,7 @@ class CardCommand {
 
   async findByIdCard(
     accessToken: string,
-    req: FindByIdCard
+    req: FindByIdCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("find_by_id_card", { accessToken, req });
@@ -442,7 +453,7 @@ class CardCommand {
 
   async findByUser(
     accessToken: string,
-    req: FindByUser
+    req: FindByUser,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("find_by_user", { accessToken, req });
@@ -454,7 +465,7 @@ class CardCommand {
 
   async findByCardNumber(
     accessToken: string,
-    req: FindByCardNumber
+    req: FindByCardNumber,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("find_by_card_number", { accessToken, req });
@@ -466,7 +477,7 @@ class CardCommand {
 
   async findActiveCard(
     accessToken: string,
-    req: FindAllCard
+    req: FindAllCard,
   ): Promise<ApiResponsePaginationCardDeleteAt> {
     try {
       return await invoke("find_active_card", { accessToken, req });
@@ -478,7 +489,7 @@ class CardCommand {
 
   async createCard(
     accessToken: string,
-    req: CreateCard
+    req: CreateCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("create_card", { accessToken, req });
@@ -490,7 +501,7 @@ class CardCommand {
 
   async updateCard(
     accessToken: string,
-    req: UpdateCard
+    req: UpdateCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("update_card", { accessToken, req });
@@ -502,7 +513,7 @@ class CardCommand {
 
   async trashedCard(
     accessToken: string,
-    req: FindByIdCard
+    req: FindByIdCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("trashed_card", { accessToken, req });

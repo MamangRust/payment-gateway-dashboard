@@ -3,13 +3,13 @@ import {
   ApiResponseCard,
   ApiResponseCardAll,
   ApiResponsePaginationCardDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class CardTrashedCommand {
   async findAllCardsTrashed(
     accessToken: string,
-    req: FindAllCard
+    req: FindAllCard,
   ): Promise<ApiResponsePaginationCardDeleteAt> {
     try {
       return await invoke("find_all_cards_trashed", { accessToken, req });
@@ -21,7 +21,7 @@ class CardTrashedCommand {
 
   async restoreCardTrashed(
     accessToken: string,
-    req: FindByIdCard
+    req: FindByIdCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("restore_card_trashed", { accessToken, req });
@@ -33,7 +33,7 @@ class CardTrashedCommand {
 
   async deletePermanentCard(
     accessToken: string,
-    req: FindByIdCard
+    req: FindByIdCard,
   ): Promise<ApiResponseCard> {
     try {
       return await invoke("delete_permanent_card", { accessToken, req });
@@ -44,7 +44,7 @@ class CardTrashedCommand {
   }
 
   async restoreAllCardsTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseCardAll> {
     try {
       return await invoke("restore_all_cards_trashed", { accessToken });
@@ -55,7 +55,7 @@ class CardTrashedCommand {
   }
 
   async deletePermanentAllCards(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseCardAll> {
     try {
       return await invoke("delete_permanent_all_cards", { accessToken });

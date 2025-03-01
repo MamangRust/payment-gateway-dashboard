@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import useModalTransaction from "@/store/transaction/modal";
 
 const TableActionTransaction = ({ transaction }: any) => {
@@ -24,12 +24,6 @@ const TableActionTransaction = ({ transaction }: any) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onSelect={() => console.log("Viewing details for:", transaction.id)}
-        >
-          <Eye className="mr-2 h-4 w-4 text-gray-500" />
-          View Details
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => showModalEdit(transaction.id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit

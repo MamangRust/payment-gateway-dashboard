@@ -18,7 +18,7 @@ import {
   ApiResponseTransferMonthStatusFailed,
   ApiResponseTransferYearStatusFailed,
   ApiResponseTransferYearAmount,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class TransferCommand {

@@ -1,5 +1,4 @@
 import {
-  FindAllMerchant,
   RestoreMerchantTrashed,
   DeletePermanentMerchant,
   FindAllMerchantTrashed,
@@ -9,7 +8,7 @@ import {
   ApiResponseMerchantAll,
   ApiResponseMerchantDelete,
   ApiResponsePaginationMerchantDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class MerchantTrashedCommand {

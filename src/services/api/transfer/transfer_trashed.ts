@@ -9,7 +9,7 @@ import {
   ApiResponseTransfers,
   ApiResponseTransferAll,
   ApiResponseTransferDelete,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TranferTrashedService {
   async findAllTransferssTrashed(

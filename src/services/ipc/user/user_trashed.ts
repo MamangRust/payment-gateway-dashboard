@@ -8,13 +8,13 @@ import {
   ApiResponseUserAll,
   ApiResponseUserDelete,
   ApiResponsePaginationUserDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class UserTrashedCommand {
   async findAllUsersTrashed(
     accessToken: string,
-    req: FindAllUser
+    req: FindAllUser,
   ): Promise<ApiResponsePaginationUserDeleteAt> {
     try {
       return await invoke("find_all_users_trashed", { accessToken, req });
@@ -26,7 +26,7 @@ class UserTrashedCommand {
 
   async restoreUserTrashed(
     accessToken: string,
-    req: RestoreUserTrashed
+    req: RestoreUserTrashed,
   ): Promise<ApiResponseUser> {
     try {
       return await invoke("restore_user_trashed", { accessToken, req });
@@ -38,7 +38,7 @@ class UserTrashedCommand {
 
   async deletePermanentUser(
     accessToken: string,
-    req: DeletePermanentUser
+    req: DeletePermanentUser,
   ): Promise<ApiResponseUserDelete> {
     try {
       return await invoke("delete_permanent_user", { accessToken, req });
@@ -49,7 +49,7 @@ class UserTrashedCommand {
   }
 
   async restoreUserAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseUserAll> {
     try {
       return await invoke("restore_user_all_trashed", { accessToken });
@@ -60,7 +60,7 @@ class UserTrashedCommand {
   }
 
   async deletePermanentAllUser(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseUserAll> {
     try {
       return await invoke("delete_permanent_all_user", { accessToken });

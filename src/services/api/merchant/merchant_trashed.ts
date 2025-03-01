@@ -9,7 +9,7 @@ import {
   ApiResponseMerchantAll,
   ApiResponseMerchantDelete,
   ApiResponsePaginationMerchantDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class MerchantTrashedService {
   async findAllMerchantsTrashed(

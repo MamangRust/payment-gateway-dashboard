@@ -8,13 +8,13 @@ import {
   ApiResponseSaldoAll,
   ApiResponseSaldoDelete,
   ApiResponsePaginationSaldoDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class SaldoTrashedCommand {
   async findAllSaldosTrashed(
     accessToken: string,
-    req: FindAllSaldo
+    req: FindAllSaldo,
   ): Promise<ApiResponsePaginationSaldoDeleteAt> {
     try {
       return await invoke("find_all_saldos_trashed", { accessToken, req });
@@ -26,7 +26,7 @@ class SaldoTrashedCommand {
 
   async restoreSaldoTrashed(
     accessToken: string,
-    req: RestoreSaldoTrashed
+    req: RestoreSaldoTrashed,
   ): Promise<ApiResponseSaldo> {
     try {
       return await invoke("restore_saldo_trashed", { accessToken, req });
@@ -38,7 +38,7 @@ class SaldoTrashedCommand {
 
   async deletePermanentSaldo(
     accessToken: string,
-    req: DeletePermanentSaldo
+    req: DeletePermanentSaldo,
   ): Promise<ApiResponseSaldoDelete> {
     try {
       return await invoke("delete_permanent_saldo", { accessToken, req });
@@ -49,7 +49,7 @@ class SaldoTrashedCommand {
   }
 
   async restoreSaldoAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseSaldoAll> {
     try {
       return await invoke("restore_saldo_all_trashed", { accessToken });
@@ -60,7 +60,7 @@ class SaldoTrashedCommand {
   }
 
   async deletePermanentAllSaldo(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseSaldoAll> {
     try {
       return await invoke("delete_permanent_all_saldo", { accessToken });

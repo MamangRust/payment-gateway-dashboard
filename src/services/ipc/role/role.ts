@@ -10,15 +10,13 @@ import {
   ApiResponsePaginationRole,
   ApiResponsePaginationRoleDeleteAt,
   ApiResponseRole,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
-
 class RoleCommand {
-
   async findAllRoles(
     accessToken: string,
-    req: FindAllRole
+    req: FindAllRole,
   ): Promise<ApiResponsePaginationRole> {
     try {
       return await invoke("find_all_roles", {
@@ -33,7 +31,7 @@ class RoleCommand {
 
   async findByIdRole(
     accessToken: string,
-    req: FindByIdRole
+    req: FindByIdRole,
   ): Promise<ApiResponseRole> {
     try {
       return await invoke("find_by_id_role", {
@@ -48,7 +46,7 @@ class RoleCommand {
 
   async findByActive(
     accessToken: string,
-    req: FindAllRoleTrashed
+    req: FindAllRoleTrashed,
   ): Promise<ApiResponsePaginationRoleDeleteAt> {
     try {
       return await invoke("find_by_active_role", {
@@ -63,7 +61,7 @@ class RoleCommand {
 
   async createRole(
     accessToken: string,
-    req: CreateRole
+    req: CreateRole,
   ): Promise<ApiResponseRole> {
     try {
       return await invoke("create_role", {
@@ -78,7 +76,7 @@ class RoleCommand {
 
   async updateRole(
     accessToken: string,
-    req: UpdateRole
+    req: UpdateRole,
   ): Promise<ApiResponseRole> {
     try {
       return await invoke("update_role", {
@@ -93,7 +91,7 @@ class RoleCommand {
 
   async trashedRole(
     accessToken: string,
-    req: TrashedRole
+    req: TrashedRole,
   ): Promise<ApiResponseRole> {
     try {
       return await invoke("trashed_role", {

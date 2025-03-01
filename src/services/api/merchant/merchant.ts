@@ -21,7 +21,7 @@ import {
   ApiResponsePaginationMerchant,
   ApiResponsePaginationMerchantTransaction,
   ApiResponsesMerchant,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class MerchantService {
   async findMonthPaymentMethod(

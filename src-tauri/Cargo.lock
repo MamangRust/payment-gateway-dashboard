@@ -747,6 +747,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dashboard"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "deranged"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1089,21 +1104,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
-]
-
-[[package]]
-name = "frontend-dashboard"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "reqwest",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-opener",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

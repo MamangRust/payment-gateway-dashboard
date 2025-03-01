@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { TableActionCardProps } from "@/types/table";
 import useModalCard from "@/store/card/modal";
 
@@ -25,12 +25,6 @@ const TableActionCard = ({ card }: TableActionCardProps) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => console.log("Viewing details for:", card.id)}
-        >
-          <Eye className="mr-2 h-4 w-4 text-gray-500" />
-          View Details
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => showModalEdit(card.id)}>
           <Pencil className="mr-2 h-4 w-4 text-gray-500" />
           Edit

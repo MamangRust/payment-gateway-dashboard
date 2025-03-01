@@ -19,7 +19,7 @@ import {
   ApiResponseTopupYearMethod,
   ApiResponseTopupYearStatusFailed,
   ApiResponseTopupYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class TopupService {
   async findMonthStatusSuccess(

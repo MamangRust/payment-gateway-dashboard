@@ -18,7 +18,7 @@ import {
   ApiResponseTopupYearMethod,
   ApiResponseTopupYearStatusFailed,
   ApiResponseTopupYearStatusSuccess,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class TopupCommand {

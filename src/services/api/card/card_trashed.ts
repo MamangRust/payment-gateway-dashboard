@@ -9,7 +9,7 @@ import {
   ApiResponseCardAll,
   ApiResponseCardDelete,
   ApiResponsePaginationCardDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 
 class CardTrashedService {
   async findAllCardsTrashed(

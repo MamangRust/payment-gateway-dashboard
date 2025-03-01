@@ -8,16 +8,19 @@ import {
   ApiResponseTransactionAll,
   ApiResponseTransactionDelete,
   ApiResponsePaginationTransactionDeleteAt,
-} from "@/types/model";
+} from "@/types/domain/response";
 import { invoke } from "@tauri-apps/api/core";
 
 class TransactionTrashedCommand {
   async findAllTransactionsTrashed(
     accessToken: string,
-    req: FindAllTransaction
+    req: FindAllTransaction,
   ): Promise<ApiResponsePaginationTransactionDeleteAt> {
     try {
-      return await invoke("find_all_transactions_trashed", { accessToken, req });
+      return await invoke("find_all_transactions_trashed", {
+        accessToken,
+        req,
+      });
     } catch (error) {
       console.error("Error in findAllTransactionsTrashed:", error);
       throw error;
@@ -26,7 +29,7 @@ class TransactionTrashedCommand {
 
   async restoreTransactionTrashed(
     accessToken: string,
-    req: RestoreTransactionTrashed
+    req: RestoreTransactionTrashed,
   ): Promise<ApiResponseTransaction> {
     try {
       return await invoke("restore_transaction_trashed", { accessToken, req });
@@ -38,7 +41,7 @@ class TransactionTrashedCommand {
 
   async deletePermanentTransaction(
     accessToken: string,
-    req: DeletePermanentTransaction
+    req: DeletePermanentTransaction,
   ): Promise<ApiResponseTransactionDelete> {
     try {
       return await invoke("delete_permanent_transaction", { accessToken, req });
@@ -49,7 +52,7 @@ class TransactionTrashedCommand {
   }
 
   async restoreTransactionAllTrashed(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseTransactionAll> {
     try {
       return await invoke("restore_transaction_all_trashed", { accessToken });
@@ -60,7 +63,7 @@ class TransactionTrashedCommand {
   }
 
   async deletePermanentAllTransaction(
-    accessToken: string
+    accessToken: string,
   ): Promise<ApiResponseTransactionAll> {
     try {
       return await invoke("delete_permanent_all_transaction", { accessToken });
