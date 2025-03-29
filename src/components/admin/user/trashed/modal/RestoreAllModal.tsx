@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreAllUser from "@/hooks/admin/user/trashed/RestoreAll";
-import useModalUserTrashed from "@/store/user/trashed/modal";
 
 export function RestoreAllUserTrashed() {
   const {
@@ -37,7 +36,7 @@ export function RestoreAllUserTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreAllUserTrashed ? "Restoring..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

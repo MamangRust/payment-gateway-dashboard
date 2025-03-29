@@ -1,15 +1,11 @@
 import myApi from "@/helpers/api";
-import {
-  DeletePermanentSaldo,
-  DeletePermanentWithdraw,
-} from "@/types/domain/request";
+import { DeletePermanentWithdraw } from "@/types/domain/request";
 import {
   FindAllWithdrawTrashed,
   RestoreWithdrawTrashed,
 } from "@/types/domain/request";
 import {
   ApiResponsePaginationWithdrawDeleteAt,
-  ApiResponseSaldoDelete,
   ApiResponseWithdraw,
   ApiResponseWithdrawAll,
   ApiResponseWithdrawDelete,

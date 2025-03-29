@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentAllMerchant from "@/hooks/admin/merchant/trashed/DeleteAll";
-import useModalMerchantTrashed from "@/store/merchant/trashed/modal";
 
 export function DeletePermanetAllMerchant() {
   const {
@@ -37,7 +36,9 @@ export function DeletePermanetAllMerchant() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentAllMerchantTrashed
+              ? "Deleting..."
+              : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

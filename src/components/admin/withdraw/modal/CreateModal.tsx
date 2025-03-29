@@ -35,7 +35,7 @@ export function AddWithdraw() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateWithdraw ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -54,7 +53,7 @@ export function EditUser() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateUser ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

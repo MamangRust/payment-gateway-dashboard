@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreTopup from "@/hooks/admin/topup/trashed/Restore";
-import useModalTopupTrashed from "@/store/topup/trashed/modal";
 
 export function RestoreTopup() {
   const {
@@ -38,7 +37,7 @@ export function RestoreTopup() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreTopupTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

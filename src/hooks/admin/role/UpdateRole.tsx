@@ -16,11 +16,8 @@ export default function useUpdateRole() {
     setLoadingUpdateRole,
     loadingUpdateRole,
     setErrorUpdateRole,
-
     Role,
     findById,
-    loadingGetRole,
-    errorGetRole,
   } = useRoleStore();
 
   const navigate = useNavigate();

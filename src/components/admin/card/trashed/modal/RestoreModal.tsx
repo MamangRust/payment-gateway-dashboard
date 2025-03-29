@@ -36,7 +36,7 @@ export function RestoreCard() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreCardTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -39,7 +39,7 @@ export function DeletePermanetWithdrawTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentWithdrawTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

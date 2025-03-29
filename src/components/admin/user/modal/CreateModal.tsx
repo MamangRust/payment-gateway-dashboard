@@ -35,7 +35,7 @@ export function AddUser() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateUser ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

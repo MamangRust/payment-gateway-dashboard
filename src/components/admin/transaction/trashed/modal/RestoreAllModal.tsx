@@ -36,7 +36,7 @@ export function RestoreAllTransactionTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreAllTransactionTrashed ? "Restoring..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

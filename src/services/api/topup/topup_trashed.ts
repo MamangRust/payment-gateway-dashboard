@@ -1,5 +1,4 @@
 import myApi from "@/helpers/api";
-import { DeletePermanentSaldo } from "@/types/domain/request";
 import {
   DeletePermanentTopup,
   FindAllTopupTrashed,
@@ -7,7 +6,6 @@ import {
 } from "@/types/domain/request/topup";
 import {
   ApiResponsePaginationTopupDeleteAt,
-  ApiResponseSaldoDelete,
   ApiResponseTopup,
   ApiResponseTopupAll,
   ApiResponseTopupDelete,

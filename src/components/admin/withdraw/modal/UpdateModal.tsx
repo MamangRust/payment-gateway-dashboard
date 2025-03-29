@@ -56,7 +56,7 @@ export function UpdateWithdraw() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateWithdraw ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

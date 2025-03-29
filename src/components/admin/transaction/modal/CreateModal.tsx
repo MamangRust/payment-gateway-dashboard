@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,8 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateTransactionForm from "../form/CreateForm";
-import useModalTransaction from "@/store/transaction/modal";
-import { CreateTransactionFormValues } from "@/schemas";
 import useCreateTransaction from "@/hooks/admin/transaction/CreateTransaction";
 
 export function AddTransaction() {
@@ -38,7 +35,7 @@ export function AddTransaction() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateTransaction ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

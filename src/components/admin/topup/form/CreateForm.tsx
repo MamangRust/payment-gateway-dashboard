@@ -16,6 +16,7 @@ import {
 import { forwardRef, useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
+import { FindAllCard } from "@/types/domain/request";
 
 const paymentProviders = [
   { value: "visa", label: "Visa" },
@@ -73,10 +74,10 @@ const CreateTopupForm = forwardRef<HTMLFormElement, TopupCreateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -106,10 +107,10 @@ const CreateTopupForm = forwardRef<HTMLFormElement, TopupCreateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

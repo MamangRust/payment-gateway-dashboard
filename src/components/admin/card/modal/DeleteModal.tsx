@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeleteCard from "@/hooks/admin/card/DeleteCard";
-import useModalCard from "@/store/card/modal";
 
 export function DeleteCard() {
   const {
@@ -38,7 +37,7 @@ export function DeleteCard() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedCard ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

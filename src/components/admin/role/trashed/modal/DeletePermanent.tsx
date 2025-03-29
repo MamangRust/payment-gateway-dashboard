@@ -12,6 +12,7 @@ export function DeletePermanetRoleTrashed() {
   const {
     deletePermanentRoleId,
     handleSubmit,
+    loadingDeletePermanentRoleTrashed,
     isModalVisibleDeletePermanent,
     showModalDeletePermanent,
     hideModalDeletePermanent,
@@ -38,7 +39,7 @@ export function DeletePermanetRoleTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentRoleTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

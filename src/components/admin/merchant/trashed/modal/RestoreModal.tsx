@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreMerchant from "@/hooks/admin/merchant/trashed/Restore";
-import useModalMerchantTrashed from "@/store/merchant/trashed/modal";
 
 export function RestoreMerchant() {
   const {
@@ -38,7 +37,7 @@ export function RestoreMerchant() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreMerchantTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

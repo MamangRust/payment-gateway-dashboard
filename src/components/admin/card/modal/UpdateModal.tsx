@@ -13,7 +13,6 @@ export function UpdateCard() {
   const {
     handleSubmit,
     card,
-
     editCardId,
     loadingUpdateCard,
     isModalVisibleEdit,
@@ -57,7 +56,7 @@ export function UpdateCard() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateCard ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

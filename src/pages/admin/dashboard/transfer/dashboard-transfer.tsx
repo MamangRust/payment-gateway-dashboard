@@ -1,32 +1,12 @@
-import {
-  Users,
-  Store,
-  Repeat,
-  FileText,
-  ChevronDown,
-  Wallet,
-  TrendingDown,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Chart from "react-apexcharts";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { TableTransfer } from "@/components/admin/transfer";
 import useListTransfer from "@/hooks/admin/transfer/ListTransfer";
-import useTransferStore from "@/store/transfer/transfer";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { debounce } from "@/helpers/debounce";
-import { formatRupiah } from "@/helpers/formatRupiah";
-import ThemeChart from "@/components/ui/chart";
 import { MonthPicker, months } from "@/components/ui/monthpicker";
-import ChartSkeleton from "@/components/ui/chartSkeleton";
 import { YearPicker } from "@/components/ui/yearpicker";
+import { useMonthAmountTransfer, useMonthStatusFailedTransfer, useMonthStatusSuccessTransfer, useYearAmountTransfer, useYearStatusFailedTransfer, useYearStatusSuccessTransfer } from "@/hooks/admin/card/dashboard/transfer";
+import TotalCardTransfer from "@/components/admin/transfer/dasboard/total";
+import ChartDashboarTransfer from "@/components/admin/transfer/dasboard/chart";
 
 export default function DashboardTransfers() {
   const initialYear = useMemo(() => {
@@ -36,6 +16,13 @@ export default function DashboardTransfers() {
 
   const currentMonthIndex = new Date().getMonth();
   const currentMonth = months[currentMonthIndex];
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonths = currentDate.getMonth();
+
+  const previousMonth = currentMonths === 0 ? 11 : currentMonths - 1;
+  const previousYear = currentMonths === 0 ? currentYear - 1 : currentYear;
+
 
   const [selectedMonth, setSelectedMonth] = useState<{
     name: string;
@@ -55,52 +42,55 @@ export default function DashboardTransfers() {
     handlePageChange,
     handlePageSizeChange,
     isLoadingWithDelay,
-    showModal,
   } = useListTransfer();
   const { toast } = useToast();
 
+
   const {
-    findMonthStatusSuccess,
-    monthStatusSuccess,
+    monthPercentageSuccessChange,
     loadingMonthStatusSuccess,
-    errorMonthStatusSuccess,
-    setLoadingMonthStatusSuccess,
-    setErrorMonthStatusSuccess,
+    currentMonthSuccess,
+    previousMonthSuccess,
+    debouncedFetchMonthlySuccess
+  } = useMonthStatusSuccessTransfer(currentMonths, currentYear, previousMonth, previousYear, toast);
 
-    findYearStatusSuccess,
-    yearStatusSuccess,
+  const {
+    debouncedFetchYearlySuccess,
     loadingYearStatusSuccess,
-    errorYearStatusSuccess,
-    setLoadingYearStatusSuccess,
-    setErrorYearStatusSuccess,
+    previousYearSuccessData,
+    currentYearSuccess,
+    yearPercentageSuccessChange,
+  } = useYearStatusSuccessTransfer(currentYear, toast);
 
-    findMonthStatusFailed,
-    monthStatusFailed,
+  const {
+    monthPercentageFailedChange,
     loadingMonthStatusFailed,
-    errorMonthStatusFailed,
-    setLoadingMonthStatusFailed,
-    setErrorMonthStatusFailed,
+    currentMonthFailed,
+    previousMonthFailed,
+    debouncedFetchMonthlyFailed
+  } = useMonthStatusFailedTransfer(currentMonths, currentYear, previousMonth, previousYear, toast);
 
-    findYearStatusFailed,
-    yearStatusFailed,
+  const {
+    debouncedFetchYearlyFailed,
     loadingYearStatusFailed,
-    errorYearStatusFailed,
-    setLoadingYearStatusFailed,
-    setErrorYearStatusFailed,
+    previousYearFailedData,
+    currentYearFailed,
+    yearPercentageFailedChange,
+  } = useYearStatusFailedTransfer(currentYear, toast);
 
-    findMonthTransferAmount,
-    monthTransferAmount,
+  const {
     loadingMonthTransferAmount,
-    errorMonthTransferAmount,
-    setLoadingMonthTransferAmount,
-    setErrorMonthTransferAmount,
+    monthlyAmount,
+    debouncedFetchMonthlyAmount
+  } = useMonthAmountTransfer(toast);
 
-    findYearTransferAmount,
-    yearTransferAmount,
+  const {
     loadingYearTransferAmount,
-    setLoadingYearTransferAmount,
-    setErrorYearTransferAmount,
-  } = useTransferStore();
+    yearlyAmount,
+    debouncedFetchYearlyAmount
+  } = useYearAmountTransfer(toast);
+
+
 
   const handleYearChange = (newYear: number) => {
     setSelectedYear(newYear);
@@ -110,295 +100,6 @@ export default function DashboardTransfers() {
     setSelectedMonth(month);
   };
 
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonths = currentDate.getMonth();
-
-  const previousMonth = currentMonths === 0 ? 11 : currentMonths - 1;
-  const previousYear = currentMonths === 0 ? currentYear - 1 : currentYear;
-
-  const calculatePercentageChange = (
-    current: number,
-    previous: number,
-  ): number => {
-    if (previous === 0) return 0;
-    return ((current - previous) / previous) * 100;
-  };
-
-  const currentMonthSuccessData =
-    monthStatusSuccess && Array.isArray(monthStatusSuccess)
-      ? monthStatusSuccess.find(
-          (balance) =>
-            balance.month === monthNames[currentMonths] &&
-            balance.year === currentYear.toString(),
-        )
-      : null;
-
-  const previousMonthSuccessData =
-    monthStatusSuccess && Array.isArray(monthStatusSuccess)
-      ? monthStatusSuccess?.find(
-          (balance) =>
-            balance.month === monthNames[previousMonth] &&
-            balance.year === previousYear.toString(),
-        )
-      : null;
-
-  const currentMonthSuccess = currentMonthSuccessData?.total_amount || 0;
-  const previousMonthSuccess = previousMonthSuccessData?.total_amount || 0;
-
-  const monthPercentageSuccessChange = calculatePercentageChange(
-    currentMonthSuccess,
-    previousMonthSuccess,
-  );
-
-  const currentYearSuccessData =
-    yearStatusSuccess && Array.isArray(yearStatusSuccess)
-      ? yearStatusSuccess.find(
-          (balance) => balance.year === currentYear.toString(),
-        )
-      : null;
-
-  const previousYearSuccessData =
-    yearStatusSuccess && Array.isArray(yearStatusSuccess)
-      ? yearStatusSuccess.find(
-          (balance) => balance.year === (currentYear - 1).toString(),
-        )
-      : null;
-
-  const currentYearSuccess = currentYearSuccessData?.total_amount || 0;
-  const previousYearSucces = previousYearSuccessData?.total_amount || 0;
-
-  const yearPercentageSuccessChange = calculatePercentageChange(
-    currentYearSuccess,
-    previousYearSucces,
-  );
-
-  const currentMonthFailedData =
-    monthStatusFailed && Array.isArray(monthStatusFailed)
-      ? monthStatusFailed.find(
-          (balance) =>
-            balance.month === monthNames[currentMonths] &&
-            balance.year === currentYear.toString(),
-        )
-      : null;
-
-  const previousMonthFailedData =
-    monthStatusFailed && Array.isArray(monthStatusFailed)
-      ? monthStatusFailed?.find(
-          (balance) =>
-            balance.month === monthNames[previousMonth] &&
-            balance.year === previousYear.toString(),
-        )
-      : null;
-
-  const currentMonthFailed = currentMonthFailedData?.total_amount || 0;
-  const previousMonthFailed = previousMonthFailedData?.total_amount || 0;
-
-  const monthPercentageFailedChange = calculatePercentageChange(
-    currentMonthFailed,
-    previousMonthFailed,
-  );
-
-  const currentYearFailedData =
-    yearStatusFailed && Array.isArray(yearStatusFailed)
-      ? yearStatusFailed.find(
-          (balance) => balance.year === currentYear.toString(),
-        )
-      : null;
-
-  const previousYearFailedData =
-    yearStatusFailed && Array.isArray(yearStatusFailed)
-      ? yearStatusFailed.find(
-          (balance) => balance.year === (currentYear - 1).toString(),
-        )
-      : null;
-
-  const currentYearFailed = currentYearFailedData?.total_amount || 0;
-  const previousYearFailed = previousYearFailedData?.total_amount || 0;
-
-  const yearPercentageFailedChange = calculatePercentageChange(
-    currentYearFailed,
-    previousYearFailed,
-  );
-
-  const monthlyAmount = useMemo(() => {
-    if (!monthTransferAmount || !Array.isArray(monthTransferAmount)) {
-      return Array(12).fill(0);
-    }
-
-    const balances = Array(12).fill(0);
-    const year = new Date().getFullYear();
-
-    monthTransferAmount.forEach((balance) => {
-      const monthIndex = new Date(`${balance.month} 1, ${year}`).getMonth();
-      if (balance.total_amount !== undefined) {
-        balances[monthIndex] = balance.total_amount;
-      }
-    });
-
-    return balances;
-  }, [monthTransferAmount]);
-
-  const yearlyAmount = useMemo(() => {
-    if (!yearTransferAmount || !Array.isArray(yearTransferAmount)) {
-      return Array(5).fill(0);
-    }
-
-    const balanceMap = new Map<number, number>();
-    yearTransferAmount.forEach((balance) => {
-      balanceMap.set(Number(balance.year), balance.total_amount);
-    });
-
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
-
-    return years.map((year) => balanceMap.get(year) || 0);
-  }, [yearTransferAmount]);
-
-  const fetchMonthlySuccess = useCallback(
-    async (year: number, month: number) => {
-      try {
-        setLoadingMonthStatusSuccess(true);
-        setErrorMonthStatusSuccess(null);
-
-        await findMonthStatusSuccess(toast, year, month);
-      } catch (error) {
-        setErrorMonthStatusSuccess("Failed to fetch monthly balance");
-      } finally {
-        setLoadingMonthStatusSuccess(false);
-      }
-    },
-    [
-      findMonthStatusSuccess,
-      setLoadingMonthStatusSuccess,
-      setErrorMonthStatusSuccess,
-    ],
-  );
-
-  const fetchYearlySuccess = useCallback(
-    async (year: number) => {
-      try {
-        setLoadingYearStatusSuccess(true);
-        setErrorYearStatusSuccess(null);
-
-        await findYearStatusSuccess(toast, year);
-      } catch (error) {
-        setErrorYearStatusSuccess("Failed to fetch yearly balance");
-      } finally {
-        setLoadingYearStatusSuccess(false);
-      }
-    },
-    [
-      findYearStatusSuccess,
-      setLoadingYearStatusSuccess,
-      setLoadingYearStatusSuccess,
-    ],
-  );
-
-  const fetchMonthlyFailed = useCallback(
-    async (year: number, month: number) => {
-      try {
-        setLoadingMonthStatusFailed(true);
-        setErrorMonthStatusFailed(null);
-
-        await findMonthStatusFailed(toast, year, month);
-      } catch (error) {
-        setErrorMonthStatusFailed("Failed to fetch monthly balance");
-      } finally {
-        setLoadingMonthStatusFailed(false);
-      }
-    },
-    [
-      findMonthStatusFailed,
-      setLoadingMonthStatusFailed,
-      setErrorMonthStatusFailed,
-    ],
-  );
-
-  const fetchYearlyFailed = useCallback(
-    async (year: number) => {
-      try {
-        setLoadingYearStatusFailed(true);
-        setErrorYearStatusFailed(null);
-
-        await findYearStatusFailed(toast, year);
-      } catch (error) {
-        setErrorYearStatusFailed("Failed to fetch yearly balance");
-      } finally {
-        setLoadingYearStatusFailed(false);
-      }
-    },
-    [
-      findYearStatusFailed,
-      setLoadingYearStatusFailed,
-      setLoadingYearStatusFailed,
-    ],
-  );
-
-  const fetchMonthlyAmount = useCallback(
-    async (year: number) => {
-      try {
-        setLoadingMonthTransferAmount(true);
-        setErrorMonthTransferAmount(null);
-
-        await findMonthTransferAmount(toast, year);
-      } catch (error) {
-        console.error("Failed to fetch monthly payment method:", error);
-        setErrorMonthTransferAmount("Failed to fetch monthly payment method");
-      } finally {
-        setLoadingMonthTransferAmount(false);
-      }
-    },
-    [
-      findMonthTransferAmount,
-      setLoadingMonthTransferAmount,
-      setErrorMonthTransferAmount,
-    ],
-  );
-
-  const fetchYearlyAmount = useCallback(
-    async (year: number) => {
-      try {
-        setLoadingYearTransferAmount(true);
-        setErrorYearTransferAmount(null);
-
-        await findYearTransferAmount(toast, year);
-      } catch (error) {
-        setErrorYearTransferAmount("Failed to fetch yearly balance");
-      } finally {
-        setLoadingYearTransferAmount(false);
-      }
-    },
-    [
-      findYearTransferAmount,
-      setLoadingYearTransferAmount,
-      setErrorYearTransferAmount,
-    ],
-  );
-
-  const debouncedFetchMonthlyFailed = debounce(fetchMonthlyFailed, 300);
-  const debouncedFetchYearlyFailed = debounce(fetchYearlyFailed, 300);
-
-  const debouncedFetchMonthlySuccess = debounce(fetchMonthlySuccess, 300);
-  const debouncedFetchYearlySuccess = debounce(fetchYearlySuccess, 300);
-
-  const debouncedFetchMonthlyAmount = debounce(fetchMonthlyAmount, 300);
-  const debouncedFetchYearlyAmount = debounce(fetchYearlyAmount, 300);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -431,90 +132,24 @@ export default function DashboardTransfers() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-10">
-        <Card className="w-full shadow-lg rounded-md border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Month success</CardTitle>
-            <Wallet className="h-6 w-6 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currentMonthSuccess
-                ? formatRupiah(currentMonthSuccess)
-                : "Data tidak tersedia"}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {previousMonthSuccess
-                ? `${monthPercentageSuccessChange >= 0 ? "↑" : "↓"} ${Math.abs(monthPercentageSuccessChange).toFixed(2)}% dari bulan sebelumnya`
-                : "Tidak ada data bulan sebelumnya"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="w-full shadow-lg rounded-md border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Year Success</CardTitle>
-            <TrendingDown className="h-6 w-6 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currentYearSuccess
-                ? formatRupiah(currentYearSuccess)
-                : "Data tidak tersedia"}
-            </div>
-            {currentYearSuccess && previousYearSuccessData ? (
-              <p className="text-sm text-muted-foreground">
-                {yearPercentageSuccessChange >= 0 ? "↑" : "↓"}{" "}
-                {Math.abs(yearPercentageSuccessChange).toFixed(2)}% dari tahun
-                sebelumnya
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Tidak ada data tahun sebelumnya
-              </p>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="w-full shadow-lg rounded-md border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Month Failed</CardTitle>
-            <Wallet className="h-6 w-6 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currentMonthFailed
-                ? formatRupiah(currentMonthFailed)
-                : "Data tidak tersedia"}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {previousMonthFailed
-                ? `${monthPercentageFailedChange >= 0 ? "↑" : "↓"} ${Math.abs(monthPercentageFailedChange).toFixed(2)}% dari bulan sebelumnya`
-                : "Tidak ada data bulan sebelumnya"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="w-full shadow-lg rounded-md border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Year Failed</CardTitle>
-            <TrendingDown className="h-6 w-6 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currentYearFailed
-                ? formatRupiah(currentYearFailed)
-                : "Data tidak tersedia"}
-            </div>
-            {currentYearFailed && previousYearFailedData ? (
-              <p className="text-sm text-muted-foreground">
-                {yearPercentageFailedChange >= 0 ? "↑" : "↓"}{" "}
-                {Math.abs(yearPercentageFailedChange).toFixed(2)}% dari tahun
-                sebelumnya
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Tidak ada data tahun sebelumnya
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <TotalCardTransfer
+          loadingMonthStatusSuccess={loadingMonthStatusSuccess}
+          currentMonthSuccess={currentMonthSuccess}
+          previousMonthSuccess={previousMonthSuccess}
+          monthPercentageSuccessChange={monthPercentageSuccessChange}
+          loadingYearStatusSuccess={loadingYearStatusSuccess}
+          currentYearSuccess={currentYearSuccess}
+          previousYearSuccessData={previousYearSuccessData!}
+          yearPercentageSuccessChange={yearPercentageSuccessChange}
+          loadingMonthStatusFailed={loadingMonthStatusFailed}
+          currentMonthFailed={currentMonthFailed}
+          previousMonthFailed={previousMonthFailed}
+          monthPercentageFailedChange={monthPercentageFailedChange}
+          loadingYearStatusFailed={loadingYearStatusFailed}
+          currentYearFailed={currentYearFailed}
+          previousYearFailedData={previousYearFailedData!}
+          yearPercentageFailedChange={yearPercentageFailedChange}
+        />
       </div>
 
       <div className="flex-1 flex flex-col min-h-0 space-y-8 mt-4">
@@ -531,95 +166,12 @@ export default function DashboardTransfers() {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {loadingMonthTransferAmount ? (
-            <ChartSkeleton />
-          ) : (
-            <Card className="w-full shadow-lg rounded-md border">
-              <CardHeader>
-                <CardTitle>Monthly Amount</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ThemeChart
-                  options={{
-                    chart: {
-                      id: "monthly-amount-chart",
-                      toolbar: { show: false },
-                    },
-                    xaxis: {
-                      categories: [
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "May",
-                        "Jun",
-                        "Jul",
-                        "Aug",
-                        "Sep",
-                        "Oct",
-                        "Nov",
-                        "Dec",
-                      ],
-                    },
-                    yaxis: {
-                      title: { text: "Balance (Rp)" },
-                      labels: {
-                        formatter: (value) => formatRupiah(value),
-                      },
-                    },
-                    tooltip: {
-                      y: {
-                        formatter: (value) => formatRupiah(value),
-                      },
-                    },
-                    colors: ["#6366F1"],
-                  }}
-                  series={[{ name: "Monthly Balance", data: monthlyAmount }]}
-                  type="line"
-                  height={300}
-                />
-              </CardContent>
-            </Card>
-          )}
-          {loadingYearTransferAmount ? (
-            <ChartSkeleton />
-          ) : (
-            <Card className="w-full shadow-lg rounded-md border">
-              <CardHeader>
-                <CardTitle>Yearly Balances</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ThemeChart
-                  options={{
-                    chart: {
-                      id: "yearly-amount-chart",
-                      toolbar: { show: false },
-                    },
-                    xaxis: {
-                      categories: Array.from({ length: 5 }, (_, i) =>
-                        (new Date().getFullYear() - 4 + i).toString(),
-                      ),
-                    },
-                    yaxis: {
-                      title: { text: "Balance (Rp)" },
-                      labels: {
-                        formatter: (value) => formatRupiah(value),
-                      },
-                    },
-                    tooltip: {
-                      y: {
-                        formatter: (value) => formatRupiah(value),
-                      },
-                    },
-                    colors: ["#22C55E"],
-                  }}
-                  series={[{ name: "Yearly Amount", data: yearlyAmount }]}
-                  type="bar"
-                  height={300}
-                />
-              </CardContent>
-            </Card>
-          )}
+          <ChartDashboarTransfer
+            loadingMonthTransferAmount={loadingMonthTransferAmount}
+            loadingYearTransferAmount={loadingYearTransferAmount}
+            monthlyAmount={monthlyAmount}
+            yearlyAmount={yearlyAmount}
+          />
         </div>
       </div>
       <TableTransfer

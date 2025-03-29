@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRoleStoreAllRole from "@/hooks/admin/role/trashed/RestoreAll";
-import useModalRoleTrashed from "@/store/role/trashed/modal";
 
 export function RestoreAllRoleTrashed() {
   const {
@@ -37,7 +36,7 @@ export function RestoreAllRoleTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreAllRoleTrashed ? "Restoring..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

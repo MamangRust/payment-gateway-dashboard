@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
-import useModalTransaction from "@/store/transaction/modal";
 import useDeleteTransaction from "@/hooks/admin/transaction/DeleteTransaction";
 
 export function DeleteTransaction() {
@@ -41,7 +38,7 @@ export function DeleteTransaction() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedTransaction ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

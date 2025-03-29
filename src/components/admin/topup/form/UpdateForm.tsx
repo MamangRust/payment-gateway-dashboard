@@ -16,7 +16,7 @@ import AsyncSelect from "react-select/async";
 import { useToast } from "@/hooks/use-toast";
 import useCardStore from "@/store/card/card";
 import { debounce } from "@/helpers/debounce";
-import { FindByCardNumber } from "@/types/domain/request";
+import { FindAllCard, FindByCardNumber } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -82,10 +82,10 @@ const UpdateTopupForm = forwardRef<HTMLFormElement, TopupUpdateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -112,14 +112,11 @@ const UpdateTopupForm = forwardRef<HTMLFormElement, TopupUpdateFormProps>(
                     value: card.card_number,
                     label: card.card_number,
                   });
-                  console.log("test card", card);
-                  console.log("test card option", options);
                 }
               }
             }
 
             setCardOptions(options);
-            console.log("Updated cardOptions:", options);
           }
         } catch (error) {
           console.error("Failed to fetch initial cards:", error);
@@ -139,10 +136,10 @@ const UpdateTopupForm = forwardRef<HTMLFormElement, TopupUpdateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

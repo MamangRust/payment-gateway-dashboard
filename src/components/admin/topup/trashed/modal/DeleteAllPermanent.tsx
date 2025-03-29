@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentAllTopup from "@/hooks/admin/topup/trashed/DeleteAll";
-import useModalTopupTrashed from "@/store/topup/trashed/modal";
 
 export function DeletePermanetAllTopupTrashed() {
   const {
@@ -37,7 +36,7 @@ export function DeletePermanetAllTopupTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentAllTopupTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

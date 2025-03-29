@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentSaldo from "@/hooks/admin/saldo/trashed/Delete";
-import useModalSaldoTrashed from "@/store/saldo/trashed/modal";
 
 export function DeletePermanetSaldo() {
   const {
@@ -40,7 +39,7 @@ export function DeletePermanetSaldo() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentSaldoTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

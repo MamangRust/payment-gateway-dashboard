@@ -37,7 +37,7 @@ export function RestoreSaldo() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreSaldoTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

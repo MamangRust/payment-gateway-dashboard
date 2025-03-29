@@ -37,7 +37,7 @@ export function DeleteRole() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedRole ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

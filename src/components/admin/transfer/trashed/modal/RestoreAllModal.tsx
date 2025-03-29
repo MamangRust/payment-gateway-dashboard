@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreAllTransfer from "@/hooks/admin/transfer/trashed/RestoreAll";
-import useModalTransferTrashed from "@/store/transfer/trashed/modal";
 
 export function RestoreAllTransferTrashed() {
   const {
@@ -37,7 +36,7 @@ export function RestoreAllTransferTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreAllTransferTrashed ? "Restoring..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

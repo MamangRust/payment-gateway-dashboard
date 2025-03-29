@@ -12,7 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import useModalTopupTrashed from "@/store/topup/trashed/modal";
 import useTopupTrashedStore from "@/store/topup/trashed/trashed";
-import { topupColumns, topupTrashedColumns } from "@/components/admin/topup";
+import {  topupTrashedColumns } from "@/components/admin/topup";
 import { FindAllTopupTrashed } from "@/types/domain/request/topup";
 
 export default function useListTopupTrashed() {

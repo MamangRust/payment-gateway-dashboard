@@ -53,7 +53,7 @@ export function UpdateSaldo() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateSaldo ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

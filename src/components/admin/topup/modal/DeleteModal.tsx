@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeleteTopup from "@/hooks/admin/topup/DeleteTopup";
-import useModalTopup from "@/store/topup/modal";
 
 export function DeleteTopup() {
   const {
@@ -39,7 +38,7 @@ export function DeleteTopup() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedTopup ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

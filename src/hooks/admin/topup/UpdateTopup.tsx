@@ -19,8 +19,6 @@ export default function useUpdateTopup() {
 
     topup,
     findByIdTopup,
-    loadingGetTopup,
-    errorGetTopup,
   } = useTopupStore();
 
   const navigate = useNavigate();

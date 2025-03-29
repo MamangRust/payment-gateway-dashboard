@@ -59,7 +59,7 @@ export function UpdateTransaction() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateTransaction ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useDeleteTransfer from "@/hooks/admin/transfer/DeleteTransfer";
 import useDeletePermanentTransfer from "@/hooks/admin/transfer/trashed/Delete";
 
 export function DeletePermanetTransferTrashed() {
@@ -40,7 +39,7 @@ export function DeletePermanetTransferTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentTransferTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

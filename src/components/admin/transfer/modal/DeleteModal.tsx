@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
-import useModalCard from "@/store/card/modal";
 import useDeleteTransfer from "@/hooks/admin/transfer/DeleteTransfer";
 
 export function DeleteTransfer() {
@@ -40,7 +37,7 @@ export function DeleteTransfer() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedTransfer ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

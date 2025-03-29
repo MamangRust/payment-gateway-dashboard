@@ -36,7 +36,9 @@ export function DeletePermanetAllTransactionTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentAllTransactionTrashed
+              ? "Deleting..."
+              : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

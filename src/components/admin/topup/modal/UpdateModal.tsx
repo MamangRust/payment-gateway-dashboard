@@ -6,9 +6,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useModalTopup from "@/store/topup/modal";
 import UpdateTopupForm from "../form/UpdateForm";
-import { UpdateTopupFormValues } from "@/schemas";
 import useUpdateTopup from "@/hooks/admin/topup/UpdateTopup";
 
 export function UpdateTopup() {
@@ -56,7 +54,7 @@ export function UpdateTopup() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateTopup ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

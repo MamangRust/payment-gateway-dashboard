@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentAllCard from "@/hooks/admin/card/trashed/DeleteAll";
-import useModalCardTrashed from "@/store/card/trashed/modal";
 
 export function DeletePermanetAllCard() {
   const {
@@ -37,7 +36,7 @@ export function DeletePermanetAllCard() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentAllCardTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

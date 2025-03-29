@@ -54,7 +54,7 @@ export function UpdateMerchant() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateMerchant ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

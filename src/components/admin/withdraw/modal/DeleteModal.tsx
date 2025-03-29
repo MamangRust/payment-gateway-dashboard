@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
@@ -38,7 +37,7 @@ export function DeleteWithdraw() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedWithdraw ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

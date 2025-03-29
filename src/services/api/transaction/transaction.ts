@@ -217,7 +217,7 @@ class TransactionService {
   ): Promise<ApiResponseTransactionMonthMethod["data"]> {
     try {
       const response = await myApi.get(
-        "/transactions/monthly-payment-methods-by-card",
+        "/transactions/monthly-methods",
         {
           headers: { Authorization: `Bearer ${access_token}` },
           params: {

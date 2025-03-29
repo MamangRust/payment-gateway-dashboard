@@ -35,7 +35,7 @@ export function AddRole() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateRole ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

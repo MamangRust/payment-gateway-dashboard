@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
-import useModalSaldo from "@/store/saldo/modal";
 import useDeleteSaldo from "@/hooks/admin/saldo/DeleteSaldo";
 
 export function DeleteSaldo() {
@@ -41,7 +38,7 @@ export function DeleteSaldo() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedSaldo ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

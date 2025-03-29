@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -58,7 +57,7 @@ export function UpdateTransfer() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateTransfer ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

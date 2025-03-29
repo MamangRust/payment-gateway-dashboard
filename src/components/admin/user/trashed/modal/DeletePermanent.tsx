@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentUser from "@/hooks/admin/user/trashed/Delete";
-import useModalUserTrashed from "@/store/user/trashed/modal";
 
 export function DeletePermanetUserTrashed() {
   const {
@@ -40,7 +39,7 @@ export function DeletePermanetUserTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentUserTrashed ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

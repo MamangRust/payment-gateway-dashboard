@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreTransfer from "@/hooks/admin/transfer/trashed/Restore";
-import useModalTransferTrashed from "@/store/transfer/trashed/modal";
 
 export function RestoreTransfer() {
   const {
@@ -38,7 +37,7 @@ export function RestoreTransfer() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreTransferTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

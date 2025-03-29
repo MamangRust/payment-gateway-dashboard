@@ -1,15 +1,12 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeleteMerchant from "@/hooks/admin/merchant/DeleteMerchant";
-import useModalMerchant from "@/store/merchant/modal";
-import { Trash } from "lucide-react";
 
 export function DeleteMerchant() {
   const {
@@ -41,7 +38,7 @@ export function DeleteMerchant() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedMerchant ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -35,7 +35,7 @@ export function AddCard() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateCard ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

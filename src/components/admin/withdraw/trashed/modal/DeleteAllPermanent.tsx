@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useDeletePermanentAllWithdraw from "@/hooks/admin/withdraw/trashed/DeleteAll";
-import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
 
 export function DeletePermanetAllWithdrawTrashed() {
   const {
@@ -37,7 +36,9 @@ export function DeletePermanetAllWithdrawTrashed() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingDeletePermanentAllWithdrawTrashed
+              ? "Deleting..."
+              : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

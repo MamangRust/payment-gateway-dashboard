@@ -35,7 +35,7 @@ export function AddSaldo() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateSaldo ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

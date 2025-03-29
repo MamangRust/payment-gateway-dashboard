@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreWithdraw from "@/hooks/admin/withdraw/trashed/Restore";
-import useModalWithdrawTrashed from "@/store/withdraw/trashed/modal";
 
 export function RestoreWithdraw() {
   const {
@@ -38,7 +37,7 @@ export function RestoreWithdraw() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreWithdrawTrashed ? "Restore..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,8 +1,8 @@
 import { flexRender } from "@tanstack/react-table";
 import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
-import { TableHeaderSaldoProps } from "@/types/table";
+import { TableHeaderTopupProps } from "@/types/table";
 
-const TableHeaderSaldo = ({ table }: TableHeaderSaldoProps) => (
+const TableHeaderTopup = ({ table }: TableHeaderTopupProps) => (
   <TableHeader>
     {table.getHeaderGroups().map((headerGroup: any) => (
       <TableRow key={headerGroup.id}>
@@ -18,4 +18,4 @@ const TableHeaderSaldo = ({ table }: TableHeaderSaldoProps) => (
   </TableHeader>
 );
 
-export default TableHeaderSaldo;
+export default TableHeaderTopup;

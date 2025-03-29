@@ -32,7 +32,7 @@ export function AddMerchant() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateMerchant ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

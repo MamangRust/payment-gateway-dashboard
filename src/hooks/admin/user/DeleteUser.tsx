@@ -43,7 +43,7 @@ export default function useDeleteUser() {
           variant: "default",
         });
 
-        // navigate(window.location.pathname);
+        navigate(window.location.pathname);
       } else {
         toast({
           title: "Error",

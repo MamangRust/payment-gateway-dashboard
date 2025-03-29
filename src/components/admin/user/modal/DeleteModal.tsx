@@ -37,7 +37,7 @@ export function DeleteUser() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingTrashedUser ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

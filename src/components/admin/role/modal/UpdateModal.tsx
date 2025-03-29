@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,7 +49,7 @@ export function EditRole() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingUpdateRole ? "Updating..." : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

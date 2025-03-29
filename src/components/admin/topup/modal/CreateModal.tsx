@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,8 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CreateTopupForm from "../form/CreateForm";
-import useModalTopup from "@/store/topup/modal";
-import { CreateTopupFormValues } from "@/schemas";
 import useCreateTopup from "@/hooks/admin/topup/CreateTopup";
 
 export function AddTopup() {
@@ -38,7 +35,7 @@ export function AddTopup() {
             Cancel
           </Button>
           <Button variant="default" onClick={handleButtonSubmit}>
-            Submit
+            {loadingCreateTopup ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

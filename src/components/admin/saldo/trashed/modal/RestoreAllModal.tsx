@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useRestoreAllSaldo from "@/hooks/admin/saldo/trashed/RestoreAll";
-import useModalSaldoTrashed from "@/store/saldo/trashed/modal";
 
 export function RestoreAllSaldo() {
   const {
@@ -37,7 +36,7 @@ export function RestoreAllSaldo() {
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleSubmit}>
-            Delete
+            {loadingRestoreAllSaldoTrashed ? "Restoring..." : "Restore"}
           </Button>
         </DialogFooter>
       </DialogContent>
