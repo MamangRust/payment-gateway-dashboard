@@ -12,7 +12,7 @@ import UserTrashedCommand from "@/services/ipc/user/user_trashed";
 import UserTrashedService from "@/services/api/user/user_trashed";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useUserTrashedStore = create<UserTrashedStore>((set, get) => ({
+const useUserTrashedStore = create<UserTrashedStore>((set, _get) => ({
   users: null,
 
   pagination: {

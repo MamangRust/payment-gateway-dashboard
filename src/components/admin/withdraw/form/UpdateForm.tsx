@@ -9,7 +9,7 @@ import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { forwardRef, useCallback, useEffect, useState } from "react";
 import { WithdrawUpdateFormProps } from "@/types/form";
-import { FindByCardNumber } from "@/types/domain/request";
+import { FindAllCard, FindByCardNumber } from "@/types/domain/request";
 import { debounce } from "@/helpers/debounce";
 import useCardStore from "@/store/card/card";
 import { useToast } from "@/hooks/use-toast";
@@ -55,10 +55,10 @@ const UpdateWithdrawForm = forwardRef<HTMLFormElement, WithdrawUpdateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -111,10 +111,10 @@ const UpdateWithdrawForm = forwardRef<HTMLFormElement, WithdrawUpdateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

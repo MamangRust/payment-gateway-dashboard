@@ -19,7 +19,7 @@ import { MerchantUpdateFormProps } from "@/types/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef, useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { FindByIdUser } from "@/types/domain/request";
+import { FindAllUser, FindByIdUser } from "@/types/domain/request";
 
 interface UserOption {
   value: string;
@@ -67,10 +67,10 @@ const UpdateMerchantForm = forwardRef<HTMLFormElement, MerchantUpdateFormProps>(
       const fetchInitialUsers = async () => {
         setLoadingGetUsers(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllUser = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllUsers(searchReq);
@@ -121,10 +121,10 @@ const UpdateMerchantForm = forwardRef<HTMLFormElement, MerchantUpdateFormProps>(
         ) => {
           setLoadingGetUsers(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllUser = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllUsers(searchReq);

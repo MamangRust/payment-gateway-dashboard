@@ -13,7 +13,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import useMerchantStore from "@/store/merchant/merchant";
 import {
-  FindAllMerchantTransaction,
   FindAllTransactionByApiKey,
 } from "@/types/domain/request";
 import { merchantTransactionColumns } from "@/components/admin/merchant/table/transaction/table-column";

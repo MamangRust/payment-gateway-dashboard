@@ -31,8 +31,6 @@ export default function useUpdateTransaction() {
 
     transaction,
     findByIdTransaction,
-    loadingGetTransaction,
-    errorGetTransaction,
   } = useTransactionStore();
 
   const navigate = useNavigate();

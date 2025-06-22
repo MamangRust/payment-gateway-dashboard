@@ -16,7 +16,7 @@ import TransferService from "@/services/api/transfer/transfer";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useTransferStore = create<TransferStore>((set, get) => ({
+const useTransferStore = create<TransferStore>((set, _get) => ({
   transfers: null,
   transfer: null,
 

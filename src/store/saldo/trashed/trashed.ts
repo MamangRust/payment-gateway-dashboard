@@ -13,7 +13,7 @@ import { SaldoTrashedStore } from "@/types/state";
 import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useSaldoTrashedStore = create<SaldoTrashedStore>((set, get) => ({
+const useSaldoTrashedStore = create<SaldoTrashedStore>((set, _get) => ({
   saldos: null,
 
   pagination: {

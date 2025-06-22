@@ -15,7 +15,7 @@ import WithdrawCommand from "@/services/ipc/withdraw/withdraw";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useWithdrawStore = create<WithdrawStore>((set, get) => ({
+const useWithdrawStore = create<WithdrawStore>((set, _get) => ({
   withdraws: null,
   withdraw: null,
 

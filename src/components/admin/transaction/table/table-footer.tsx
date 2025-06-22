@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import PaginationDropdown from "@/components/admin/dropdown-pagination";
 import {
   TableFooterTransactionProps,
-  TableFooterTransferProps,
 } from "@/types/table";
 
 const TableFooterTransaction = ({

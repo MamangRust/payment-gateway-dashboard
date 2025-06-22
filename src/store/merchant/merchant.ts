@@ -18,7 +18,7 @@ import { getAccessToken } from "../auth";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useMerchantStore = create<MerchantStore>((set, get) => ({
+const useMerchantStore = create<MerchantStore>((set, _get) => ({
   merchants: null,
   merchant: null,
 
@@ -1194,7 +1194,7 @@ const useMerchantStore = create<MerchantStore>((set, get) => ({
       handleApiError(
         err,
         () => set({ loadingGetActiveMerchant: false }),
-        (message: any) => set({ errorGetActiveMerchant: null }),
+        () => set({ errorGetActiveMerchant: null }),
         null,
       );
     }

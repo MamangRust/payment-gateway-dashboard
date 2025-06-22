@@ -15,7 +15,7 @@ import { FindByCardNumberTopup } from "@/types/domain/request/topup/findByCardNu
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useTopupStore = create<TopupStore>((set, get) => ({
+const useTopupStore = create<TopupStore>((set, _get) => ({
   topups: null,
   topup: null,
 

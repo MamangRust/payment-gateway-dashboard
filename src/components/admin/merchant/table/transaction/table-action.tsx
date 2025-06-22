@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash, MoreHorizontal } from "lucide-react";
 import { TableActionMerchantTransactionProps } from "@/types/table";
-import useModalMerchant from "@/store/merchant/modal";
 import useModalTransaction from "@/store/transaction/modal";
 
 const TableActionMerchantTransaction = ({

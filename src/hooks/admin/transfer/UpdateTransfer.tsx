@@ -22,8 +22,6 @@ export default function useUpdateTransfer() {
 
     transfer,
     findByIdTransfer,
-    loadingGetTransfer,
-    errorGetTransfer,
   } = useTransferStore();
 
   const navigate = useNavigate();

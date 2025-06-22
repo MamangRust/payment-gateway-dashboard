@@ -2,11 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import useModalCard from "@/store/card/modal";
 import { UpdateCardFormValues, updateCardRequestSchema } from "@/schemas";
-import { FindByIdCard, FindByIdUser, UpdateCard } from "@/types/domain/request";
+import { FindByIdCard, UpdateCard } from "@/types/domain/request";
 import useCardStore from "@/store/card/card";
 import { z } from "zod";
 import { useEffect, useRef } from "react";
-import useUserStore from "@/store/user/user";
 
 export default function useUpdateCard() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editCardId } =
@@ -17,9 +16,6 @@ export default function useUpdateCard() {
   const {
     card,
     findByIdCard,
-    loadingGetCard,
-    errorGetCard,
-
     updateCard,
     setLoadingUpdateCard,
     loadingUpdateCard,

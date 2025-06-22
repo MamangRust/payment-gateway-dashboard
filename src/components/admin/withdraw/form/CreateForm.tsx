@@ -12,6 +12,7 @@ import { forwardRef, useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { WithdrawCreateFormProps } from "@/types/form";
+import { FindAllCard } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -45,10 +46,10 @@ const CreateWithdrawForm = forwardRef<HTMLFormElement, WithdrawCreateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -80,10 +81,10 @@ const CreateWithdrawForm = forwardRef<HTMLFormElement, WithdrawCreateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

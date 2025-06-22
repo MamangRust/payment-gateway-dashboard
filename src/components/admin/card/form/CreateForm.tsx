@@ -16,6 +16,7 @@ import AsyncSelect from "react-select/async";
 import useUserStore from "@/store/user/user";
 import { debounce } from "@/helpers/debounce";
 import { useToast } from "@/hooks/use-toast";
+import { FindAllUser } from "@/types/domain/request";
 
 const cardTypeOptions = [
   { value: "credit", label: "Credit Card" },
@@ -72,10 +73,10 @@ const CreateCardForm = forwardRef<HTMLFormElement, CardCreateFormProps>(
       const fetchInitialUsers = async () => {
         setLoadingGetUsers(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllUser = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllUsers(searchReq);
@@ -108,7 +109,7 @@ const CreateCardForm = forwardRef<HTMLFormElement, CardCreateFormProps>(
             const searchReq = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllUsers(searchReq);

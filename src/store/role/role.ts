@@ -16,7 +16,7 @@ import { FindAllRoleTrashed } from "@/types/domain/request/role/trashed/list";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useRoleStore = create<RoleStore>((set, get) => ({
+const useRoleStore = create<RoleStore>((set, _get) => ({
   Roles: null,
   Role: null,
 

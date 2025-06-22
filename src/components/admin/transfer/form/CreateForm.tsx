@@ -12,6 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { TransferCreateFormProps } from "@/types/form";
 import { debounce } from "@/helpers/debounce";
+import { FindAllCard } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -50,10 +51,10 @@ const CreateTransferForm = forwardRef<HTMLFormElement, TransferCreateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -84,10 +85,10 @@ const CreateTransferForm = forwardRef<HTMLFormElement, TransferCreateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

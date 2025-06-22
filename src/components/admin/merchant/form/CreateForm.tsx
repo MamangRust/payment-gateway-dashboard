@@ -12,6 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { debounce } from "@/helpers/debounce";
 import { useToast } from "@/hooks/use-toast";
+import { FindAllUser } from "@/types/domain/request";
 
 interface UserOption {
   value: string;
@@ -44,10 +45,10 @@ const CreateMerchantForm = forwardRef<HTMLFormElement, MerchantCreateFormProps>(
       const fetchInitialUsers = async () => {
         setLoadingGetUsers(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllUser = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllUsers(searchReq);
@@ -77,10 +78,10 @@ const CreateMerchantForm = forwardRef<HTMLFormElement, MerchantCreateFormProps>(
         ) => {
           setLoadingGetUsers(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllUser = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllUsers(searchReq);

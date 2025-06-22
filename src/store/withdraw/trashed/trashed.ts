@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -13,7 +12,7 @@ import { WithdrawTrashedStore } from "@/types/state";
 import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, get) => ({
+const useWithdrawTrashedStore = create<WithdrawTrashedStore>((set, _get) => ({
   withdraws: null,
 
   pagination: {

@@ -15,7 +15,7 @@ import { isTauri } from "@tauri-apps/api/core";
 import { FindByUser } from "@/types/domain/request/card/user";
 import { handleMessageAction } from "@/helpers/message";
 
-const useCardStore = create<CardStore>((set, get) => ({
+const useCardStore = create<CardStore>((set, _get) => ({
   cards: null,
   card: null,
 

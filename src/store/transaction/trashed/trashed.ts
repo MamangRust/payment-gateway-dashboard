@@ -13,7 +13,7 @@ import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
 const useTransactionTrashedStore = create<TransactionTrashedStore>(
-  (set, get) => ({
+  (set, _get) => ({
     transactions: null,
 
     pagination: {

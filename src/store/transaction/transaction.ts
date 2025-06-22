@@ -16,7 +16,7 @@ import TransactionService from "@/services/api/transaction/transaction";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useTransactionStore = create<TransactionStore>((set, get) => ({
+const useTransactionStore = create<TransactionStore>((set, _get) => ({
   transactions: null,
   transaction: null,
 

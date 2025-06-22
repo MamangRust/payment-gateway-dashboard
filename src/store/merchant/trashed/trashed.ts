@@ -11,7 +11,7 @@ import MerchantTrashedService from "@/services/api/merchant/merchant_trashed";
 import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useMerchantTrashedStore = create<MerchantTrashedStore>((set, get) => ({
+const useMerchantTrashedStore = create<MerchantTrashedStore>((set, _get) => ({
   merchants: null,
 
   pagination: {

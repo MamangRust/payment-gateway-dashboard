@@ -1,4 +1,3 @@
-import myApi from "@/helpers/api";
 import { handleApiError } from "@/helpers/handleApi";
 import { handleMessageAction } from "@/helpers/message";
 import { getAccessToken } from "@/store/auth";
@@ -13,7 +12,7 @@ import CardCommandTrashed from "@/services/ipc/card/card_trashed";
 import CardServiceTrashed from "@/services/api/card/card_trashed";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useCardTrashedStore = create<CardTrashedStore>((set, get) => ({
+const useCardTrashedStore = create<CardTrashedStore>((set, _get) => ({
   cards: null,
 
   pagination: {

@@ -12,7 +12,7 @@ import { TopupTrashedStore } from "@/types/state";
 import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useTopupTrashedStore = create<TopupTrashedStore>((set, get) => ({
+const useTopupTrashedStore = create<TopupTrashedStore>((set, _get) => ({
   topups: null,
 
   pagination: {

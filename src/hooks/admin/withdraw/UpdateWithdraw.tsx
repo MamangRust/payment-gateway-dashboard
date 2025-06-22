@@ -9,7 +9,6 @@ import {
 import { z } from "zod";
 import useModalWithdraw from "@/store/withdraw/modal";
 import { FindByIdWithdraw, UpdateWithdraw } from "@/types/domain/request";
-import { Edit } from "lucide-react";
 
 export default function useUpdateWithdraw() {
   const { isModalVisibleEdit, showModalEdit, hideModalEdit, editWithdrawId } =
@@ -23,8 +22,6 @@ export default function useUpdateWithdraw() {
 
     withdraw,
     findByIdWithdraw,
-    loadingGetWithdraw,
-    errorGetWithdraw,
   } = useWithdrawStore();
 
   const navigate = useNavigate();

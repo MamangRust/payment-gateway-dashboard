@@ -9,7 +9,7 @@ import { SaldoUpdateFormProps } from "@/types/form";
 import { useToast } from "@/hooks/use-toast";
 import useCardStore from "@/store/card/card";
 import { debounce } from "@/helpers/debounce";
-import { FindByCardNumber } from "@/types/domain/request";
+import { FindAllCard, FindByCardNumber } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -50,10 +50,10 @@ const UpdateSaldoForm = forwardRef<HTMLFormElement, SaldoUpdateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -107,10 +107,10 @@ const UpdateSaldoForm = forwardRef<HTMLFormElement, SaldoUpdateFormProps>(
         ) => {
           setLoadingGetCards(true);
           try {
-            const searchReq = {
+            const searchReq: FindAllCard = {
               search: inputValue,
               page: 1,
-              pageSize: 10,
+              page_size: 10,
               toast: toast,
             };
             await findAllCards(searchReq);

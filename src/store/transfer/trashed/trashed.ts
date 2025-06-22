@@ -12,7 +12,7 @@ import { TransferTrashedStore } from "@/types/state";
 import { create } from "zustand";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useTransferTrashedStore = create<TransferTrashedStore>((set, get) => ({
+const useTransferTrashedStore = create<TransferTrashedStore>((set, _get) => ({
   transfers: null,
 
   pagination: {

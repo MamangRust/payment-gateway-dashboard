@@ -12,7 +12,7 @@ import RoleTrashedCommand from "@/services/ipc/role/role_trashed";
 import RoleTrashedService from "@/services/api/role/role_trashed";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useRoleTrashedStore = create<RoleTrashedStore>((set, get) => ({
+const useRoleTrashedStore = create<RoleTrashedStore>((set, _get) => ({
   Roles: null,
 
   pagination: {

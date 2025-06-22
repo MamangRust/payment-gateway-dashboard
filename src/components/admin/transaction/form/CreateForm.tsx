@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { TransactionCreateFormProps } from "@/types/form";
 import useMerchantStore from "@/store/merchant/merchant";
+import { FindAllCard, FindAllMerchant } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -94,10 +95,10 @@ const CreateTransactionForm = forwardRef<
     const fetchInitialCards = async () => {
       setLoadingGetCards(true);
       try {
-        const searchReq = {
+        const searchReq: FindAllCard = {
           search: "",
           page: 1,
-          pageSize: 10,
+          page_size: 10,
           toast: toast,
         };
         await findAllCards(searchReq);
@@ -125,10 +126,10 @@ const CreateTransactionForm = forwardRef<
     const fetchInitialMerchants = async () => {
       setLoadingGetMerchants(true);
       try {
-        const searchReq = {
+        const searchReq: FindAllMerchant = {
           search: "",
           page: 1,
-          pageSize: 10,
+          page_size: 10,
           toast: toast,
         };
         await findAllMerchants(searchReq);
@@ -157,10 +158,10 @@ const CreateTransactionForm = forwardRef<
       async (inputValue: string, callback: (options: CardOption[]) => void) => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: inputValue,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -198,10 +199,10 @@ const CreateTransactionForm = forwardRef<
       ) => {
         setLoadingGetMerchants(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllMerchant = {
             search: inputValue,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllMerchants(searchReq);

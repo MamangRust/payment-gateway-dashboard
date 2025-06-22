@@ -12,6 +12,7 @@ import AsyncSelect from "react-select/async";
 import { useToast } from "@/hooks/use-toast";
 import useCardStore from "@/store/card/card";
 import { debounce } from "@/helpers/debounce";
+import { FindAllCard } from "@/types/domain/request";
 
 interface CardOption {
   value: string;
@@ -62,10 +63,10 @@ const UpdateTransferForm = forwardRef<HTMLFormElement, TransferUpdateFormProps>(
       const fetchInitialCards = async () => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: "",
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -127,10 +128,10 @@ const UpdateTransferForm = forwardRef<HTMLFormElement, TransferUpdateFormProps>(
       debounce(async (inputValue, callback) => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: inputValue,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);

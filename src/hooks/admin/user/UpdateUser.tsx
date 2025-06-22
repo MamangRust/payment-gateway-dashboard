@@ -19,8 +19,6 @@ export default function useUpdateUser() {
 
     user,
     findById,
-    loadingGetUser,
-    errorGetUser,
   } = useUserStore();
 
   const navigate = useNavigate();

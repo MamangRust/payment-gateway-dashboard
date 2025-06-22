@@ -11,12 +11,11 @@ import {
 import { getAccessToken } from "../auth";
 import UserService from "@/services/api/user/user";
 import UserCommand from "@/services/ipc/user/user";
-import { FindAllUserTrashed } from "@/types/domain/request/user/trashed/list";
 
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useUserStore = create<UserStore>((set, get) => ({
+const useUserStore = create<UserStore>((set, _get) => ({
   users: null,
   user: null,
 
@@ -64,7 +63,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   setLoadingUpdateUser: (value: boolean) => set({ loadingUpdateUser: value }),
   setLoadingTrashedUser: (value: boolean) => set({ loadingTrashedUser: value }),
 
-  findAllUsers: async (req: FindAllUserTrashed) => {
+  findAllUsers: async (req: FindAllUser) => {
     set({ loadingGetUsers: true, errorGetUsers: null });
     try {
       const token = getAccessToken();

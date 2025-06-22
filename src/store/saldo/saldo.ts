@@ -17,7 +17,7 @@ import SaldoService from "@/services/api/saldo/saldo";
 import { handleMessageAction } from "@/helpers/message";
 import { isTauri } from "@tauri-apps/api/core";
 
-const useSaldoStore = create<SaldoStore>((set, get) => ({
+const useSaldoStore = create<SaldoStore>((set, _get) => ({
   saldos: null,
   saldo: null,
 

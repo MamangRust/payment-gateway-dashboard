@@ -18,7 +18,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import TableHeaderCard from "./table-header";
 import TableBodyCard from "./table-body";
 import TableFooterCard from "./table-footer";
-import useModalCard from "@/store/card/modal";
 
 const TableCard = ({
   search,

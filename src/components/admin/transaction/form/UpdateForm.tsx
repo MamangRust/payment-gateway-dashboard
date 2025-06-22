@@ -18,7 +18,7 @@ import {
 import { TransactionUpdateFormProps } from "@/types/form";
 import useMerchantStore from "@/store/merchant/merchant";
 import { useToast } from "@/hooks/use-toast";
-import { FindByCardNumber, FindByIdMerchant } from "@/types/domain/request";
+import { FindAllCard, FindAllMerchant, FindByCardNumber, FindByIdMerchant } from "@/types/domain/request";
 import { debounce } from "@/helpers/debounce";
 import useCardStore from "@/store/card/card";
 
@@ -109,10 +109,10 @@ const UpdateTransactionForm = forwardRef<
     const fetchInitialCards = async () => {
       setLoadingGetCards(true);
       try {
-        const searchReq = {
+        const searchReq: FindAllCard = {
           search: "",
           page: 1,
-          pageSize: 10,
+          page_size: 10,
           toast: toast,
         };
         await findAllCards(searchReq);
@@ -162,10 +162,10 @@ const UpdateTransactionForm = forwardRef<
     const fetchInitialMerchants = async () => {
       setLoadingGetMerchants(true);
       try {
-        const searchReq = {
+        const searchReq: FindAllMerchant = {
           search: "",
           page: 1,
-          pageSize: 10,
+          page_size: 10,
           toast: toast,
         };
         await findAllMerchants(searchReq);
@@ -216,10 +216,10 @@ const UpdateTransactionForm = forwardRef<
       async (inputValue: string, callback: (options: CardOption[]) => void) => {
         setLoadingGetCards(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllCard = {
             search: inputValue,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllCards(searchReq);
@@ -259,10 +259,10 @@ const UpdateTransactionForm = forwardRef<
       ) => {
         setLoadingGetMerchants(true);
         try {
-          const searchReq = {
+          const searchReq: FindAllMerchant = {
             search: inputValue,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             toast: toast,
           };
           await findAllMerchants(searchReq);
